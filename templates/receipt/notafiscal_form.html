@@ -1,0 +1,115 @@
+{% extends 'receipt/index.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Cadastrar Nota Fiscal{% endblock %}
+
+{% block content %}
+<div class="container mt-5 d-flex justify-content-center">
+  <div class="card shadow-lg border-0 rounded-4" style="max-width: 700px;">
+    <div class="card-body p-5">
+      
+      <!-- Título dinâmico -->
+    <h2 class="text-center fw-bold mb-4 text-primary">
+    <i class="bi bi-file-earmark-text me-2"></i>
+    {% if form.instance.pk %}
+        Editar Nota Fiscal
+    {% else %}
+        Cadastrar Nota Fiscal
+    {% endif %}
+    </h2>
+
+
+      <!-- Mensagens de sucesso/erro -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} mt-3">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="row g-4">
+
+          <!-- Turno -->
+          <div class="col-12 col-md-6">
+            <label for="id_turno" class="form-label">
+              <i class="bi bi-clock-fill text-secondary me-1"></i> Turno
+            </label>
+            {{ form.turno|add_class:"form-control text-muted"|attr:"required" }}
+          </div>
+
+          <!-- Número da Nota Fiscal -->
+          <div class="col-12 col-md-6">
+            <label for="id_nf" class="form-label">
+              <i class="bi bi-receipt text-secondary me-1"></i> Nº da Nota
+            </label>
+            {{ form.nf|add_class:"form-control text-muted"|attr:"placeholder:Ex: 2024-001"|attr:"required" }}
+          </div>
+
+          <!-- Unidade de Origem -->
+          <div class="col-12 col-md-6">
+            <label for="id_un_origem" class="form-label">
+              <i class="bi bi-buildings-fill text-secondary me-1"></i> UN de Origem
+            </label>
+            {{ form.un_origem|add_class:"form-control text-muted"|attr:"placeholder:Ex: UN10"|attr:"required" }}
+          </div>
+
+          <!-- Quantidade de Pallets -->
+          <div class="col-12 col-md-6">
+            <label for="id_qnt_pallet" class="form-label">
+              <i class="bi bi-boxes text-secondary me-1"></i> QNT de Pallets
+            </label>
+            {{ form.qnt_pallet|add_class:"form-control text-muted"|attr:"placeholder:Ex: 10"|attr:"required" }}
+          </div>
+
+          <!-- Tipo de Veículo -->
+          <div class="col-12 col-md-6">
+            <label for="id_tipo_veiculo" class="form-label">
+              <i class="bi bi-truck-front-fill text-secondary me-1"></i> Tipo de Veículo
+            </label>
+            {{ form.tipo_veiculo|add_class:"form-control text-muted"|attr:"placeholder:Ex: Truck"|attr:"required" }}
+          </div>
+
+          <!-- Peso Bruto -->
+          <div class="col-12 col-md-6">
+            <label for="id_peso_nota" class="form-label">
+              <i class="bi bi-speedometer2 text-secondary me-1"></i> Peso Bruto
+            </label>
+            {{ form.peso_nota|add_class:"form-control text-muted"|attr:"type:text"|attr:"placeholder:Ex: 1.250 kg"|attr:"required" }}
+          </div>
+
+        </div>
+
+        <!-- Botões -->
+        <div class="d-flex justify-content-end mt-4 gap-2">
+          <a href="{% url 'index' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle me-1"></i> Cancelar
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save-fill me-1"></i> Salvar
+          </button>
+        </div>
+
+        <!-- Erros -->
+        {% if form.errors %}
+        <div class="alert alert-danger mt-4">
+          <strong>Erros no formulário:</strong>
+          <ul class="mb-0">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

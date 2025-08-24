@@ -1,0 +1,74 @@
+{% extends 'receipt/index.html' %}
+{% load static %}
+
+{% block title %}Excluir Carga{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center fw-bold mb-4" style="color:#dc3545;">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>Excluir Carga
+    </h2>
+
+    <p class="text-center mb-4">Você está prestes a excluir a seguinte carga. Confira os detalhes antes de prosseguir:</p>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- Card da carga -->
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 1rem; background-color:#f8f9fa;">
+                <div class="card-body d-flex flex-column">
+
+                    <!-- Destino -->
+                    <h5 class="card-title fw-bold mb-2" style="color:#1e3a8a;">
+                        Destino: <span class="text-dark">{{ object.destino|default:"Não informado" }}</span>
+                    </h5>
+
+                    <!-- Número de Transporte -->
+                    <h6 class="mb-3">
+                        N° Transporte: 
+                        <span class="fw-bold" style="color:#d4af37;">{{ object.numero_transporte|default:"Não informado" }}</span>
+                    </h6>
+
+                    <!-- Informações -->
+                    <ul class="list-unstyled mb-3">
+                        <li><strong>Data:</strong> {{ object.data|default:"Não informado" }}</li>
+                        <li><strong>OT:</strong> {{ object.ot|default:"Não informado" }}</li>
+                        <li><strong>Entrega/Box:</strong> {{ object.entrega_box|default:"Não informado" }}</li>
+                        <li><strong>Tipo de Veículo:</strong> {{ object.tipo_veiculo|default:"Não informado" }}</li>
+                        <li><strong>Separador:</strong> {{ object.outros_separadores|default:"Não informado" }}</li>
+                        <li><strong>Conferente:</strong> {{ object.conferente|default:"Não informado" }}</li>
+                        <li><strong>Início Separação:</strong> {{ object.inicio_separacao|default:"Não informado" }}</li>
+                    </ul>
+
+                    <!-- Documentos -->
+                    <div class="mb-3">
+                        <strong>Documentos:</strong>
+                        <ul class="mb-0 ps-3">
+                            {% if object.resumo_conf %}<li>Resumo Conf. Impresso</li>{% endif %}
+                            {% if object.resumo_motorista %}<li>Resumo Motorista Impresso</li>{% endif %}
+                            {% if object.etiquetas_cds %}<li>Etiquetas Enviadas CDs</li>{% endif %}
+                            {% if object.carga_gerada %}<li>Carga Gerada</li>{% endif %}
+                            {% if not object.resumo_conf and not object.resumo_motorista and not object.etiquetas_cds and not object.carga_gerada %}
+                                <li>Nenhum documento gerado</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    <!-- Botões no estilo Cenário Expedição -->
+                    <div class="mt-auto d-flex justify-content-center gap-3 flex-wrap">
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger fw-bold">
+                                <i class="bi bi-trash-fill"></i> Excluir
+                            </button>
+                        </form>
+                        <a href="{% url 'expedicao:cargas_list' %}" class="btn btn-sm btn-outline-secondary fw-bold">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

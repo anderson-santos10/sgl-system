@@ -1,0 +1,25 @@
+{% extends 'receipt/index.html' %}
+
+{% block title %}Detalhes da Carga {{ carga.numero_transporte }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="fw-bold mb-4 text-primary">Carga {{ carga.numero_transporte }}</h2>
+
+    <p><strong>Destino:</strong> {{ carga.destino }}</p>
+    <p><strong>Data:</strong> {{ carga.data }}</p>
+    <p><strong>OT:</strong> {{ carga.ot }}</p>
+    <p><strong>Entrega/Box:</strong> {{ carga.entrega_box }}</p>
+    <p><strong>Tipo de Veículo:</strong> {{ carga.tipo_veiculo }}</p>
+    <p><strong>Separador:</strong> {{ carga.outros_separadores }}</p>
+    <p><strong>Conferente:</strong> {{ carga.conferente }}</p>
+
+    <!-- Campo de observações -->
+    <div class="mb-3">
+        <label for="observacoes" class="form-label fw-semibold">Observações</label>
+        <textarea id="observacoes" class="form-control" rows="4" placeholder="Escreva algo sobre a carga…">{{ carga.observacoes }}</textarea>
+    </div>
+
+    <a href="{% url 'expedicao:cargas_list' %}" class="btn btn-secondary mt-3">Voltar</a>
+</div>
+{% endblock %}

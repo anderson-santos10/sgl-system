@@ -1,0 +1,162 @@
+{% extends 'receipt/index.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Controle de Separação{% endblock %}
+
+{% block content %}
+<div class="container mt-3 d-flex justify-content-center">
+    <div class="w-100" style="max-width: 900px; min-width: 600px;">
+        <form method="post" class="border rounded shadow-sm p-4 bg-light" novalidate>
+            {% csrf_token %}
+
+            <div class="card shadow-lg border-0 rounded-4 mx-auto" style="max-width: 700px;">
+                <div class="card-body p-5">
+
+                    <!-- Título -->
+                    <h2 class="text-center fw-bold mb-4 text-primary">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        {% if form.instance.pk %}Editar Carga{% else %}Lançar Carga{% endif %}
+                    </h2>
+
+                    <div class="row g-3">
+
+                        <!-- Linha 1: Data e Nº Transporte -->
+                        <div class="col-12 col-md-6">
+                            <label for="id_data" class="form-label fw-semibold">Data <span class="text-danger">*</span></label>
+                            <input type="date" name="data" id="id_data" class="form-control"
+                                   {% if form.instance.pk %}value="{{ form.instance.data|date:'Y-m-d' }}"{% endif %} required>
+                            <div class="invalid-feedback">Por favor, selecione a data.</div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="id_numero_transporte" class="form-label fw-semibold">Nº Transporte (Carga) <span class="text-danger">*</span></label>
+                            <input type="text" name="numero_transporte" id="id_numero_transporte" class="form-control"
+                                   {% if form.instance.pk %}value="{{ form.instance.numero_transporte }}"{% endif %}
+                                   placeholder="Digite o número da carga" required>
+                            <div class="invalid-feedback">Por favor, informe o número da carga.</div>
+                        </div>
+
+                        <!-- Linha 2: Destino e OT -->
+                        <div class="col-12 col-md-6">
+                            <label for="id_destino" class="form-label fw-semibold">Destino <span class="text-danger">*</span></label>
+                            <input type="text" name="destino" id="id_destino" class="form-control"
+                                   {% if form.instance.pk %}value="{{ form.instance.destino }}"{% endif %}
+                                   placeholder="Digite o destino" required>
+                            <div class="invalid-feedback">Por favor, informe o destino.</div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="id_ot" class="form-label fw-semibold">OT</label>
+                            <input type="text" name="ot" id="id_ot" class="form-control"
+                                   {% if form.instance.pk %}value="{{ form.instance.ot }}"{% endif %}
+                                   placeholder="Ordem de Transporte">
+                        </div>
+
+                        <!-- Linha 3: Entrega/Box e Tipo de Veículo -->
+                        <div class="col-12 col-md-6">
+                            <label for="id_entrega_box" class="form-label fw-semibold">Entrega/Box</label>
+                            <input type="text" name="entrega_box" id="id_entrega_box" class="form-control"
+                                   {% if form.instance.pk %}value="{{ form.instance.entrega_box }}"{% endif %}
+                                   placeholder="Local de entrega ou box">
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="tipo_veiculo" class="form-label fw-semibold">Tipo de Veículo</label>
+                            <select name="tipo_veiculo" id="tipo_veiculo" class="form-select" required>
+                                <option value="" {% if not form.instance.tipo_veiculo %}selected{% endif %}>
+                                    Selecione o tipo de veículo
+                                </option>
+                                {% for tipo in tipos_veiculo %}
+                                    <option value="{{ tipo }}"
+                                        {% if form.instance.tipo_veiculo|default_if_none:""|lower == tipo|lower %}selected{% endif %}>
+                                        {{ tipo|capfirst }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Por favor, selecione o tipo de veículo.</div>
+                        </div>
+
+                        <!-- Linha 4: Separador e Conferente -->
+                        <div class="col-12 col-md-6">
+                            <label for="id_outros_separadores" class="form-label fw-semibold">Separador</label>
+                            <input type="text" name="outros_separadores" id="id_outros_separadores" class="form-control"
+                                   {% if form.instance.pk %}value="{{ form.instance.outros_separadores }}"{% endif %}
+                                   placeholder="Nome do separador">
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="id_conferente" class="form-label fw-semibold">Conferente</label>
+                            <input type="text" name="conferente" id="id_conferente" class="form-control"
+                                   {% if form.instance.pk %}value="{{ form.instance.conferente }}"{% endif %}
+                                   placeholder="Nome do conferente">
+                        </div>
+
+                        <!-- Linha 5: Início Separação -->
+                        <div class="col-12 col-md-6">
+                            <label for="id_inicio_separacao" class="form-label fw-semibold">Início Separação</label>
+                            <input type="time" name="inicio_separacao" id="id_inicio_separacao" class="form-control"
+                                   {% if form.instance.pk %}value="{{ form.instance.inicio_separacao|time:'H:i' }}"{% endif %}>
+                        </div>
+
+                        <!-- Documentos -->
+                        <div class="col-12">
+                            <fieldset class="mb-3">
+                                <legend class="fw-semibold text-primary small">
+                                    <i class="bi bi-file-earmark-check me-1"></i>Documentos
+                                </legend>
+                                <div class="row">
+                                    <div class="col-6 d-flex flex-column gap-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="resumo_conf" id="resumo_conf" value="1"
+                                                   {% if form.instance.resumo_conf %}checked{% endif %}>
+                                            <label class="form-check-label fw-semibold" for="resumo_conf">Resumo Conf. Impresso</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="resumo_motorista" id="resumo_motorista" value="1"
+                                                   {% if form.instance.resumo_motorista %}checked{% endif %}>
+                                            <label class="form-check-label fw-semibold" for="resumo_motorista">Resumo Motorista Impresso</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 d-flex flex-column gap-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="etiquetas_cds" id="etiquetas_cds" value="1"
+                                                   {% if form.instance.etiquetas_cds %}checked{% endif %}>
+                                            <label class="form-check-label fw-semibold" for="etiquetas_cds">Etiquetas Enviadas CDs</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="carga_gerada" id="carga_gerada" value="1"
+                                                   {% if form.instance.carga_gerada %}checked{% endif %}>
+                                            <label class="form-check-label fw-semibold" for="carga_gerada">Carga Gerada</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+
+                    </div>
+
+                    <!-- Botão -->
+                    <div class="text-end mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-1"></i>Salvar
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+(() => {
+    'use strict';
+    const forms = document.querySelectorAll('form');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+})();
+</script>
+{% endblock %}

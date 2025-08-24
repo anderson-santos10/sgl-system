@@ -1,0 +1,76 @@
+{% extends 'receipt/index.html' %}
+
+{% block title %}Cargas Concluídas{% endblock %}
+
+{% block content %}
+<style>
+    .card:hover {
+        transform: translateY(-5px);
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    }
+
+    /* Filtro fixo na lateral direita */
+    .filtro-fixo {
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        width: 220px;
+        z-index: 1000;
+    }
+</style>
+
+<div class="container-fluid mt-5 px-lg-4">
+    <h1 class="text-center fw-bold mb-4" style="color:#1e3a8a;">CARGAS CONCLUIDAS</h1>
+
+    <!-- Filtro fixo à direita -->
+    <div class="filtro-fixo card shadow-sm p-3 mb-4">
+        <form method="get" class="d-flex flex-column">
+            <label for="data_filtro" class="fw-bold mb-2">Escolha a Data:</label>
+            <input type="date" id="data_filtro" name="data" class="form-control mb-2"
+                   value="{{ request.GET.data }}">
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        </form>
+    </div>
+
+    <div class="row g-4 justify-content-start">
+        {% for carga in cargas %}
+        <!-- Ajuste para 6 cards em telas XL -->
+        <div class="col-6 col-md-4 col-lg-3 col-xl-2" id="carga-{{ carga.id }}">
+            <div class="card shadow-sm border-0 h-100 d-flex flex-column" 
+                 style="border-radius: 1rem; background-color:#f8f9fa;">
+
+                <div class="card-body d-flex flex-column mt-2">
+                    <h5 class="card-title fw-bold mb-2" style="color:#1e3a8a;">
+                        <i class="bi bi-truck"></i> Destino: 
+                        <span class="text-dark">{{ carga.destino|default:"Não informado" }}</span>
+                    </h5>
+
+                    <h6 class="mb-2">
+                        <i class="bi bi-hash"></i> N° Transporte: 
+                        <a href="{% url 'expedicao:detalhe_carga' carga.id %}" class="fw-bold text-decoration-none" style="color:#d4af37;">
+                            {{ carga.numero_transporte|default:"Não informado" }}
+                        </a>
+                    </h6>
+
+                    <ul class="list-unstyled mb-2">
+                        <li><i class="bi bi-calendar-date"></i> <strong>Data:</strong> {{ carga.data|date:"d/m/Y"|default:"Não informado" }}</li>
+                        <li><i class="bi bi-box"></i> <strong>Entrega/Box:</strong> {{ carga.entrega_box|default:"Não informado" }}</li>
+                        <li><i class="bi bi-truck-front"></i> <strong>Tipo de Veículo:</strong> {{ carga.tipo_veiculo|default:"Não informado" }}</li>
+                    </ul>
+
+                    <div class="mt-auto">
+                        <button type="button" class="btn btn-outline-success w-100" disabled>
+                            <i class="bi bi-check-circle-fill"></i> Concluído
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center text-muted mt-4">Nenhuma carga concluída encontrada.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
