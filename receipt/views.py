@@ -1,3 +1,5 @@
+from django.db.models import Sum
+from datetime import date
 from django.views.generic import ListView, CreateView, UpdateView
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -7,6 +9,35 @@ from django.views import View
 
 def salvo_sucesso_view(request):
     return render(request, "receipt/sucesso.html")
+
+class DashboardView(View):
+    def get(self, request):
+        hoje = date.today()
+
+        # Filtra somente notas do dia
+        notas_hoje = NotaFiscal.objects.filter(data=hoje)
+        notas = notas_hoje.count()
+        
+        # Quantidade de pallets por unidade
+        total_peso = notas_hoje.aggregate(total_peso=Sum('peso_nota'))['total_peso'] or 0
+        un10 = notas_hoje.filter(un_origem="UN10").aggregate(Sum("qnt_pallet"))["qnt_pallet__sum"] or 0
+        un20 = notas_hoje.filter(un_origem="UN20").aggregate(Sum("qnt_pallet"))["qnt_pallet__sum"] or 0
+        un40 = notas_hoje.filter(un_origem="UN40").aggregate(Sum("qnt_pallet"))["qnt_pallet__sum"] or 0
+        
+        # Total
+        total = un10 + un20 + un40
+
+        context = {
+            "total_peso": total_peso,
+            "notas": notas,
+            "hoje": hoje,
+            "un10": un10,
+            "un20": un20,
+            "un40": un40,
+            "total": total,
+        }
+
+        return render(request, "home.html", context)
 
 
 class ReceiptListView(ListView):

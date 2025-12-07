@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+{% static 'css/css.style.css'%}
+
+
+{% block title %}Cenário de Carregamento{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary fw-bold">
+        <i class="bi bi-box-seam me-2"></i> Cenário de Carregamento
+    </h2>
+
+    <a href="{% url 'expedicao:inserir_carga' %}" class="btn btn-success btn-insert">
+        <i class="bi bi-plus-circle me-1"></i> Inserir Carga
+    </a>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Lecom</th>
+                    <th>Cargas</th>
+                    <th>Seg</th>
+                    <th>Veículo</th>
+                    <th>Destino</th>
+                    <th>UF</th>
+                    <th>Peso (Kg)</th>
+                    <th>M³</th>
+                    <th>Data</th>
+                    <th>T</th>
+                    <th>Entregas</th>
+                    <th>MOD</th>
+                    <th>Observação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% regroup cargas by lecom as cargas_por_lecom %}
+                {% for grupo_lecom in cargas_por_lecom %}
+                    {% for carga in grupo_lecom.list %}
+                        <tr>
+                            {% if forloop.first %}
+                                <td rowspan="{{ grupo_lecom.list|length }}">{{ grupo_lecom.grouper|default:"-" }}</td>
+                                <td rowspan="{{ grupo_lecom.list|length }}">{{ carga.numero_transporte|default:"-" }}</td>
+                                <td rowspan="{{ grupo_lecom.list|length }}">{{ carga.seg|default:"-" }}</td>
+                                <td rowspan="{{ grupo_lecom.list|length }}">{{ carga.tipo_veiculo|default:"-" }}</td>
+                                <td rowspan="{{ grupo_lecom.list|length }}">{{ carga.destino|default:"-" }}</td>
+                                <td rowspan="{{ grupo_lecom.list|length }}">{{ carga.uf|default:"-" }}</td>
+                                <td rowspan="{{ grupo_lecom.list|length }}">{{ carga.peso|default:"-" }}</td>
+                                <td rowspan="{{ grupo_lecom.list|length }}">{{ carga.m3|default:"-" }}</td>
+                                <td rowspan="{{ grupo_lecom.list|length }}">{{ carga.data|date:"d/m/Y" }}</td>
+                            {% endif %}
+                            <td>{{ carga.t|default:"-" }}</td>
+                            <td>{{ carga.entregas|default:"-" }}</td>
+                            <td>{{ carga.mod|default:"-" }}</td>
+                            <td>{{ carga.observacao|default:"-" }}</td>
+                        </tr>
+                    {% endfor %}
+                {% empty %}
+                    <tr>
+                        <td colspan="13" class="text-center text-muted">Nenhuma carga registrada</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

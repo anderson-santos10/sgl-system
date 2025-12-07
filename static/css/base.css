@@ -1,0 +1,199 @@
+/* =======================================================
+   Global
+======================================================= */
+body {
+    background: #fff !important;
+    font-family: "Inter", Arial, sans-serif;
+}
+
+/* Títulos */
+h2 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    color: #0d6efd;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 3px solid rgba(13, 110, 253, 0.25);
+    letter-spacing: 0.5px;
+}
+
+/* Hover suave em cards */
+.card:hover {
+    transform: translateY(-6px);
+    transition: 0.25s ease;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+}
+
+/* =======================================================
+   Sidebar
+======================================================= */
+.sidebar {
+    width: 69px;
+    height: 100vh;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    background-color: #3b82f6;
+    overflow: hidden;
+    transition: width 0.3s ease;
+    padding: 10px 0;
+    z-index: 100;
+}
+
+.sidebar:hover {
+    width: 203px;
+}
+
+/* Links padrões da sidebar */
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    color: #fff !important;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background-color 0.25s ease, padding 0.25s ease;
+}
+
+.sidebar a:hover {
+    background-color: rgba(255,255,255,0.15);
+}
+
+/* Ícones */
+.sidebar a i {
+    min-width: 40px;
+    font-size: 1.3rem;
+    text-align: center;
+}
+
+/* Label dos links */
+.sidebar a span {
+    opacity: 0;
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar:hover a span {
+    opacity: 1;
+}
+
+/* =======================================================
+   Accordion (submenu)
+======================================================= */
+.accordion-item {
+    border: none !important;
+    background: transparent !important;
+    margin: 0;
+    padding: 0;
+}
+
+/* Cabeçalho do accordion */
+.accordion-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    background: transparent !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: none !important;
+    transition: background-color 0.2s ease;
+}
+
+.accordion-button:hover {
+    background-color: rgba(255,255,255,0.12);
+}
+
+.accordion-button::after {
+    transform: scale(0.8);
+}
+
+/* Ícone no accordion */
+.accordion-button i {
+    min-width: 40px;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+/* Corpo do submenu */
+.accordion-body {
+    padding: 5px 5px;
+    display: none;
+}
+
+/* Links do submenu */
+.accordion-body a {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    padding: 6px 12px;
+    margin: 2px 0;
+    font-size: 0.88rem;
+    color: #e5e7eb;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+.accordion-body a:hover {
+    background-color: rgba(255,255,255,0.18);
+    transform: translateX(4px);
+}
+
+/* Exibir submenu somente quando aberto */
+.sidebar:hover .accordion-body {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Ocultar texto quando sidebar está retraída */
+.sidebar .accordion-button span,
+.sidebar .accordion-body {
+    display: none;
+}
+
+.sidebar:hover .accordion-button span,
+.sidebar:hover .accordion-body {
+    display: flex;
+}
+
+/* =======================================================
+   Avatar
+======================================================= */
+.profile {
+    margin-top: auto;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.profile img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.4);
+    transition: transform 0.2s ease;
+}
+
+.profile img:hover {
+    transform: scale(1.07);
+}
+
+/* =======================================================
+   Conteúdo
+======================================================= */
+.content {
+    width: 100%;
+    padding: 20px;
+    margin-left: 70px;
+    transition: margin-left 0.3s ease;
+}
+
+.sidebar:hover ~ .content {
+    margin-left: 240px;
+}

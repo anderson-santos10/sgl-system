@@ -1,4 +1,4 @@
-{% extends 'receipt/index.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Controle de Notas{% endblock %}
 
@@ -101,7 +101,7 @@
                             <option value="UN40" {% if request.GET.un_origem == "UN40" %}selected{% endif %}>UN40</option>
                             <option value="UN50" {% if request.GET.un_origem == "UN50" %}selected{% endif %}>UN50</option>
                             <option value="CD09" {% if request.GET.un_origem == "CD09" %}selected{% endif %}>CD09</option>
-                            <option value="Outro" {% if request.GET.un_origem == "Outro" %}selected{% endif %}>Outro</option>
+                            <option value="Outro" {% if request.GET.un_origem == "Outro" %}selected{% endif %}>Outros</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Filtrar</button>
