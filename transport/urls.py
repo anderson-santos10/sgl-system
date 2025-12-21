@@ -1,6 +1,9 @@
-from django.urls import path
-from .views import CenarioTransporteView
+from django.urls import include, path
+from .views import CriarTransporteView, CenarioTransporteView
+
+app_name = "transport"
 
 urlpatterns = [
-    path("transport/", CenarioTransporteView.as_view(), name="transport_list"),
+    path("criar/", CriarTransporteView.as_view(), name="criar_transporte"),
+    path("cenario/", CenarioTransporteView.as_view(), name="cenario_transporte"),    
 ]

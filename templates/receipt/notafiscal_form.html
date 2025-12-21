@@ -7,22 +7,28 @@
 <div class="container mt-5 d-flex justify-content-center">
   <div class="card shadow-lg border-0 rounded-4" style="max-width: 700px;">
     <div class="card-body p-5">
-      
-      <!-- Título dinâmico -->
-    <h2 class="text-center fw-bold mb-4 text-primary">
-    <i class="bi bi-file-earmark-text me-2"></i>
-    {% if form.instance.pk %}
-        Editar Nota Fiscal
-    {% else %}
-        Cadastrar Nota Fiscal
-    {% endif %}
-    </h2>
 
+      <!-- HEADER PADRÃO -->
+      <div class="page-header mb-4">
+        <h4 class="fw-bold text-primary mb-1">
+          <i class="bi bi-file-earmark-text me-1"></i>
+          {% if form.instance.pk %}
+            Editar Nota Fiscal
+          {% else %}
+            Cadastrar Nota Fiscal
+          {% endif %}
+        </h4>
+        <small class="text-muted">
+          Preencha os dados da nota fiscal
+        </small>
+      </div>
 
-      <!-- Mensagens de sucesso/erro -->
+      <!-- Mensagens -->
       {% if messages %}
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} mt-3">{{ message }}</div>
+          <div class="alert alert-{{ message.tags }} mt-3">
+            {{ message }}
+          </div>
         {% endfor %}
       {% endif %}
 
@@ -39,7 +45,7 @@
             {{ form.turno|add_class:"form-control text-muted"|attr:"required" }}
           </div>
 
-          <!-- Número da Nota Fiscal -->
+          <!-- Nº Nota -->
           <div class="col-12 col-md-6">
             <label for="id_nf" class="form-label">
               <i class="bi bi-receipt text-secondary me-1"></i> Nº da Nota
@@ -47,7 +53,7 @@
             {{ form.nf|add_class:"form-control text-muted"|attr:"placeholder:Ex: 2024-001"|attr:"required" }}
           </div>
 
-          <!-- Unidade de Origem -->
+          <!-- UN Origem -->
           <div class="col-12 col-md-6">
             <label for="id_un_origem" class="form-label">
               <i class="bi bi-buildings-fill text-secondary me-1"></i> UN de Origem
@@ -55,7 +61,7 @@
             {{ form.un_origem|add_class:"form-control text-muted"|attr:"placeholder:Ex: UN10"|attr:"required" }}
           </div>
 
-          <!-- Quantidade de Pallets -->
+          <!-- Pallets -->
           <div class="col-12 col-md-6">
             <label for="id_qnt_pallet" class="form-label">
               <i class="bi bi-boxes text-secondary me-1"></i> QNT de Pallets
@@ -63,7 +69,7 @@
             {{ form.qnt_pallet|add_class:"form-control text-muted"|attr:"placeholder:Ex: 10"|attr:"required" }}
           </div>
 
-          <!-- Tipo de Veículo -->
+          <!-- Tipo Veículo -->
           <div class="col-12 col-md-6">
             <label for="id_tipo_veiculo" class="form-label">
               <i class="bi bi-truck-front-fill text-secondary me-1"></i> Tipo de Veículo
@@ -71,17 +77,17 @@
             {{ form.tipo_veiculo|add_class:"form-control text-muted"|attr:"placeholder:Ex: Truck"|attr:"required" }}
           </div>
 
-          <!-- Peso Bruto -->
+          <!-- Peso -->
           <div class="col-12 col-md-6">
             <label for="id_peso_nota" class="form-label">
               <i class="bi bi-speedometer2 text-secondary me-1"></i> Peso Bruto
             </label>
-            {{ form.peso_nota|add_class:"form-control text-muted"|attr:"type:text"|attr:"placeholder:Ex: 1.250 kg"|attr:"required" }}
+            {{ form.peso_nota|add_class:"form-control text-muted"|attr:"placeholder:Ex: 1.250 kg"|attr:"required" }}
           </div>
 
         </div>
 
-        <!-- Botões -->
+        <!-- BOTÕES -->
         <div class="d-flex justify-content-end mt-4 gap-2">
           <a href="{% url 'index' %}" class="btn btn-outline-secondary">
             <i class="bi bi-x-circle me-1"></i> Cancelar
@@ -91,7 +97,7 @@
           </button>
         </div>
 
-        <!-- Erros -->
+        <!-- ERROS -->
         {% if form.errors %}
         <div class="alert alert-danger mt-4">
           <strong>Erros no formulário:</strong>
