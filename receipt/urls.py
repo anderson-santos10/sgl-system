@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ReceiptListView, ReceiptCreateView, ControleSeparacaoView, salvo_sucesso_view
+from .views import ReceiptListView, ReceiptCreateView,  salvo_sucesso_view
 
 urlpatterns = [
     path("", ReceiptListView.as_view(), name="index"),

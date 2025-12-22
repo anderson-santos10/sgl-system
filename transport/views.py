@@ -1,10 +1,13 @@
+from datetime import date
 from django.shortcuts import render, redirect
 from django.views import View
+from django.views.generic import ListView
 from django.contrib import messages
 from decimal import Decimal, InvalidOperation
 from django.db import transaction
 from django.utils.dateparse import parse_date
 from .models import Lecom, Carga, Entrega, Veiculo
+
 
 
 class CriarTransporteView(View):
@@ -153,29 +156,47 @@ class CriarTransporteView(View):
         return redirect("transport:cenario_transporte")
 
 
-class CenarioTransporteView(View):
+class CenarioTransporteView(ListView):
+    model = Lecom
     template_name = "transport/cenario_transporte.html"
+    context_object_name = "lecoms"
+    ordering = ["-id"]
 
-    def get(self, request):
+    def get_total_lecoms(self):
+        return self.get_queryset().count()
 
-        # Lista final que será enviada para o template
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
         grupo_cargas = []
 
-        # Busca todos os LECOM criados
-        lecoms = Lecom.objects.all().order_by("-data")
-
-        for lecom in lecoms:
-            # Todas as cargas relacionadas ao LECOM
+        for lecom in context["lecoms"]:
             cargas = lecom.cargas.all().order_by("seq")
-
             grupo_cargas.append({
                 "grupo": lecom,
                 "cargas": cargas
             })
 
+        context["grupo_cargas"] = grupo_cargas
+        context["total_lecoms"] = self.get_total_lecoms()
+
+        return context
+    
+
+class DashboardView(View):
+    def get(self, request):
+        hoje = date.today()
+
+        # Filtra somente notas do dia
+        lecom_hoje = Lecom.objects.filter(data=hoje)
+        lecoms = lecom_hoje.count()
+        lecoms+=1
+        
         context = {
-            "grupo_cargas": grupo_cargas
+            "total_lecoms": lecoms
         }
 
-        return render(request, self.template_name, context)
+        return render(request, "dashboard/home.html", context)
 
+
+        

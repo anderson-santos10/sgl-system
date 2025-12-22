@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - SGL{% endblock %}
+
+{% block content %}
+
+<hr style="border: 1px solid #ccc;">
+<div class="row g-4">
+
+    <!-- CARD: RECEBIMENTO-->
+    <div class="col" style="max-width: 330px;">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-muted text-center">RECEBIMENTO</h5>
+                <div class="text-center">
+                    <p>Total Notas</p>
+                    <h1 class="display-4 fw-bold text-warning" style="font-size: 3.0rem;">{{ notas }}</h1>
+                </div>
+                <hr style="border: 1px solid #ccc;">
+                <p class="mb-1">UN10 <span class="float-end">{{ un10 }}</span></p>
+                <p class="mb-1">UN20 <span class="float-end">{{ un20 }}</span></p>
+                <p class="mb-1">UN40 <span class="float-end">{{ un40 }}</span></p>
+                <p class="mb-1">TOTAL PALETES <span class="float-end">{{ total }}</span></p>
+                <p class="mb-1">TOTAL PESO BRUTO <span class="float-end">{{ total_peso|floatformat:2 }}</span></p>
+                <div class="card-footer">
+                    <small class="text-muted">{{ hoje }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CARD: EXPEDIÇÃO (exemplo estático) -->
+    <div class="col" style="max-width: 330px;">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-muted text-center">EXPEDIÇÃO</h5>
+                <div class="text-center">
+                    <p>Total Cargas</p>
+                    <h1 class="display-4 fw-bold text-warning" style="font-size: 3.0rem;">0%</h1>
+                </div>
+                <hr style="border: 1px solid #ccc;">
+                <p class="mb-1">CARGAS DIA <span class="float-end">4</span></p>
+                <p class="mb-1">CARGAS SEMANA <span class="float-end">4</span></p>
+                <p class="mb-1">CARGAS MES <span class="float-end">1</span></p>
+                <p class="mb-1">TOTAL <span class="float-end">58.29</span></p>
+                <div class="card-footer">
+                    <small class="text-muted">Last updated 3 mins ago</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CARD: TRANSPORTE-->
+    <div class="col" style="max-width: 330px;">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-muted text-center">TRANSPORTE</h5>
+                <div class="text-center">
+                    <p>Total Cargas</p>
+                    <h1 class="display-4 fw-bold text-warning" style="font-size: 3.0rem;">{{ total_lecoms }}</h1>
+                </div>
+                <hr style="border: 1px solid #ccc;">
+                <p class="mb-1">TOTAL LECOMS <span class="float-end">{{ total_lecoms }}</span></p>
+                <p class="mb-1">UN20 <span class="float-end">{{ un20_transp }}</span></p>
+                <p class="mb-1">UN40 <span class="float-end">{{ un40_transp }}</span></p>
+                <p class="mb-1">TOTAL <span class="float-end">{{ total_transp }}</span></p>
+                <p class="mb-1">TOTAL PESO BRUTO <span class="float-end">{{ total_peso_transp|floatformat:2 }}</span></p>
+                <div class="card-footer">
+                    <small class="text-muted">{{ hoje }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -28,7 +28,8 @@ INSTALLED_APPS = [
     "receipt",
     "widget_tweaks",
     "expedicao",
-    "transport"
+    "transport",
+    "dashboard",
 ]
 
 MIDDLEWARE = [
@@ -121,4 +122,5 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-LOGIN_REDIRECT_URL = '/pg_inicial/'
+LOGIN_REDIRECT_URL = '/cards/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'

@@ -30,7 +30,7 @@
     </div>
 
     <!-- Dashboard -->
-    <a href="{% url 'pg_inicial' %}" class="sidebar-link">
+    <a href="{% url 'cards' %}" class="sidebar-link">
         <i class="bi bi-graph-up me-2"></i>Dashboard</i>
     </a>
 
@@ -46,7 +46,7 @@
                         data-bs-target="#collapseRecebimento"
                         aria-expanded="false"
                         aria-controls="collapseRecebimento">
-                    <i class="bi bi-box-seam me-2"></i> Recebimento
+                    <i class="bi bi-box-seam me-2">{{notas}}</i> Recebimento
                 </button>
             </h2>
 

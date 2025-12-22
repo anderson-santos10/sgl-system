@@ -1,6 +1,4 @@
 from django.db import models
-
-
 from decimal import Decimal
 from django.db import models
 
