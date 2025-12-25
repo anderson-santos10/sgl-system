@@ -1,22 +1,33 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Inserir Transporte{% endblock %}
+{% block title %}
+  Editar Transporte
+{% endblock %}
 
 {% block content %}
 <div class="container py-4">
 
-  <div class="card shadow-sm border-0 rounded-4 mx-auto" style="max-width: 1100px;">
+  <div class="card shadow border-0 rounded-4 mx-auto" style="max-width: 1150px;">
     <div class="card-body p-4">
 
-      <!-- HEADER -->
-      <div class="page-header mb-4">
-        <h4 class="fw-bold text-primary mb-1">
-          <i class="bi bi-truck-front-fill me-1"></i> Inserir Transporte
-        </h4>
-        <small class="text-muted">
-          Cadastro de LECOM, veículo, cargas e entregas
-        </small>
+      <!-- ================= HEADER ================= -->
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+          <h4 class="fw-bold text-primary mb-1">
+            <i class="bi bi-truck-front-fill me-1"></i> Editar Transporte
+          </h4>
+          <small class="text-muted">
+            Gestão de LECOM, veículo, cargas e entregas
+          </small>
+        </div>
+
+        {% if lecom %}
+          <span class="badge rounded-pill px-3 py-2
+            {% if lecom.status == 'LIBERADO' %}bg-success{% else %}bg-danger{% endif %}">
+            {{ lecom.status }}
+          </span>
+        {% endif %}
       </div>
 
       {% if messages %}
@@ -30,83 +41,113 @@
       <form method="post">
         {% csrf_token %}
 
-        <!-- ================= DADOS PRINCIPAIS ================= -->
-        <h6 class="fw-bold text-primary border-bottom pb-2 mb-3">
-          Dados do Transporte
-        </h6>
+        <!-- ================= DADOS DO TRANSPORTE ================= -->
+        <div class="border rounded-3 p-3 mb-4 bg-light">
+          <h6 class="fw-bold text-primary mb-3">
+            <i class="bi bi-info-circle me-1"></i> Dados do Transporte
+          </h6>
 
-        <div class="row g-2 mb-4">
-          <div class="col-md-2">
-            <label class="form-label small">LECOM</label>
-            <input type="text" name="lecom" class="form-control form-control-sm" required>
+          <!-- STATUS INTERATIVO -->
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <span class="fw-semibold small">Status:</span>
+
+            <div id="statusToggle" class="status-toggle {% if lecom.status == 'LIBERADO' %}status-ok{% else %}status-block{% endif %}">
+              <i id="statusIcon" class="bi {% if lecom.status == 'LIBERADO' %}bi-unlock{% else %}bi-lock{% endif %} me-1"></i>
+              <span id="statusText">{{ lecom.status }}</span>
+            </div>
+
+            <input type="hidden" name="status" id="statusInput" value="{{ lecom.status }}">
           </div>
 
-          <div class="col-md-3">
-            <label class="form-label small">Destino</label>
-            <input type="text" name="destino" class="form-control form-control-sm" required>
-          </div>
+          <div class="row g-3">
+            <div class="col-md-2">
+              <label class="form-label small">LECOM</label>
+              <input type="text" name="lecom"
+                     class="form-control form-control-sm"
+                     value="{{ lecom.lecom|default:'' }}" required>
+            </div>
 
-          <div class="col-md-1">
-            <label class="form-label small">UF</label>
-            <input type="text" name="uf" maxlength="2"
-                   class="form-control form-control-sm text-uppercase" required>
-          </div>
+            <div class="col-md-3">
+              <label class="form-label small">Destino</label>
+              <input type="text" name="destino"
+                     class="form-control form-control-sm"
+                     value="{{ lecom.destino|default:'' }}" required>
+            </div>
 
-          <div class="col-md-2">
-            <label class="form-label small">Data</label>
-            <input type="date" name="data" class="form-control form-control-sm" required>
-          </div>
+            <div class="col-md-1">
+              <label class="form-label small">UF</label>
+              <input type="text" name="uf"
+                     maxlength="2"
+                     class="form-control form-control-sm text-uppercase"
+                     value="{{ lecom.uf|default:'' }}" required>
+            </div>
 
-          <div class="col-md-2">
-            <label class="form-label small">Veículo</label>
-            <input type="text" name="tipo_veiculo"
-                   class="form-control form-control-sm"
-                   placeholder="Truck, Carreta">
-          </div>
+            <div class="col-md-2">
+              <label class="form-label small">Data</label>
+              <input type="date" name="data"
+                     class="form-control form-control-sm"
+                     value="{{ lecom.data|date:'Y-m-d' }}" required>
+            </div>
 
-          <div class="col-md-1">
-            <label class="form-label small">Peso</label>
-            <input type="number" step="0.01" name="peso"
-                   class="form-control form-control-sm">
-          </div>
+            <div class="col-md-2">
+              <label class="form-label small">Veículo</label>
+              <input type="text" name="tipo_veiculo"
+                     class="form-control form-control-sm"
+                     value="{{ lecom.veiculo.tipo_veiculo|default:'' }}"
+                     placeholder="Truck, Carreta">
+            </div>
 
-          <div class="col-md-1">
-            <label class="form-label small">m³</label>
-            <input type="number" step="0.01" name="m3"
-                   class="form-control form-control-sm">
-          </div>
+            <div class="col-md-1">
+              <label class="form-label small">Peso</label>
+              <input type="number" step="0.01" name="peso"
+                     class="form-control form-control-sm"
+                     value="{{ lecom.peso|default_if_none:0.00|floatformat:2 }}">
+            </div>
 
-          <div class="col-md-12">
-            <label class="form-label small">Observação</label>
-            <input type="text" name="observacao"
-                   class="form-control form-control-sm">
+            <div class="col-md-1">
+              <label class="form-label small">m³</label>
+              <input type="number" step="0.01" name="m3"
+                     class="form-control form-control-sm"
+                     value="{{ lecom.m3|default_if_none:0.00|floatformat:2 }}">
+            </div>
+
+            <div class="col-md-12">
+              <label class="form-label small">Observação</label>
+              <input type="text" name="observacao"
+                     class="form-control form-control-sm"
+                     value="{{ lecom.observacao|default:'' }}">
+            </div>
           </div>
         </div>
 
         <!-- ================= CARGAS ================= -->
-        <h6 class="fw-bold text-primary border-bottom pb-2 mb-3">
-          Cargas
-        </h6>
+        <div class="border rounded-3 p-3 mb-4">
+          <h6 class="fw-bold text-primary mb-3">
+            <i class="bi bi-box-seam me-1"></i> Cargas
+          </h6>
 
-        <div class="row g-2 mb-3">
-          <div class="col-md-2">
-            <label class="form-label small">Qtd. de Cargas</label>
-            <input type="number" id="seqInput"
-                   class="form-control form-control-sm"
-                   min="1" value="1" required>
+          <div class="row g-3 mb-3">
+            <div class="col-md-2">
+              <label class="form-label small">Qtd. de Cargas</label>
+              <input type="number" id="seqInput"
+                     class="form-control form-control-sm"
+                     min="1"
+                     value="{{ lecom.cargas.count }}" required>
+            </div>
           </div>
+
+          <div class="row g-3" id="cargasContainer"></div>
         </div>
 
-        <div class="row g-3" id="cargasContainer"></div>
-
         <!-- ================= AÇÕES ================= -->
-        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+        <div class="d-flex justify-content-between align-items-center border-top pt-3">
           <a href="{% url 'transport:cenario_transporte' %}"
              class="btn btn-outline-secondary btn-sm px-4">
-            Cancelar
+            <i class="bi bi-arrow-left me-1"></i> Voltar
           </a>
+
           <button type="submit" class="btn btn-primary btn-sm px-5">
-            <i class="bi bi-save me-1"></i> Salvar
+            <i class="bi bi-save me-1"></i> Atualizar Transporte
           </button>
         </div>
 
@@ -121,44 +162,89 @@ document.addEventListener("DOMContentLoaded", () => {
   const seqInput = document.getElementById("seqInput");
   const cargasContainer = document.getElementById("cargasContainer");
 
+  const cargasExistentes = [
+    {% for carga in lecom.cargas.all %}
+      {
+        carga: "{{ carga.carga }}",
+        seq: "{{ carga.seq }}",
+        total_entregas: "{{ carga.total_entregas }}",
+        mod: "{{ carga.mod }}"
+      },
+    {% endfor %}
+  ];
+
   function renderCargas() {
     const qtd = parseInt(seqInput.value) || 0;
     cargasContainer.innerHTML = "";
 
     for (let i = 0; i < qtd; i++) {
-      const div = document.createElement("div");
-      div.classList.add("col-md-4");
-
-      div.innerHTML = `
-        <div class="border rounded-3 p-3 h-100">
-          <strong class="text-primary small d-block mb-2">
-            Carga ${i + 1}
-          </strong>
-
-          <input type="text" name="carga[]"
-                 class="form-control form-control-sm mb-2"
-                 placeholder="Carga" required>
-
-          <input type="number" name="seq[]" value="${i + 1}"
-                 class="form-control form-control-sm mb-2"
-                 placeholder="Seq" required>
-
-          <input type="number" name="total_entregas[]"
-                 class="form-control form-control-sm mb-2"
-                 placeholder="Entregas">
-
-          <input type="text" name="mod[]"
-                 class="form-control form-control-sm mb-2"
-                 placeholder="MOD">
+      const data = cargasExistentes[i] || {};
+      cargasContainer.innerHTML += `
+        <div class="col-md-4">
+          <div class="border rounded-3 p-3 h-100 bg-light">
+            <strong class="text-primary small d-block mb-2">Carga ${i + 1}</strong>
+            <input type="text" name="carga[]" class="form-control form-control-sm mb-2" placeholder="Carga" value="${data.carga || ''}" required>
+            <input type="number" name="seq[]" class="form-control form-control-sm mb-2" placeholder="Seq" value="${data.seq || (i+1)}">
+            <input type="number" name="total_entregas[]" class="form-control form-control-sm mb-2" placeholder="Entregas" value="${data.total_entregas || 1}">
+            <input type="text" name="mod[]" class="form-control form-control-sm" placeholder="MOD" value="${data.mod || '-'}">
+          </div>
         </div>
       `;
-
-      cargasContainer.appendChild(div);
     }
   }
 
   seqInput.addEventListener("input", renderCargas);
   renderCargas();
+
+  // Toggle de status
+  const statusToggle = document.getElementById("statusToggle");
+  const statusInput = document.getElementById("statusInput");
+  const statusText = document.getElementById("statusText");
+  const statusIcon = document.getElementById("statusIcon");
+
+  statusToggle.addEventListener("click", () => {
+    if (statusInput.value === "LIBERADO") {
+      statusInput.value = "BLOQUEADO";
+      statusText.textContent = "BLOQUEADO";
+      statusToggle.classList.remove("status-ok");
+      statusToggle.classList.add("status-block");
+      statusIcon.classList.remove("bi-unlock");
+      statusIcon.classList.add("bi-lock");
+    } else {
+      statusInput.value = "LIBERADO";
+      statusText.textContent = "LIBERADO";
+      statusToggle.classList.remove("status-block");
+      statusToggle.classList.add("status-ok");
+      statusIcon.classList.remove("bi-lock");
+      statusIcon.classList.add("bi-unlock");
+    }
+  });
 });
 </script>
+
+<!-- ================= ESTILO LOCAL ================= -->
+<style>
+.status-toggle {
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.status-ok {
+  background: #198754;
+  color: #fff;
+}
+.status-ok:hover {
+  background: #157347;
+}
+.status-block {
+  background: #dc3545;
+  color: #fff;
+}
+.status-block:hover {
+  background: #bb2d3b;
+}
+</style>
 {% endblock %}

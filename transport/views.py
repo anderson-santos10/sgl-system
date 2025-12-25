@@ -1,7 +1,8 @@
 from datetime import date
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
+from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, UpdateView
 from django.contrib import messages
 from decimal import Decimal, InvalidOperation
 from django.db import transaction
@@ -155,34 +156,95 @@ class CriarTransporteView(View):
         messages.success(request, f"LECOM {lecom.lecom} criada com sucesso.")
         return redirect("transport:cenario_transporte")
 
-
 class CenarioTransporteView(ListView):
     model = Lecom
     template_name = "transport/cenario_transporte.html"
     context_object_name = "lecoms"
     ordering = ["-id"]
 
-    def get_total_lecoms(self):
-        return self.get_queryset().count()
+    def get_queryset(self):
+        queryset = super().get_queryset().prefetch_related("cargas", "veiculo")
+
+        # FILTROS
+        transporte_id = self.request.GET.get("transporte_id")
+        lecom = self.request.GET.get("lecom")
+        status = self.request.GET.get("status")
+
+        if transporte_id and transporte_id.isdigit():
+            queryset = queryset.filter(id=int(transporte_id))
+
+        if lecom:
+            queryset = queryset.filter(lecom__icontains=lecom)
+
+        if status in ["LIBERADO", "BLOQUEADO"]:
+            queryset = queryset.filter(status=status)
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         grupo_cargas = []
-
         for lecom in context["lecoms"]:
-            cargas = lecom.cargas.all().order_by("seq")
             grupo_cargas.append({
                 "grupo": lecom,
-                "cargas": cargas
+                "cargas": lecom.cargas.all().order_by("seq")
             })
 
         context["grupo_cargas"] = grupo_cargas
-        context["total_lecoms"] = self.get_total_lecoms()
+        context["total_lecoms"] = context["lecoms"].count()
+
+        # Mantém os valores dos filtros no template
+        context["filtro_transporte_id"] = self.request.GET.get("transporte_id", "")
+        context["filtro_lecom"] = self.request.GET.get("lecom", "")
+        context["filtro_status"] = self.request.GET.get("status", "")
 
         return context
-    
 
+class EditarTransporteView(View):
+    template_name = "transport/inserir_carga.html"
+    success_url = reverse_lazy("transport:cenario_transporte")
+
+    def get(self, request, pk):
+        lecom = get_object_or_404(Lecom, pk=pk)
+        cargas = lecom.cargas.all()
+        return render(request, self.template_name, {
+            "lecom": lecom,
+            "cargas": cargas,
+            "modo_edicao": True
+        })
+
+    def post(self, request, pk):
+        lecom = get_object_or_404(Lecom, pk=pk)
+
+        # Atualiza os campos do Lecom
+        lecom.lecom = request.POST.get("lecom")
+        lecom.destino = request.POST.get("destino")
+        lecom.uf = request.POST.get("uf")
+        lecom.data = request.POST.get("data")
+        lecom.peso = request.POST.get("peso") or 0
+        lecom.m3 = request.POST.get("m3") or 0
+        lecom.observacao = request.POST.get("observacao")
+        lecom.status = request.POST.get("status", "BLOQUEADO")
+        lecom.save()
+
+        # Atualiza as cargas existentes
+        carga_ids = request.POST.getlist("carga_id[]")
+        carga_nomes = request.POST.getlist("carga[]")
+        seqs = request.POST.getlist("seq[]")
+        total_entregas_list = request.POST.getlist("total_entregas[]")
+        mods = request.POST.getlist("mod[]")
+
+        for i, cid in enumerate(carga_ids):
+            carga = get_object_or_404(Carga, pk=cid)
+            carga.carga = carga_nomes[i]
+            carga.seq = seqs[i] or 1
+            carga.total_entregas = total_entregas_list[i] or "1"
+            carga.mod = mods[i] or "-"
+            carga.save()
+
+        return redirect(self.success_url)
+    
 class DashboardView(View):
     def get(self, request):
         hoje = date.today()
@@ -199,4 +261,4 @@ class DashboardView(View):
         return render(request, "dashboard/home.html", context)
 
 
-        
+    

@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
 from receipt.views import NotasUpdateView
-from expedicao.views import CargaUpdateView, CargaDeleteView
 from django.contrib.auth import views as auth_views
 
 from transport.views import DashboardView  
@@ -19,10 +18,7 @@ urlpatterns = [
 
     # Views diretas
     path("update/<int:pk>", NotasUpdateView.as_view(), name="notas_update"),
-    path("update_cargas/<int:pk>", CargaUpdateView.as_view(), name="editar_carga"),
-    path("delete/<int:pk>", CargaDeleteView.as_view(), name="excluir_carga"),
     path("cards/", DashboardView.as_view(), name="cards"),
-
     # Autenticação
     path("accounts/", include("django.contrib.auth.urls")),
 ]

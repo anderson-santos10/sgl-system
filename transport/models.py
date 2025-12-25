@@ -4,6 +4,12 @@ from django.db import models
 
 
 class Lecom(models.Model):
+
+    STATUS_CHOICES = [
+        ('LIBERADO', 'Liberado'),
+        ('BLOQUEADO', 'Bloqueado'),
+    ]
+
     lecom = models.CharField(max_length=10)
     destino = models.CharField(max_length=150)
     uf = models.CharField(max_length=2)
@@ -23,8 +29,14 @@ class Lecom(models.Model):
     data = models.DateField(verbose_name="Data da Carga")
     observacao = models.CharField(max_length=255, blank=True)
 
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='BLOQUEADO'
+    )
+
     def __str__(self):
-        return f"LECOM {self.lecom}"
+        return f'{self.lecom} - {self.get_status_display()}'
 
 
 
@@ -33,7 +45,7 @@ class Carga(models.Model):
     carga = models.CharField("Número da Carga", max_length=10)
     seq = models.PositiveIntegerField(blank=True, null=True)
     total_entregas = models.CharField(max_length=2, default="1")
-    mod = models.CharField(max_length=10, default="")
+    mod = models.CharField(max_length=10, default="-")
 
 
 class Entrega(models.Model):

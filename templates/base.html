@@ -18,6 +18,29 @@
 </head>
 
 <body>
+    <!-- OFFCANVAS FILTRO -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasFiltro">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">
+      <i class="bi bi-funnel"></i> Filtro
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+
+  <div class="offcanvas-body">
+    <form method="get" action="{% block filter_action %}{% endblock %}">
+      
+      {% block filter_fields %}
+      <!-- campos específicos entram aqui -->
+      {% endblock %}
+
+      <button type="submit" class="btn btn-primary w-100 mt-3">
+        Aplicar Filtros
+      </button>
+    </form>
+  </div>
+</div>
+
 
 <!-- SIDEBAR -->
 <div class="sidebar bg-primary">
@@ -54,7 +77,6 @@
                  data-bs-parent="#menuAccordion">
                 <div class="accordion-body p-0">
                     <a href="{% url 'notas_list' %}" class="sidebar-sub">Controle de Notas</a>
-                    <a href="{% url 'create_list' %}" class="sidebar-sub">Cadastro de Notas</a>
                 </div>
             </div>
         </div>
@@ -74,8 +96,7 @@
             <div id="collapseExpedicao" class="accordion-collapse collapse"
                  data-bs-parent="#menuAccordion">
                 <div class="accordion-body p-0">
-                    <a href="{% url 'expedicao:cargas_list' %}" class="sidebar-sub">Cenário Expedição</a>
-                    <a href="{% url 'expedicao:cargas_concluidas' %}" class="sidebar-sub">Cargas Concluídas</a>
+                    <a href="{% url 'expedicao:cenario_expedicao' %}" class="sidebar-sub">Cenário Expedição</a>
                 </div>
             </div>
         </div>
@@ -139,6 +160,22 @@
 
 <!-- JS DO BOOTSTRAP -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const offcanvas = document.getElementById("offcanvasFiltro");
+
+    if (offcanvas) {
+        offcanvas.addEventListener("show.bs.offcanvas", function () {
+            offcanvas.querySelectorAll("input").forEach(input => {
+                input.value = "";
+            });
+        });
+    }
+});
+</script>
+{% endblock %}
 
 </body>
 </html>

@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Cenário de Transporte{% endblock %}
+{% block title %}Cenário de Expedição{% endblock %}
 
 {% block filter_action %}
-    {% url 'transport:cenario_transporte' %}
+    {% url 'expedicao:cenario_expedicao' %}
 {% endblock %}
 
 {% block filter_fields %}
@@ -27,14 +27,8 @@
            value="{{ request.GET.lecom }}">
 </div>
 
-<div class="mb-3">
-    <label class="form-label">Status</label>
-    <select name="status" class="form-select">
-        <option value="">Todos</option>
-        <option value="LIBERADO" {% if request.GET.status == 'LIBERADO' %}selected{% endif %}>Liberado</option>
-        <option value="BLOQUEADO" {% if request.GET.status == 'BLOQUEADO' %}selected{% endif %}>Bloqueado</option>
-    </select>
-</div>
+{# Status fixo em LIBERADO no transporte, mas mostrado como PENDENTE na expedição #}
+<input type="hidden" name="status" value="LIBERADO">
 
 {% endblock %}
 
@@ -48,15 +42,12 @@
 
         <div class="page-header">
             <h4 class="fw-bold text-primary mb-1">
-                <i class="bi bi-box-seam me-1"></i> Cenário de Transporte
+                <i class="bi bi-truck me-1"></i> Cenário de Expedição
             </h4>
-            <small class="text-muted">Visualização do cenário de transportes</small>
+            <small class="text-muted">Visualização apenas das cargas liberadas (status pendente)</small>
         </div>
 
         <div class="d-flex gap-2">
-            <a href="{% url 'transport:criar_transporte' %}" class="btn btn-primary btn-sm px-3">
-                <i class="bi bi-plus-lg me-1"></i> Novo Transporte</a>
-
             <button class="btn btn-outline-primary btn-sm"
                     data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasFiltro">
@@ -102,11 +93,7 @@
 
                                     {% if forloop.first %}
                                         <td rowspan="{{ item.cargas|length }}" class="bg-light fw-semibold">
-                                            <a href="{% url 'transport:editar_transporte' item.grupo.id %}"
-                                            class="text-decoration-none text-primary fw-semibold">
                                             #{{ item.grupo.id }}
-                                            </a>
-
                                         </td>
 
                                         <td rowspan="{{ item.cargas|length }}" class="bg-light fw-semibold">
@@ -135,11 +122,7 @@
                                         </td>
 
                                         <td rowspan="{{ item.cargas|length }}">
-                                            {% if item.grupo.status == 'LIBERADO' %}
-                                                <span class="badge bg-success">Liberado</span>
-                                            {% else %}
-                                                <span class="badge bg-danger">Bloqueado</span>
-                                            {% endif %}
+                                            <span class="badge bg-warning text-dark">Pendente</span>
                                         </td>
                                     {% endif %}
 
@@ -148,7 +131,7 @@
                         {% empty %}
                             <tr>
                                 <td colspan="14" class="text-center text-muted py-4">
-                                    <i class="bi bi-inbox me-1"></i> Nenhum transporte cadastrado
+                                    <i class="bi bi-inbox me-1"></i> Nenhuma carga liberada encontrada
                                 </td>
                             </tr>
                         {% endfor %}

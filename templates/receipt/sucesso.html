@@ -1,45 +1,53 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Nota Lançada{% endblock %}
+{% block title %}{{ title|default:"Sucesso!" }}{% endblock %}
 
 {% block content %}
 <div class="container mt-5 d-flex justify-content-center">
-  <div class="card shadow border-0 rounded-4" style="max-width: 550px;">
+  <div class="card shadow-lg border-0 rounded-4" style="max-width: 550px;">
     <div class="card-body text-center p-5">
 
       <!-- Ícone de sucesso -->
       <div class="mb-4">
         <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex justify-content-center align-items-center"
-             style="width: 110px; height: 110px;">
-          <i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>
+             style="width: 120px; height: 120px;">
+          <i class="bi {{ icon|default:"bi-check-circle-fill" }} text-success" style="font-size: 4rem;"></i>
         </div>
       </div>
 
-      <h2 class="fw-bold text-dark mb-3">Nota lançada com sucesso!</h2>
+      <!-- Título -->
+      <h2 class="fw-bold text-dark mb-3">{{ title|default:"Sucesso!" }}</h2>
 
-      <p class="text-muted mb-4">
-        A nota fiscal foi registrada e já está disponível para consulta no sistema.
-      </p>
+      <!-- Mensagem -->
+      <p class="text-muted mb-4">{{ message|default:"A operação foi concluída com sucesso." }}</p>
 
-      <!-- Botões Modernos -->
-      <div class="d-flex justify-content-center gap-3 mt-4">
-
-        <a href="{% url 'create_list' %}" 
-           class="btn btn-lg btn-modern-primary d-flex align-items-center justify-content-center">
-          <i class="bi bi-plus-circle me-2"></i>
-          Lançar nova nota
-        </a>
-
-        <a href="{% url 'index' %}" 
-           class="btn btn-lg btn-modern-secondary d-flex align-items-center justify-content-center">
-          <i class="bi bi-house-door me-2"></i>
-          Início
-        </a>
-
+      <!-- Botões -->
+      <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-4">
+        {% for button in buttons %}
+          <a href="{{ button.url }}" 
+             class="btn {{ button.class|default:'btn-success' }} btn-lg d-flex align-items-center justify-content-center">
+            {% if button.icon %}
+              <i class="bi {{ button.icon }} me-2"></i>
+            {% endif %}
+            {{ button.label }}
+          </a>
+        {% endfor %}
       </div>
 
     </div>
   </div>
 </div>
+
+<!-- Estilo adicional para responsividade -->
+<style>
+@media (max-width: 576px) {
+  .card-body {
+    padding: 2.5rem 1.5rem;
+  }
+  .btn-lg {
+    width: 100%;
+  }
+}
+</style>
 {% endblock %}
