@@ -1,3 +1,17 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form");
+    const btnSalvar = document.getElementById("btnSalvar");
+    const btnText = document.getElementById("btnText");
+    const btnLoader = document.getElementById("btnLoader");
+
+    form.addEventListener("submit", function () {
+        btnText.innerText = "Salvando...";
+        btnLoader.classList.remove("d-none");
+        btnSalvar.disabled = true;
+    });
+});
+
+
 function renderCargas() {
     const qtd = parseInt(seqInput.value) || 0;
     cargasContainer.innerHTML = "";

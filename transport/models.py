@@ -10,7 +10,7 @@ class Lecom(models.Model):
         ('BLOQUEADO', 'Bloqueado'),
     ]
 
-    lecom = models.CharField(max_length=10)
+    lecom = models.CharField(max_length=10, unique=True)
     destino = models.CharField(max_length=150)
     uf = models.CharField(max_length=2)
 
@@ -42,7 +42,7 @@ class Lecom(models.Model):
 
 class Carga(models.Model):
     lecom = models.ForeignKey(Lecom, on_delete=models.CASCADE, related_name="cargas")
-    carga = models.CharField("Número da Carga", max_length=10)
+    carga = models.CharField("Número da Carga", max_length=10, default="1")
     seq = models.PositiveIntegerField(blank=True, null=True)
     total_entregas = models.CharField(max_length=2, default="1")
     mod = models.CharField(max_length=10, default="-")

@@ -2,30 +2,25 @@ from datetime import date
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, UpdateView
+from django.views.generic import ListView
 from django.contrib import messages
 from decimal import Decimal, InvalidOperation
 from django.db import transaction
 from django.utils.dateparse import parse_date
 from .models import Lecom, Carga, Entrega, Veiculo
-
+from django.db import IntegrityError
 
 
 class CriarTransporteView(View):
     template_name = "transport/inserir_carga.html"
 
     def get(self, request):
-        # Apenas exibe a página com o formulário
         return render(request, self.template_name)
 
     def post(self, request):
-        # Quando o usuário envia o formulário, cai aqui
-        return self.salvar_dados(request)
-
-    def salvar_dados(self, request):
 
         # -------------------------------
-        # 1️⃣ CAPTURA DADOS DA LECOM
+        # 1️⃣ DADOS DA LECOM
         # -------------------------------
         lecom_code = request.POST.get("lecom", "").strip()
         destino = request.POST.get("destino", "").strip()
@@ -37,7 +32,6 @@ class CriarTransporteView(View):
 
         errors = []
 
-        # Validação simples
         if not lecom_code:
             errors.append("O campo LECOM é obrigatório.")
         if not destino:
@@ -45,66 +39,64 @@ class CriarTransporteView(View):
         if not uf:
             errors.append("O campo UF é obrigatório.")
 
-        # Converte peso
-        try:
-            peso = Decimal(peso_raw)
-        except InvalidOperation:
-            errors.append("Peso inválido.")
-            peso = Decimal("0")
+        peso_raw = request.POST.get("peso", "").strip()
+        m3_raw = request.POST.get("m3", "").strip()
 
-        # Converte m3
         try:
-            m3 = Decimal(m3_raw)
+            peso = Decimal(peso_raw) if peso_raw else Decimal("0.00")
         except InvalidOperation:
-            errors.append("m³ inválido.")
-            m3 = Decimal("0")
+            peso = Decimal("0.00")
 
-        # Converte data
+        try:
+            m3 = Decimal(m3_raw) if m3_raw else Decimal("0.00")
+        except InvalidOperation:
+            m3 = Decimal("0.00")
+
+
         data = parse_date(data_raw)
-        if data is None:
-            errors.append("Data inválida. Use YYYY-MM-DD.")
+        if not data:
+            errors.append("Data inválida.")
 
-        # Se tiver erros → volta
         if errors:
             for e in errors:
                 messages.error(request, e)
-            return redirect("transport:cenario_transporte")
+            return render(request, self.template_name)
 
+        # 🚫 LECOM DUPLICADA (ANTES DA TRANSACTION)
+        if Lecom.objects.filter(lecom=lecom_code).exists():
+            messages.error(request, "Esse Numero de LECOM já existe.")
+            return render(request, self.template_name)
 
-        # ----------------------------------
-        # 2️⃣ CAPTURA DADOS DO VEÍCULO
-        # ----------------------------------
+        # -------------------------------
+        # 2️⃣ VEÍCULO
+        # -------------------------------
         tipo_veiculo = request.POST.get("tipo_veiculo", "Não informado")
 
-        # ----------------------------------
-        # 3️⃣ CAPTURA LISTA DE CARGAS
-        # ----------------------------------
-        # Estes campos devem vir como listas no formulário
+        # -------------------------------
+        # 3️⃣ CARGAS
+        # -------------------------------
         cargas_list = request.POST.getlist("carga[]")
         seq_list = request.POST.getlist("seq[]")
         total_entregas_list = request.POST.getlist("total_entregas[]")
         mod_list = request.POST.getlist("mod[]")
 
-        # Consistência
         if not cargas_list:
-            messages.error(request, "É necessário informar ao menos uma carga.")
-            return redirect("transport:cenario_transporte")
+            messages.error(request, "Informe ao menos uma carga.")
+            return render(request, self.template_name)
 
-
-        # ----------------------------------
-        # 4️⃣ CAPTURA LISTA DE ENTREGAS (opcional)
-        # ----------------------------------
-        # entrega_carga_ref[] indica a qual carga a entrega pertence
+        # -------------------------------
+        # 4️⃣ ENTREGAS
+        # -------------------------------
         entrega_numeros = request.POST.getlist("entrega_numero[]")
         entrega_carga_ref = request.POST.getlist("entrega_carga_index[]")
 
-        # ----------------------------------
-        # 5️⃣ SALVA TUDO NO BANCO COM TRANSACTION
-        # ----------------------------------
+        # -------------------------------
+        # 5️⃣ SALVAR TUDO
+        # -------------------------------
         try:
             with transaction.atomic():
 
-                # Salva LECOM
+                # 🔹 LECOM
                 lecom = Lecom.objects.create(
                     lecom=lecom_code,
                     destino=destino,
@@ -115,46 +107,56 @@ class CriarTransporteView(View):
                     observacao=observacao,
                 )
 
-                # Salva veículo (OneToOne)
+                # 🔹 VEÍCULO
                 Veiculo.objects.create(
                     lecom=lecom,
                     tipo_veiculo=tipo_veiculo
                 )
 
-                # Salvar cada carga associada à LECOM
+                # 🔹 CARGAS
                 cargas_salvas = []
 
                 for i, carga_num in enumerate(cargas_list):
+
+                    # 🚫 CARGA DUPLICADA NA MESMA LECOM
+                    if Carga.objects.filter(lecom=lecom, carga=carga_num).exists():
+                        messages.error(
+                            request,
+                            f"A carga {carga_num} já existe para este LECOM."
+                        )
+                        raise ValueError("Carga duplicada")
+
                     carga_obj = Carga.objects.create(
                         lecom=lecom,
                         carga=carga_num,
-                        seq=seq_list[i] if seq_list else None,
+                        seq=seq_list[i] if seq_list else 1,
                         total_entregas=total_entregas_list[i] if total_entregas_list else "1",
                         mod=mod_list[i] if mod_list else "",
                     )
                     cargas_salvas.append(carga_obj)
 
-                # Salvar as entregas de cada carga
-                for idx, numero_entrega in enumerate(entrega_numeros):
-                    if numero_entrega.strip() == "":
+                # 🔹 ENTREGAS
+                for i, numero in enumerate(entrega_numeros):
+                    if not numero.strip():
                         continue
 
-                    indice_carga = int(entrega_carga_ref[idx])
-                    carga_relacionada = cargas_salvas[indice_carga]
-
+                    carga_index = int(entrega_carga_ref[i])
                     Entrega.objects.create(
-                        numero=numero_entrega,
-                        carga=carga_relacionada
+                        numero=numero,
+                        carga=cargas_salvas[carga_index]
                     )
 
+        except ValueError:
+            # erro controlado (carga duplicada)
+            return render(request, self.template_name)
+
         except Exception as e:
-            messages.error(request, f"Erro ao salvar dados: {e}")
-            return redirect("transport:cenario_transporte")
+            messages.error(request, f"Erro ao salvar: {e}")
+            return render(request, self.template_name)
 
-
-        # Sucesso
         messages.success(request, f"LECOM {lecom.lecom} criada com sucesso.")
-        return redirect("transport:cenario_transporte")
+        return render(request, self.template_name)
+
 
 class CenarioTransporteView(ListView):
     model = Lecom
@@ -169,21 +171,53 @@ class CenarioTransporteView(ListView):
         transporte_id = self.request.GET.get("transporte_id")
         lecom = self.request.GET.get("lecom")
         status = self.request.GET.get("status")
-
+        data = self.request.GET.get("data")
+        carga = self.request.GET.get("carga")
+        veiculo = self.request.GET.get("veiculo")
+        destino = self.request.GET.get("destino")
+        
         if transporte_id and transporte_id.isdigit():
             queryset = queryset.filter(id=int(transporte_id))
-
+            
         if lecom:
             queryset = queryset.filter(lecom__icontains=lecom)
-
+        
         if status in ["LIBERADO", "BLOQUEADO"]:
             queryset = queryset.filter(status=status)
+            
+        if data:
+            queryset = queryset.filter(data=data)
+            
+        if carga:
+            queryset = queryset.filter(
+                cargas__carga__icontains=carga
+            ).distinct()
+            
+        if veiculo:
+            queryset = queryset.filter(
+                veiculo__tipo_veiculo=veiculo
+            )
+            
+        if destino:
+            queryset = queryset.filter(
+                destino__icontains=destino
+            )
 
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # 🔹 Select dinâmico de veículos
+        context['veiculos'] = (
+            Veiculo.objects
+            .exclude(tipo_veiculo="Não informado")
+            .values_list('tipo_veiculo', flat=True)
+            .distinct()
+            .order_by('tipo_veiculo')
+        )
+
+        # 🔹 Agrupamento de cargas por LECOM
         grupo_cargas = []
         for lecom in context["lecoms"]:
             grupo_cargas.append({
@@ -194,10 +228,13 @@ class CenarioTransporteView(ListView):
         context["grupo_cargas"] = grupo_cargas
         context["total_lecoms"] = context["lecoms"].count()
 
-        # Mantém os valores dos filtros no template
+        # 🔹 Manter filtros no template
         context["filtro_transporte_id"] = self.request.GET.get("transporte_id", "")
         context["filtro_lecom"] = self.request.GET.get("lecom", "")
         context["filtro_status"] = self.request.GET.get("status", "")
+        context["filtro_veiculo"] = self.request.GET.get("veiculo", "")
+        context["filtro_carga"] = self.request.GET.get("carga", "")
+        context["filtro_data"] = self.request.GET.get("data", "")
 
         return context
 
