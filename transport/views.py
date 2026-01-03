@@ -1,4 +1,3 @@
-from datetime import date
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -344,20 +343,5 @@ class EditarTransporteView(View):
 
         return redirect(self.success_url)
     
-class DashboardView(View):
-    def get(self, request):
-        hoje = date.today()
-
-        # Filtra somente notas do dia
-        lecom_hoje = Lecom.objects.filter(data=hoje)
-        lecoms = lecom_hoje.count()
-        lecoms+=1
-        
-        context = {
-            "total_lecoms": lecoms
-        }
-
-        return render(request, "dashboard/home.html", context)
-
 
     

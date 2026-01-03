@@ -1,7 +1,6 @@
 from django.urls import path
-from receipt.views import DashboardView
-
+from .views import CardView
 
 urlpatterns = [
-   path("cards/", DashboardView.as_view(), name="cards"),
+    path('', CardView.as_view(), name='dashboard_home'),
 ]
