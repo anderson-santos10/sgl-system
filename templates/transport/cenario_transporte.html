@@ -35,7 +35,6 @@
            value="{{ request.GET.carga }}">
 </div>
 
-
 <div class="mb-3">
     <label class="form-label">Lecom</label>
     <input type="text"
@@ -56,7 +55,6 @@
     >
 </div>
 
-
 <div class="mb-3">
     <label class="form-label">Veículo</label>
     <select name="veiculo" class="form-select form-select-sm">
@@ -71,8 +69,6 @@
     </select>
 </div>
 
-
-
 <div class="mb-3">
     <label class="form-label">Status</label>
     <select name="status" class="form-select">
@@ -85,7 +81,7 @@
 {% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'css/transporte/cenario_transporte.css' %}">
 
 <div class="container mt-4">
 
@@ -152,7 +148,6 @@
                                             class="text-decoration-none text-primary fw-semibold">
                                             #{{ item.grupo.id }}
                                             </a>
-
                                         </td>
 
                                         <td rowspan="{{ item.cargas|length }}" class="bg-light fw-semibold">
@@ -182,9 +177,13 @@
 
                                         <td rowspan="{{ item.cargas|length }}">
                                             {% if item.grupo.status == 'LIBERADO' %}
-                                                <span class="badge bg-success">Liberado</span>
-                                            {% else %}
-                                                <span class="badge bg-danger">Bloqueado</span>
+                                                <span class="badge-status badge-liberado">
+                                                    <i class="bi bi-unlock-fill"></i> Liberado
+                                                </span>
+                                            {% elif item.grupo.status == 'BLOQUEADO' %}
+                                                <span class="badge-status badge-bloqueado">
+                                                    <i class="bi bi-lock-fill"></i> Bloqueado
+                                                </span>
                                             {% endif %}
                                         </td>
                                     {% endif %}
@@ -208,4 +207,5 @@
     </div>
 </div>
 
+<script src="{% static 'js/transporte/editar_transporte.js' %}"></script>
 {% endblock %}

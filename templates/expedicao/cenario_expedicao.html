@@ -8,64 +8,67 @@
 {% endblock %}
 
 {% block filter_fields %}
-
 <div class="mb-3">
-    <label class="form-label">ID do Transporte</label>
-    <input type="number"
-           name="transporte_id"
-           class="form-control"
-           placeholder="Ex: 1023"
-           value="{{ request.GET.transporte_id }}">
+  <label class="form-label small">Data</label>
+  <input type="date" name="data" class="form-control form-control-sm" value="{{ request.GET.data }}">
 </div>
-
 <div class="mb-3">
-    <label class="form-label">LECOM</label>
-    <input type="text"
-           name="lecom"
-           class="form-control"
-           placeholder="Ex: LECOM123"
-           value="{{ request.GET.lecom }}">
+  <label class="form-label small">ID</label>
+  <input type="text" name="transporte_id" class="form-control form-control-sm" placeholder="Ex: 123" value="{{ request.GET.transporte_id }}">
 </div>
-
-{# Status fixo em LIBERADO no transporte, mas mostrado como PENDENTE na expedição #}
+<div class="mb-3">
+  <label class="form-label">Carga</label>
+  <input type="text" name="carga" class="form-control form-control-sm" placeholder="Ex: 1023" value="{{ request.GET.carga }}">
+</div>
+<div class="mb-3">
+  <label class="form-label">Lecom</label>
+  <input type="text" name="lecom" class="form-control" placeholder="Ex: 123" value="{{ request.GET.lecom }}">
+</div>
+<div class="mb-3">
+  <label class="form-label">Destino</label>
+  <input type="text" name="destino" class="form-control" placeholder="Ex: São Paulo" value="{{ request.GET.destino }}">
+</div>
+<div class="mb-3">
+  <label class="form-label">Veículo</label>
+  <select name="veiculo" class="form-select form-select-sm">
+      <option value="">Todos</option>
+      {% for tipo in veiculos %}
+          <option value="{{ tipo }}" {% if request.GET.veiculo == tipo %}selected{% endif %}>{{ tipo }}</option>
+      {% endfor %}
+  </select>
+</div>
+<div class="mb-3">
+  <label class="form-label">Status</label>
+  <select name="status" class="form-select">
+      <option value="">Todos</option>
+      <option value="LIBERADO" {% if request.GET.status == 'LIBERADO' %}selected{% endif %}>Liberado</option>
+      <option value="BLOQUEADO" {% if request.GET.status == 'BLOQUEADO' %}selected{% endif %}>Bloqueado</option>
+  </select>
+</div>
 <input type="hidden" name="status" value="LIBERADO">
-
 {% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'css/transporte/cenario_transporte.css' %}">
 
 <div class="container mt-4">
 
-    <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-
         <div class="page-header">
-            <h4 class="fw-bold text-primary mb-1">
-                <i class="bi bi-truck me-1"></i> Cenário de Expedição
-            </h4>
+            <h4 class="fw-bold text-primary mb-1"><i class="bi bi-truck me-1"></i> Cenário de Expedição</h4>
             <small class="text-muted">Visualização apenas das cargas liberadas (status pendente)</small>
         </div>
-
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-primary btn-sm"
-                    data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasFiltro">
+            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFiltro">
                 <i class="bi bi-funnel me-1"></i> Filtros
             </button>
         </div>
-
     </div>
 
-    <!-- CARD -->
     <div class="card shadow-sm border-0 rounded-4">
-
         <div class="card-body p-0">
-
             <div class="table-wrapper">
-
                 <table class="table table-hover table-bordered align-middle mb-0 table-fixed">
-
                     <thead class="table-light text-uppercase text-center small sticky-top">
                         <tr>
                             <th style="width:70px">ID</th>
@@ -84,21 +87,17 @@
                             <th style="width:90px">Status</th>
                         </tr>
                     </thead>
-
                     <tbody class="small text-center">
-
                         {% for item in grupo_cargas %}
                             {% for carga in item.cargas %}
-                                <tr>
-
+                                {% comment %}Pega o ControleSeparacao correspondente{% endcomment %}
+                                {% with controle=carga.controlesep_set.first %}
+                                <tr class="{% if forloop.first %}clickable-row{% endif %}"
+                                    {% if controle %}data-href="{% url 'expedicao:detalhe_card' controle.id %}"{% endif %}>
+                                    
                                     {% if forloop.first %}
-                                        <td rowspan="{{ item.cargas|length }}" class="bg-light fw-semibold">
-                                            #{{ item.grupo.id }}
-                                        </td>
-
-                                        <td rowspan="{{ item.cargas|length }}" class="bg-light fw-semibold">
-                                            {{ item.grupo.lecom }}
-                                        </td>
+                                        <td rowspan="{{ item.cargas|length }}" class="bg-light fw-semibold">#{{ item.grupo.id }}</td>
+                                        <td rowspan="{{ item.cargas|length }}" class="bg-light fw-semibold">{{ item.grupo.lecom }}</td>
                                     {% endif %}
 
                                     <td class="text-truncate">{{ carga.carga }}</td>
@@ -117,16 +116,11 @@
                                     <td>{{ carga.mod }}</td>
 
                                     {% if forloop.first %}
-                                        <td rowspan="{{ item.cargas|length }}" class="text-truncate">
-                                            {{ item.grupo.observacao|default:"—" }}
-                                        </td>
-
-                                        <td rowspan="{{ item.cargas|length }}">
-                                            <span class="badge bg-warning text-dark">Pendente</span>
-                                        </td>
+                                        <td rowspan="{{ item.cargas|length }}" class="text-truncate">{{ item.grupo.observacao|default:"—" }}</td>
+                                        <td rowspan="{{ item.cargas|length }}"><span class="badge bg-warning text-dark">Pendente</span></td>
                                     {% endif %}
-
                                 </tr>
+                                {% endwith %}
                             {% endfor %}
                         {% empty %}
                             <tr>
@@ -135,14 +129,12 @@
                                 </td>
                             </tr>
                         {% endfor %}
-
                     </tbody>
-
                 </table>
-
             </div>
         </div>
     </div>
 </div>
+<script src="{% static 'js/expedicao/cenario_expedicao.js' %}"></script>
 
 {% endblock %}

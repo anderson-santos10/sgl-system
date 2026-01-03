@@ -1,110 +1,68 @@
-<!doctype html>
-<html lang="pt-br">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+{% extends 'registration/base_auth.html' %}
+{% block title %}Login | SGL{% endblock %}
 
-    <style>
-      body {
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: #eaf4ff;
-      }
-      .login-container {
-        display: flex;
-        width: 900px;
-        max-width: 100%;
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        overflow: hidden;
-      }
-      .login-left {
-        flex: 1;
-        background: linear-gradient(135deg, #7db9ff, #3b82f6);
-        color: white;
-        padding: 40px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-      .login-left h2 {
-        font-weight: bold;
-      }
-      .login-right {
-        flex: 1;
-        background: #fff;
-        padding: 50px 40px;
-      }
-      .login-right h3 {
-        font-weight: bold;
-        margin-bottom: 30px;
-      }
-      .form-control {
-        border-radius: 30px;
-        padding: 10px 20px;
-      }
-      .btn-login {
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
-        color: #fff;
-        border-radius: 30px;
-        padding: 10px;
-        font-weight: bold;
-        width: 100%;
-      }
-      .btn-login:hover {
-        background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      }
-      .links {
-        margin-top: 15px;
-        font-size: 14px;
-        display: flex;
-        justify-content: space-between;
-      }
-      .links a {
-        text-decoration: none;
-        color: #2563eb;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="login-container">
-      <!-- Lado esquerdo -->
-      <div class="login-left">
-        <h2>Bem-vindo</h2>
-        <p>Faça login para acessar sua conta existente.</p>
-      </div>
+{% block content %}
 
-      <!-- Lado direito -->
-      <div class="login-right">
-        <h3>Entrar</h3>
-        <form method="post">
-          {% csrf_token %}
-          <div class="mb-3">
-            <input type="text" name="username" class="form-control" placeholder="Usuário" required>
+<div class="login-wrapper">
+  <div class="login-container">
+
+    <!-- LADO ESQUERDO -->
+    <div class="login-left">
+      <h2>Bem-vindo</h2>
+      <p>Faça login para acessar sua conta existente.</p>
+    </div>
+
+    <!-- LADO DIREITO -->
+    <div class="login-right">
+      <h3>Entrar</h3>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.errors %}
+          <div class="alert alert-danger text-center">
+            Usuário ou senha inválidos.
           </div>
-          <div class="mb-3">
-            <input type="password" name="password" class="form-control" placeholder="Senha" required>
-          </div>
+        {% endif %}
 
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" value="" id="rememberMe">
-              <label class="form-check-label" for="rememberMe">Lembrar-me</label>
-            </div>
-            <a href="{% url 'password_reset' %}">Esqueceu a senha?</a>
-          </div>
-
-          <button type="submit" class="btn btn-login">Entrar</button>
-        </form>
-
-        <div class="text-center mt-3">
-          <span>Não tem conta?</span> <a href="#">Criar conta</a>
+        <div class="mb-3">
+          <input type="text"
+                 name="username"
+                 class="form-control"
+                 placeholder="Usuário"
+                 required>
         </div>
+
+        <div class="mb-3">
+          <input type="password"
+                 name="password"
+                 class="form-control"
+                 placeholder="Senha"
+                 required>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3 login-links">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="rememberMe">
+            <label class="form-check-label" for="rememberMe">
+              Lembrar-me
+            </label>
+          </div>
+          <a href="{% url 'password_reset' %}">Esqueceu a senha?</a>
+        </div>
+
+        <button type="submit" class="btn btn-login w-100">
+          Entrar
+        </button>
+      </form>
+
+      <div class="text-center mt-3 login-links">
+        <span>Não tem conta?</span> <a href="#">Criar conta</a>
       </div>
     </div>
-  </body>
-</html>
+
+  </div>
+</div>
+
+{% endblock %}
+

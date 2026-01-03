@@ -1,25 +1,84 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Detalhes da Carga {{ carga.numero_transporte }}{% endblock %}
+{% block title %}Detalhes da Carga {{ controle.numero_transporte }}{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/transporte/cenario_transporte.css' %}">
+
 <div class="container mt-5">
-    <h2 class="fw-bold mb-4 text-primary">Carga {{ carga.numero_transporte }}</h2>
 
-    <p><strong>Destino:</strong> {{ carga.destino }}</p>
-    <p><strong>Data:</strong> {{ carga.data }}</p>
-    <p><strong>OT:</strong> {{ carga.ot }}</p>
-    <p><strong>Entrega/Box:</strong> {{ carga.entrega_box }}</p>
-    <p><strong>Tipo de Veículo:</strong> {{ carga.tipo_veiculo }}</p>
-    <p><strong>Separador:</strong> {{ carga.outros_separadores }}</p>
-    <p><strong>Conferente:</strong> {{ carga.conferente }}</p>
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body">
 
-    <!-- Campo de observações -->
-    <div class="mb-3">
-        <label for="observacoes" class="form-label fw-semibold">Observações</label>
-        <textarea id="observacoes" class="form-control" rows="4" placeholder="Escreva algo sobre a carga…">{{ carga.observacoes }}</textarea>
+            <h4 class="fw-bold text-primary mb-4">
+                Carga {{ controle.numero_transporte }}
+            </h4>
+
+            <!-- ================= DADOS DO TRANSPORTE (SÓ LEITURA) ================= -->
+            <div class="border rounded-3 p-3 mb-4 bg-light">
+                <h6 class="fw-bold text-primary mb-3">Dados do Transporte</h6>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small">Destino</label>
+                        <input type="text" class="form-control form-control-sm" value="{{ controle.destino }}" readonly>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">Data</label>
+                        <input type="text" class="form-control form-control-sm" value="{{ controle.data|date:'d/m/Y' }}" readonly>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">Tipo de Veículo</label>
+                        <input type="text" class="form-control form-control-sm" value="{{ controle.tipo_veiculo }}" readonly>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">Entrega/Box</label>
+                        <input type="text" class="form-control form-control-sm" value="{{ controle.entrega_box }}" readonly>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">Peso</label>
+                        <input type="text" class="form-control form-control-sm" value="{{ controle.peso }}" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= CAMPOS EDITÁVEIS ================= -->
+            <form method="post">
+                {% csrf_token %}
+                <div class="border rounded-3 p-3 mb-4 bg-light">
+                    <h6 class="fw-bold text-primary mb-3">Atualizar Informações</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small">OT</label>
+                            <input type="text" name="ot" class="form-control form-control-sm" value="{{ controle.ot }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Separador</label>
+                            <input type="text" name="outros_separadores" class="form-control form-control-sm" value="{{ controle.outros_separadores }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Conferente</label>
+                            <input type="text" name="conferente" class="form-control form-control-sm" value="{{ controle.conferente }}">
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <label class="form-label small">Observações</label>
+                            <textarea name="observacao" class="form-control" rows="4">{{ controle.observacao }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= BOTÕES ================= -->
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'expedicao:cenario_expedicao' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Voltar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i> Salvar
+                    </button>
+                </div>
+            </form>
+
+        </div>
     </div>
-
-    <a href="{% url 'expedicao:cargas_list' %}" class="btn btn-secondary mt-3">Voltar</a>
 </div>
 {% endblock %}

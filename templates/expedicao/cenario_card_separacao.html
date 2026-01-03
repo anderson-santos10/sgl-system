@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Cenário Expedição{% endblock %}
+{% block title %}Cenário Cards{% endblock %}
 
 {% block content %}
 <div class="container-fluid mt-4 px-lg-4">
@@ -137,7 +137,7 @@
             <div class="card shadow-sm border-0 p-3 position-fixed"
                  style="right:20px; top:110px; width:220px;">
 
-                <a href="{% url 'expedicao:controle_separacao' %}"
+                <a href="{% url 'expedicao:detalhe_card' %}"
                    class="btn btn-sm btn-primary mb-3 w-100">
                     Inserir Carga
                 </a>

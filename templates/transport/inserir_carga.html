@@ -103,7 +103,7 @@
               <input type="number" step="0.01" name="peso"
                      class="form-control form-control-sm"
                      placeholder="0.00"
-                     value="{{ lecom.peso|default_if_none:0.00|floatformat:3 }}">
+                     value="{{ lecom.peso|floatformat:2 }}">
             </div>
 
             <div class="col-md-1">
@@ -111,7 +111,7 @@
               <input type="number" step="0.01" name="m3"
                      class="form-control form-control-sm"
                      placeholder="0.00"
-                     value="{{ lecom.m3|default_if_none:0.00|floatformat:3 }}">
+                     value="{{ lecom.m3|floatformat:2 }}">
             </div>
 
             <div class="col-md-12">
