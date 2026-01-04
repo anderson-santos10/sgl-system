@@ -8,48 +8,54 @@
 {% endblock %}
 
 {% block filter_fields %}
-<div class="mb-3">
-  <label class="form-label small">Data</label>
-  <input type="date" name="data" class="form-control form-control-sm" value="{{ request.GET.data }}">
-</div>
-<div class="mb-3">
-  <label class="form-label small">ID</label>
-  <input type="text" name="transporte_id" class="form-control form-control-sm" placeholder="Ex: 123" value="{{ request.GET.transporte_id }}">
-</div>
-<div class="mb-3">
-  <label class="form-label">Carga</label>
-  <input type="text" name="carga" class="form-control form-control-sm" placeholder="Ex: 1023" value="{{ request.GET.carga }}">
-</div>
-<div class="mb-3">
-  <label class="form-label">Lecom</label>
-  <input type="text" name="lecom" class="form-control" placeholder="Ex: 123" value="{{ request.GET.lecom }}">
-</div>
-<div class="mb-3">
-  <label class="form-label">Destino</label>
-  <input type="text" name="destino" class="form-control" placeholder="Ex: São Paulo" value="{{ request.GET.destino }}">
-</div>
-<div class="mb-3">
-  <label class="form-label">Veículo</label>
-  <select name="veiculo" class="form-select form-select-sm">
-      <option value="">Todos</option>
-      {% for tipo in veiculos %}
-          <option value="{{ tipo }}" {% if request.GET.veiculo == tipo %}selected{% endif %}>{{ tipo }}</option>
-      {% endfor %}
-  </select>
-</div>
-<div class="mb-3">
-  <label class="form-label">Status</label>
-  <select name="status" class="form-select">
-      <option value="">Todos</option>
-      <option value="LIBERADO" {% if request.GET.status == 'LIBERADO' %}selected{% endif %}>Liberado</option>
-      <option value="BLOQUEADO" {% if request.GET.status == 'BLOQUEADO' %}selected{% endif %}>Bloqueado</option>
-  </select>
-</div>
-<input type="hidden" name="status" value="LIBERADO">
+    <div class="mb-3">
+        <label class="form-label small">Data</label>
+        <input type="date" name="data" class="form-control form-control-sm" value="{{ request.GET.data }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label small">ID</label>
+        <input type="text" name="transporte_id" class="form-control form-control-sm" placeholder="Ex: 123" value="{{ request.GET.transporte_id }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Carga</label>
+        <input type="text" name="carga" class="form-control form-control-sm" placeholder="Ex: 1023" value="{{ request.GET.carga }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Lecom</label>
+        <input type="text" name="lecom" class="form-control" placeholder="Ex: 123" value="{{ request.GET.lecom }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Destino</label>
+        <input type="text" name="destino" class="form-control" placeholder="Ex: São Paulo" value="{{ request.GET.destino }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Veículo</label>
+        <select name="veiculo" class="form-select form-select-sm">
+            <option value="">Todos</option>
+            {% for tipo in veiculos %}
+                <option value="{{ tipo }}" {% if request.GET.veiculo == tipo %}selected{% endif %}>{{ tipo }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+    <label class="form-label">Status</label>
+    <select name="status" class="form-select">
+        <option value="">Todos</option>
+        <option value="LIBERADO" {% if request.GET.status == 'LIBERADO' %}selected{% endif %}>Liberado</option>
+        <option value="BLOQUEADO" {% if request.GET.status == 'BLOQUEADO' %}selected{% endif %}>Bloqueado</option>
+    </select>
+    </div>
+    <input type="hidden" name="status" value="LIBERADO">
 {% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/transporte/cenario_transporte.css' %}">
+<link rel="stylesheet" href="{% static 'css/table.css' %}">
 
 <div class="container mt-4">
 
@@ -136,5 +142,4 @@
     </div>
 </div>
 <script src="{% static 'js/expedicao/cenario_expedicao.js' %}"></script>
-
 {% endblock %}

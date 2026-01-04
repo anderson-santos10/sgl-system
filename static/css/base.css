@@ -1,7 +1,230 @@
-.sidebar {
-  background: linear-gradient(
-    135deg,
-    var(--sgl-primary),
-    var(--sgl-primary-dark)
-  );
+:root {
+  /* ===== CORES PRINCIPAIS ===== */
+  --sgl-primary: #2563eb;
+  --sgl-primary-dark: #1e40af;
+  --sgl-primary-light: #3b82f6;
+
+  /* ===== FUNDOS ===== */
+  --sgl-bg-light: #f8fafc;
+  --sgl-white: #ffffff;
+
+  /* ===== TEXTO ===== */
+  --sgl-text-dark: #0f172a;
+  --sgl-text-light: #e5e7eb;
+
+  /* ===== LAYOUT ===== */
+  --sidebar-width: 260px;
+
+  /* ===== TRANSIÇÃO E RADIUS ===== */
+  --radius: 0.75rem;
+  --transition: all 0.2s ease-in-out;
+
+  /* ===== HOVER ROW ===== */
+  --hover-row: #f1f8ff;
+}
+
+/* ===============================
+   RESET GLOBAL
+================================ */
+body {
+  margin: 0;
+  background-color: var(--sgl-bg-light);
+  color: var(--sgl-text-dark);
+  font-size: 0.9rem;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* ===============================
+   LAYOUT BASE
+================================ */
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ===============================
+   SIDEBAR
+================================ */
+.app-layout .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  max-width: var(--sidebar-width);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  background: linear-gradient(135deg, var(--sgl-primary), var(--sgl-primary-dark));
+  z-index: 1000;
+  flex-shrink: 0; /* garante que não encolha */
+}
+
+/* Logo */
+.app-layout .sidebar-logo {
+  padding: 20px;
+  text-align: center;
+}
+.app-layout .sidebar-logo h4 {
+  margin: 0;
+  color: #fff;
+}
+.app-layout .sidebar-logo p {
+  margin: 0;
+  color: #e5e7eb;
+  font-size: 0.85rem;
+}
+.app-layout .sidebar-logo hr {
+  border-color: rgba(255, 255, 255, 0.5);
+  margin: 10px 0;
+}
+
+/* LINKS PRINCIPAIS */
+.app-layout .sidebar a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.app-layout .sidebar-link {
+  padding: 12px 20px;
+  display: block;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  font-size: 1.1rem; 
+}
+.app-layout .sidebar-link:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* SUBMENU */
+.app-layout .sidebar-sub {
+  padding: 8px 20px;
+  display: block;
+  font-size: 0.9rem;
+  color: #e5e7eb;
+  transition: background-color 0.2s ease;
+}
+.app-layout .sidebar-sub:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ACCORDION (BOOTSTRAP OVERRIDE) */
+.app-layout .accordion-button {
+  background: transparent;
+  color: #fff;
+  box-shadow: none;
+  padding: 12px 20px;
+  width: 100%;
+}
+
+.app-layout .accordion-button:not(.collapsed) {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.app-layout .accordion-button:focus {
+  box-shadow: none;
+}
+
+.app-layout .accordion-button::after {
+  filter: invert(1); /* seta branca */
+}
+
+.app-layout .accordion-body {
+  background: transparent;
+  padding: 0;
+}
+
+/* ===============================
+   CONTEÚDO PRINCIPAL
+================================ */
+.app-layout .content {
+  margin-left: var(--sidebar-width);
+  padding: 24px;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--sgl-bg-light);
+}
+
+/* ===============================
+   PERFIL
+================================ */
+.app-layout .profile-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* ===============================
+   OFFCANVAS
+================================ */
+.offcanvas-body {
+  padding: 1rem;
+}
+
+/* ===============================
+   CARDS
+================================ */
+.card {
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+.card-body {
+  padding: 1rem;
+  background: #fff;
+}
+
+/* ===============================
+   BOTÕES
+================================ */
+.btn {
+  border-radius: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.btn-primary {
+  background: var(--sgl-primary);
+  border: none;
+}
+.btn-primary:hover {
+  background: var(--sgl-primary-dark);
+}
+
+/* ===============================
+   LINHAS CLICÁVEIS
+================================ */
+.clickable-row {
+  transition: background-color 0.2s ease;
+}
+.clickable-row:hover {
+  background-color: var(--hover-row);
+  cursor: pointer;
+}
+
+/* ===============================
+   RESPONSIVIDADE
+================================ */
+@media (max-width: 1200px) {
+  .table th, .table td {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .card-body {
+    padding: 1rem;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .app-layout .content {
+    margin-left: 0; /* sidebar colapsa em mobile */
+  }
 }

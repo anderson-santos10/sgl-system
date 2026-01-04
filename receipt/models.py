@@ -8,7 +8,7 @@ class NotaFiscal(models.Model):
         (3, "Turno 3"),
     ]
 
-    data = models.DateField(default=timezone.now, verbose_name="Data")
+    data = models.DateField(default=timezone.localdate, verbose_name="Data")
     turno = models.IntegerField(choices=TURNO_CHOICES, verbose_name="Turno")
     nf = models.CharField(max_length=10, unique=True, verbose_name="Número da Nota")
     un_origem = models.CharField(max_length=4, verbose_name="UN Origem")

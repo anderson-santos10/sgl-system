@@ -14,15 +14,15 @@
             <div class="card-body">
                 <h5 class="card-title text-muted text-center">RECEBIMENTO</h5>
                 <div class="text-center">
-                    <p>Total NFs Hoje</p>
+                    <p>Total NFs</p>
                     <h1 class="display-4 fw-bold text-warning" style="font-size: 3.0rem;">{{ nf_total_hj }}</h1>
                 </div>
                 <hr style="border: 1px solid #ccc;">
                 <p> UN10 <span class="float-end">{{ nf_total_hj_un10 }}</span></p>
                 <p> UN20 <span class="float-end">{{ nf_total_hj_un20 }}</span></p>
                 <p> UN40 <span class="float-end">{{ nf_total_hj_un40 }}</span></p>
-                <p> Total Pallets <span class="float-end">{{ total_pallets_hj }}</span></p>
-                <p> Total Peso Bruto <span class="float-end">{{ total_peso_hj|floatformat:2 }} kg</span></p>
+                <p> TOTAL PALETES <span class="float-end">{{ total_pallets_hj }}</span></p>
+                <p> TOTAL PESO BRUTO<span class="float-end">{{ total_peso_hj|floatformat:2 }} kg</span></p>
                 <div class="card-footer">
                     <small class="text-muted"></small>
                 </div>
@@ -30,20 +30,18 @@
         </div>
     </div>
 
-    <!-- CARD: EXPEDIÇÃO (estático por enquanto) -->
+    <!-- CARD: TRANSPORTE -->
     <div class="col" style="max-width: 330px;">
         <div class="card h-100 shadow-sm">
             <div class="card-body">
-                <h5 class="card-title text-muted text-center">EXPEDIÇÃO</h5>
+                <h5 class="card-title text-muted text-center">TRANSPORTE</h5>
                 <div class="text-center">
                     <p>Total Cargas</p>
-                    <h1 class="display-4 fw-bold text-warning" style="font-size: 3.0rem;">0%</h1>
+                    <h1 class="display-4 fw-bold text-warning" style="font-size: 3.0rem;">{{ lecoms_hj }}</h1>
                 </div>
                 <hr style="border: 1px solid #ccc;">
-                <p class="mb-1">CARGAS DIA <span class="float-end">4</span></p>
-                <p class="mb-1">CARGAS SEMANA <span class="float-end">4</span></p>
-                <p class="mb-1">CARGAS MES <span class="float-end">1</span></p>
-                <p class="mb-1">TOTAL <span class="float-end">58.29</span></p>
+                <p> TOTAL M³ <span class="float-end">{{ total_m3_transp_hj }}</span></p>
+                <p class="mb-1">TOTAL PESO BRUTO <span class="float-end">{{ total_peso_transp_hj|floatformat:2 }} kg</span></p>
                 <div class="card-footer">
                     <small class="text-muted">Last updated 3 mins ago</small>
                 </div>
@@ -51,11 +49,11 @@
         </div>
     </div>
 
-    <!-- CARD: TRANSPORTE (exemplo estático) -->
+    <!-- CARD: EXPEDIÇÃO -->
     <div class="col" style="max-width: 330px;">
         <div class="card h-100 shadow-sm">
             <div class="card-body">
-                <h5 class="card-title text-muted text-center">TRANSPORTE</h5>
+                <h5 class="card-title text-muted text-center"> EXPEDIÇÃO</h5>
                 <div class="text-center">
                     <p>Total Cargas</p>
                     <h1 class="display-4 fw-bold text-warning" style="font-size: 3.0rem;">{{ total_lecoms }}</h1>

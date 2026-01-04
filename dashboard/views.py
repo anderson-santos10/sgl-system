@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView
 from django.utils import timezone
 from receipt.models import NotaFiscal
+from transport.models import Lecom
 from django.db.models import Sum
 
 class CardView(TemplateView):
@@ -11,9 +12,21 @@ class CardView(TemplateView):
         hoje = timezone.localdate()
         context['hoje'] = hoje.strftime("%d/%m/%Y")
 
-        # Queryset base
+        # Queryset base receipt
+        
         notas_qs = NotaFiscal.objects.all()
         notas_hj_qs = notas_qs.filter(data=hoje)
+        
+        # Queryset base transport
+        
+        lecom_total = Lecom.objects.all()
+        lecom_hj = lecom_total.filter(data=hoje)
+        lecom_hj_qs = Lecom.objects.filter(data=hoje)
+        m3_total_hj = Lecom.objects.filter(data=hoje)
+        
+        # Total de peso bruto dos transportes de hoje
+        total_peso_transp_hj = lecom_hj_qs.aggregate(total=Sum('peso'))['total'] or 0
+        total_m3_transp_hj = m3_total_hj.aggregate(total=Sum('m3'))['total'] or 0
 
         # -------------------- NFs --------------------
         context['notas'] = notas_qs.count()  # total NFs
@@ -43,4 +56,10 @@ class CardView(TemplateView):
         context['total_peso_hj_un20'] = notas_hj_qs.filter(un_origem__iexact="un20").aggregate(total=Sum('peso_nota'))['total'] or 0
         context['total_peso_hj_un40'] = notas_hj_qs.filter(un_origem__iexact="un40").aggregate(total=Sum('peso_nota'))['total'] or 0
 
+        # -------------------- lecoms --------------------
+        context['lecoms'] = lecom_total.count()  # total lecoms
+        context['lecoms_hj'] = lecom_hj.count()  # total lecoms hoje
+        context['total_peso_transp_hj'] = total_peso_transp_hj # total peso bruto dos transportes de hoje
+        context['total_m3_transp_hj'] = total_m3_transp_hj  # total lecoms hoje
+        
         return context

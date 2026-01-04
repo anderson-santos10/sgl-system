@@ -98,7 +98,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "pt-br"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
@@ -122,5 +122,5 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/cards/'
+LOGIN_REDIRECT_URL = 'dashboard_home'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
