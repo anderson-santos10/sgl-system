@@ -118,25 +118,45 @@ class CenarioCardSeparacaoView(ListView):
         context["filtro_veiculo"] = self.request.GET.get("veiculo", "")
 
         return context
-    
+
+class CenarioSeparacaoView(View):
+    template_name = "expedicao/cenario_separacao.html"
+
+    def get(self, request):
+        separacoes = ControleSeparacao.objects.all().order_by("-id")
+
+        return render(request, self.template_name, {
+            "separacoes": separacoes
+        })
+        
 class DetalheCard(View):
-    template_name = "expedicao/detalhe_carga.html"  # o template que criamos
+    template_name = "expedicao/detalhe_carga.html"
 
     def get(self, request, pk):
-        # Busca a carga no ControleSeparacao
         controle = get_object_or_404(ControleSeparacao, pk=pk)
-        return render(request, self.template_name, {"controle": controle})
+
+        return render(request, self.template_name, {
+            "controle": controle
+        })
 
     def post(self, request, pk):
         controle = get_object_or_404(ControleSeparacao, pk=pk)
 
-        # Atualiza apenas os campos que podem ser editados
-        controle.ot = request.POST.get("ot", controle.ot)
-        controle.outros_separadores = request.POST.get("outros_separadores", controle.outros_separadores)
-        controle.conferente = request.POST.get("conferente", controle.conferente)
-        controle.observacao = request.POST.get("observacao", controle.observacao)
+        # =========================
+        # CAMPOS EDITÁVEIS DA EXPEDIÇÃO
+        # =========================
+        controle.ot = request.POST.get("ot", "").strip()
+        controle.outros_separadores = request.POST.get("outros_separadores", "").strip()
+        controle.conferente = request.POST.get("conferente", "").strip()
+        controle.observacao = request.POST.get("observacao", "").strip()
+
+        # Status da separação (se existir no form)
+        status = request.POST.get("status")
+        if status:
+            controle.status = status
 
         controle.save()
 
-        return redirect("expedicao:cenario_expedicao")  # volta para o cenário
+        # 🔁 REDIRECIONA PARA O CENÁRIO DE SEPARAÇÃO
+        return redirect("expedicao:cenario_separacao")
     

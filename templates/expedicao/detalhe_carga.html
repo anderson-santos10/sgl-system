@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Detalhes da Carga {{ controle.numero_transporte }}{% endblock %}
+{% block title %}Expedição | Controle #{{ controle.id }}{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/transporte/cenario_transporte.css' %}">
@@ -12,57 +12,115 @@
         <div class="card-body">
 
             <h4 class="fw-bold text-primary mb-4">
-                Carga {{ controle.numero_transporte }}
+                Expedição • Controle #{{ controle.id }}
             </h4>
 
-            <!-- ================= DADOS DO TRANSPORTE (SÓ LEITURA) ================= -->
+            <!-- ================= DADOS DO TRANSPORTE (SOMENTE LEITURA) ================= -->
             <div class="border rounded-3 p-3 mb-4 bg-light">
-                <h6 class="fw-bold text-primary mb-3">Dados do Transporte</h6>
+                <h6 class="fw-bold text-primary mb-3">
+                    Dados do Transporte
+                </h6>
+
                 <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label small">Destino</label>
-                        <input type="text" class="form-control form-control-sm" value="{{ controle.destino }}" readonly>
+                    <div class="col-md-3">
+                        <label class="form-label small">LECOM</label>
+                        <input type="text" class="form-control form-control-sm"
+                               value="{{ controle.lecom.lecom }}" readonly>
                     </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label small">Destino</label>
+                        <input type="text" class="form-control form-control-sm"
+                               value="{{ controle.lecom.destino }}" readonly>
+                    </div>
+
+                    <div class="col-md-1">
+                        <label class="form-label small">UF</label>
+                        <input type="text" class="form-control form-control-sm"
+                               value="{{ controle.lecom.uf }}" readonly>
+                    </div>
+
                     <div class="col-md-2">
                         <label class="form-label small">Data</label>
-                        <input type="text" class="form-control form-control-sm" value="{{ controle.data|date:'d/m/Y' }}" readonly>
+                        <input type="text" class="form-control form-control-sm"
+                               value="{{ controle.lecom.data|date:'d/m/Y' }}" readonly>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label small">Tipo de Veículo</label>
-                        <input type="text" class="form-control form-control-sm" value="{{ controle.tipo_veiculo }}" readonly>
+
+                    <div class="col-md-3">
+                        <label class="form-label small">Veículo</label>
+                        <input type="text" class="form-control form-control-sm"
+                               value="{{ controle.lecom.veiculo.tipo_veiculo|default:'—' }}" readonly>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label small">Entrega/Box</label>
-                        <input type="text" class="form-control form-control-sm" value="{{ controle.entrega_box }}" readonly>
-                    </div>
+
                     <div class="col-md-2">
                         <label class="form-label small">Peso</label>
-                        <input type="text" class="form-control form-control-sm" value="{{ controle.peso }}" readonly>
+                        <input type="text" class="form-control form-control-sm"
+                               value="{{ controle.lecom.peso }}" readonly>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small">M³</label>
+                        <input type="text" class="form-control form-control-sm"
+                               value="{{ controle.lecom.m3 }}" readonly>
+                    </div>
+
+                    <div class="col-md-8">
+                        <label class="form-label small">Observação do Transporte</label>
+                        <input type="text" class="form-control form-control-sm"
+                               value="{{ controle.lecom.observacao|default:'—' }}" readonly>
                     </div>
                 </div>
             </div>
 
-            <!-- ================= CAMPOS EDITÁVEIS ================= -->
+            <!-- ================= DADOS DA EXPEDIÇÃO (EDITÁVEIS) ================= -->
             <form method="post">
                 {% csrf_token %}
-                <div class="border rounded-3 p-3 mb-4 bg-light">
-                    <h6 class="fw-bold text-primary mb-3">Atualizar Informações</h6>
+
+                <div class="border rounded-3 p-3 mb-4">
+                    <h6 class="fw-bold text-primary mb-3">
+                        Informações da Expedição
+                    </h6>
+
                     <div class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label small">OT</label>
-                            <input type="text" name="ot" class="form-control form-control-sm" value="{{ controle.ot }}">
+                            <input type="text" name="ot"
+                                   class="form-control form-control-sm"
+                                   value="{{ controle.ot|default:'' }}">
                         </div>
-                        <div class="col-md-4">
+
+                        <div class="col-md-3">
                             <label class="form-label small">Separador</label>
-                            <input type="text" name="outros_separadores" class="form-control form-control-sm" value="{{ controle.outros_separadores }}">
+                            <input type="text" name="outros_separadores"
+                                   class="form-control form-control-sm"
+                                   value="{{ controle.outros_separadores|default:'' }}">
                         </div>
-                        <div class="col-md-4">
+
+                        <div class="col-md-3">
                             <label class="form-label small">Conferente</label>
-                            <input type="text" name="conferente" class="form-control form-control-sm" value="{{ controle.conferente }}">
+                            <input type="text" name="conferente"
+                                   class="form-control form-control-sm"
+                                   value="{{ controle.conferente|default:'' }}">
                         </div>
-                        <div class="col-md-12 mt-3">
-                            <label class="form-label small">Observações</label>
-                            <textarea name="observacao" class="form-control" rows="4">{{ controle.observacao }}</textarea>
+
+                        <div class="col-md-3">
+                            <label class="form-label small">Status</label>
+                            <select name="status" class="form-select form-select-sm">
+                                <option value="Pendente" {% if controle.status == "Pendente" %}selected{% endif %}>
+                                    Pendente
+                                </option>
+                                <option value="Em Separação" {% if controle.status == "Em Separação" %}selected{% endif %}>
+                                    Em Separação
+                                </option>
+                                <option value="Finalizado" {% if controle.status == "Finalizado" %}selected{% endif %}>
+                                    Finalizado
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label small">Observações da Expedição</label>
+                            <textarea name="observacao" class="form-control" rows="4">{{ controle.observacao|default:'' }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -72,6 +130,7 @@
                     <a href="{% url 'expedicao:cenario_expedicao' %}" class="btn btn-outline-secondary">
                         <i class="bi bi-arrow-left me-1"></i> Voltar
                     </a>
+
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-save me-1"></i> Salvar
                     </button>
@@ -80,5 +139,6 @@
 
         </div>
     </div>
+
 </div>
 {% endblock %}

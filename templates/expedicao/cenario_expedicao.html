@@ -15,22 +15,26 @@
 
 <div class="mb-3">
     <label class="form-label small">ID</label>
-    <input type="text" name="transporte_id" class="form-control form-control-sm" placeholder="Ex: 123" value="{{ request.GET.transporte_id }}">
+    <input type="text" name="controle_id" class="form-control form-control-sm"
+           placeholder="Ex: 123" value="{{ request.GET.controle_id }}">
 </div>
 
 <div class="mb-3">
     <label class="form-label">Carga</label>
-    <input type="text" name="carga" class="form-control form-control-sm" placeholder="Ex: 1023" value="{{ request.GET.carga }}">
+    <input type="text" name="carga" class="form-control form-control-sm"
+           placeholder="Ex: 1023" value="{{ request.GET.carga }}">
 </div>
 
 <div class="mb-3">
     <label class="form-label">Lecom</label>
-    <input type="text" name="lecom" class="form-control" placeholder="Ex: 123" value="{{ request.GET.lecom }}">
+    <input type="text" name="lecom" class="form-control"
+           placeholder="Ex: 123" value="{{ request.GET.lecom }}">
 </div>
 
 <div class="mb-3">
     <label class="form-label">Destino</label>
-    <input type="text" name="destino" class="form-control" placeholder="Ex: São Paulo" value="{{ request.GET.destino }}">
+    <input type="text" name="destino" class="form-control"
+           placeholder="Ex: São Paulo" value="{{ request.GET.destino }}">
 </div>
 
 <div class="mb-3">
@@ -38,21 +42,15 @@
     <select name="veiculo" class="form-select form-select-sm">
         <option value="">Todos</option>
         {% for tipo in veiculos %}
-            <option value="{{ tipo }}" {% if request.GET.veiculo == tipo %}selected{% endif %}>{{ tipo }}</option>
+            <option value="{{ tipo }}"
+                {% if request.GET.veiculo == tipo %}selected{% endif %}>
+                {{ tipo }}
+            </option>
         {% endfor %}
     </select>
 </div>
 
-<div class="mb-3">
-    <label class="form-label">Status</label>
-    <select name="status" class="form-select">
-        <option value="">Todos</option>
-        <option value="LIBERADO" {% if request.GET.status == 'LIBERADO' %}selected{% endif %}>Liberado</option>
-        <option value="BLOQUEADO" {% if request.GET.status == 'BLOQUEADO' %}selected{% endif %}>Bloqueado</option>
-    </select>
-</div>
-
-<input type="hidden" name="status" value="LIBERADO">
+<input type="hidden" name="status" value="PENDENTE">
 {% endblock %}
 
 {% block content %}
@@ -61,25 +59,36 @@
 
 <div class="container mt-4">
 
+    <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <div class="page-header">
-            <h4 class="fw-bold text-primary mb-1"><i class="bi bi-truck me-1"></i> Cenário de Expedição</h4>
-            <small class="text-muted">Visualização apenas das cargas liberadas (status pendente)</small>
+            <h4 class="fw-bold text-primary mb-1">
+                <i class="bi bi-truck me-1"></i> Cenário de Expedição
+            </h4>
+            <small class="text-muted">
+                Transportes liberados aguardando separação
+            </small>
         </div>
+
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFiltro">
+            <button class="btn btn-outline-primary btn-sm"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasFiltro">
                 <i class="bi bi-funnel me-1"></i> Filtros
             </button>
         </div>
     </div>
 
+    <!-- CARD -->
     <div class="card shadow-sm border-0 rounded-4">
         <div class="card-body p-0">
             <div class="table-wrapper">
+
                 <table class="table table-hover table-bordered align-middle mb-0 table-fixed">
+
                     <thead class="table-light text-uppercase text-center small sticky-top">
                         <tr>
-                            <th style="width:70px">ID</th>
+                            <th style="width:80px">ID</th>
                             <th style="width:110px">LECOM</th>
                             <th style="width:120px">Carga</th>
                             <th style="width:60px">Seq</th>
@@ -95,57 +104,75 @@
                             <th style="width:90px">Status</th>
                         </tr>
                     </thead>
+
                     <tbody class="small text-center">
+
                         {% for item in grupo_cargas %}
                             {% for carga in item.cargas %}
                                 <tr>
 
                                     {% if forloop.first %}
                                         <td rowspan="{{ item.cargas|length }}" class="bg-light fw-semibold">
-                                            {% with controle=item.cargas.0.controlesep_set.first %}
-                                                {% if controle %}
-                                                    <a href="{% url 'expedicao:detalhe_card' controle.id %}" 
-                                                       class="text-decoration-none text-primary fw-semibold">
-                                                       #{{ item.grupo.id }}
-                                                    </a>
-                                                {% else %}
+                                            {% with controle=item.grupo.controles.first %}
+                                                <a href="{% url 'expedicao:detalhe_card' controle.id|default:item.grupo.id %}"
+                                                   class="text-decoration-none text-primary fw-semibold">
                                                     #{{ item.grupo.id }}
-                                                {% endif %}
+                                                </a>
                                             {% endwith %}
                                         </td>
-                                        <td rowspan="{{ item.cargas|length }}" class="bg-light fw-semibold">{{ item.grupo.lecom }}</td>
+
+                                        <td rowspan="{{ item.cargas|length }}" class="bg-light fw-semibold">
+                                            {{ item.grupo.lecom }}
+                                        </td>
                                     {% endif %}
 
                                     <td class="text-truncate">{{ carga.carga }}</td>
                                     <td>{{ carga.seq }}</td>
 
                                     {% if forloop.first %}
-                                        <td rowspan="{{ item.cargas|length }}">{{ item.grupo.veiculo.tipo_veiculo|default:"—" }}</td>
-                                        <td rowspan="{{ item.cargas|length }}" class="text-truncate">{{ item.grupo.destino }}</td>
+                                        <td rowspan="{{ item.cargas|length }}">
+                                            {{ item.grupo.veiculo.tipo_veiculo|default:"—" }}
+                                        </td>
+                                        <td rowspan="{{ item.cargas|length }}" class="text-truncate">
+                                            {{ item.grupo.destino }}
+                                        </td>
                                         <td rowspan="{{ item.cargas|length }}">{{ item.grupo.uf }}</td>
                                         <td rowspan="{{ item.cargas|length }}">{{ item.grupo.peso }}</td>
                                         <td rowspan="{{ item.cargas|length }}">{{ item.grupo.m3 }}</td>
-                                        <td rowspan="{{ item.cargas|length }}">{{ item.grupo.data|date:"d/m/Y" }}</td>
+                                        <td rowspan="{{ item.cargas|length }}">
+                                            {{ item.grupo.data|date:"d/m/Y" }}
+                                        </td>
                                     {% endif %}
 
                                     <td>{{ carga.total_entregas }}</td>
                                     <td>{{ carga.mod }}</td>
 
                                     {% if forloop.first %}
-                                        <td rowspan="{{ item.cargas|length }}" class="text-truncate">{{ item.grupo.observacao|default:"—" }}</td>
-                                        <td rowspan="{{ item.cargas|length }}"><span class="badge bg-warning text-dark">Pendente</span></td>
+                                        <td rowspan="{{ item.cargas|length }}" class="text-truncate">
+                                            {{ item.grupo.observacao|default:"—" }}
+                                        </td>
+                                        <td rowspan="{{ item.cargas|length }}">
+                                            <span class="badge bg-warning text-dark">
+                                                Pendente
+                                            </span>
+                                        </td>
                                     {% endif %}
+
                                 </tr>
                             {% endfor %}
                         {% empty %}
                             <tr>
                                 <td colspan="14" class="text-center text-muted py-4">
-                                    <i class="bi bi-inbox me-1"></i> Nenhuma carga liberada encontrada
+                                    <i class="bi bi-inbox me-1"></i>
+                                    Nenhum transporte pendente encontrado
                                 </td>
                             </tr>
                         {% endfor %}
+
                     </tbody>
+
                 </table>
+
             </div>
         </div>
     </div>

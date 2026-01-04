@@ -40,7 +40,7 @@
                     <h1 class="display-4 fw-bold text-warning" style="font-size: 3.0rem;">{{ lecoms_hj }}</h1>
                 </div>
                 <hr style="border: 1px solid #ccc;">
-                <p> TOTAL M³ <span class="float-end">{{ total_m3_transp_hj }}</span></p>
+                <p> TOTAL M³ <span class="float-end">{{ total_m3_transp_hj|floatformat:2 }}</span></p>
                 <p class="mb-1">TOTAL PESO BRUTO <span class="float-end">{{ total_peso_transp_hj|floatformat:2 }} kg</span></p>
                 <div class="card-footer">
                     <small class="text-muted">Last updated 3 mins ago</small>

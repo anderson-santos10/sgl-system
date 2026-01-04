@@ -3,10 +3,12 @@ from transport.models import Lecom, Carga
 
 
 class ControleSeparacao(models.Model):
-    lecom = models.ForeignKey(
+    # 🔑 Lecom vira o ID da tabela
+    lecom = models.OneToOneField(
         Lecom,
         on_delete=models.CASCADE,
-        related_name="controles",
+        primary_key=True,          # <<< ESSENCIAL
+        related_name="controle_separacao",
         verbose_name="Lecom"
     )
 
@@ -56,10 +58,10 @@ class ControleSeparacao(models.Model):
         verbose_name = "Controle de Separação"
         verbose_name_plural = "Controles de Separação"
         ordering = ["-criado_em"]
-        unique_together = ("lecom",)  # 1 controle por lecom
 
     def __str__(self):
         return f"Separação Lecom {self.lecom.lecom}"
+
 
 
 class SeparacaoCarga(models.Model):
