@@ -7,7 +7,7 @@ from decimal import Decimal, InvalidOperation
 from django.db import transaction
 from django.utils.dateparse import parse_date
 from .models import Lecom, Carga, Entrega, Veiculo
-from expedicao.models import ControleSeparacao
+from expedicao.services import sincronizar_expedicao
 
 
 class CriarTransporteView(View):
@@ -242,7 +242,8 @@ class EditarTransporteView(View):
 
     def get(self, request, pk):
         lecom = get_object_or_404(Lecom, pk=pk)
-        cargas = lecom.cargas.all()
+        cargas = lecom.cargas.all().order_by("seq")
+
         return render(request, self.template_name, {
             "lecom": lecom,
             "cargas": cargas,
@@ -253,7 +254,7 @@ class EditarTransporteView(View):
         lecom = get_object_or_404(Lecom, pk=pk)
 
         # ==========================
-        # Atualiza campos do Lecom
+        # LECom
         # ==========================
         lecom.lecom = request.POST.get("lecom")
         lecom.destino = request.POST.get("destino")
@@ -262,86 +263,49 @@ class EditarTransporteView(View):
         lecom.observacao = request.POST.get("observacao")
         lecom.status = request.POST.get("status", "BLOQUEADO")
 
-        # Converte peso e m3 para Decimal
-        try:
-            lecom.peso = Decimal(request.POST.get("peso") or "0.00")
-        except InvalidOperation:
-            lecom.peso = Decimal("0.00")
-
-        try:
-            lecom.m3 = Decimal(request.POST.get("m3") or "0.00")
-        except InvalidOperation:
-            lecom.m3 = Decimal("0.00")
+        lecom.peso = Decimal(request.POST.get("peso") or "0")
+        lecom.m3 = Decimal(request.POST.get("m3") or "0")
 
         lecom.save()
 
         # ==========================
-        # Atualiza ou cria veículo
+        # VEÍCULO
         # ==========================
-        tipo_veiculo = request.POST.get("tipo_veiculo", "Não informado")
-        if hasattr(lecom, 'veiculo'):
-            lecom.veiculo.tipo_veiculo = tipo_veiculo
-            lecom.veiculo.save()
-        else:
-            Veiculo.objects.create(lecom=lecom, tipo_veiculo=tipo_veiculo)
+        Veiculo.objects.update_or_create(
+            lecom=lecom,
+            defaults={
+                "tipo_veiculo": request.POST.get("tipo_veiculo", "Não informado")
+            }
+        )
 
         # ==========================
-        # Atualiza cargas do Lecom
+        # CARGAS
         # ==========================
         carga_nomes = request.POST.getlist("carga[]")
         seqs = request.POST.getlist("seq[]")
-        total_entregas_list = request.POST.getlist("total_entregas[]")
+        entregas = request.POST.getlist("total_entregas[]")
         mods = request.POST.getlist("mod[]")
-        carga_ids = request.POST.getlist("carga_id[]")  # caso tenha hidden input com ID
+        carga_ids = request.POST.getlist("carga_id[]")
 
-        carga_queryset = list(lecom.cargas.all())
+        for index, carga_nome in enumerate(carga_nomes):
 
-        for i, carga_nome in enumerate(carga_nomes):
-            if carga_ids:
-                carga = get_object_or_404(Carga, pk=carga_ids[i])
-            elif i < len(carga_queryset):
-                carga = carga_queryset[i]
+            if index < len(carga_ids) and carga_ids[index]:
+                carga = get_object_or_404(Carga, pk=carga_ids[index])
             else:
-                continue  # ignora se não tiver carga correspondente
+                continue  # segurança total
 
             carga.carga = carga_nome
-            carga.seq = int(seqs[i]) if seqs[i] else i + 1
-            carga.total_entregas = total_entregas_list[i] if total_entregas_list[i] else "1"
-            carga.mod = mods[i] if mods[i] else "-"
+            carga.seq = int(seqs[index]) if index < len(seqs) and seqs[index] else index + 1
+            carga.total_entregas = (
+                entregas[index] if index < len(entregas) and entregas[index] else "1"
+            )
+            carga.mod = mods[index] if index < len(mods) and mods[index] else "-"
+
             carga.save()
 
         # ==========================
-        # Cria/atualiza ControleSeparacao se Lecom liberada
+        # EXPEDIÇÃO (SERVICE)
         # ==========================
-        if lecom.status == "LIBERADO":
-            for carga in carga_queryset:
-                controle, created = ControleSeparacao.objects.get_or_create(
-                    lecom=lecom.lecom,
-                    numero_transporte=carga.carga,
-                    defaults={
-                        "resumo": "1",
-                        "destino": lecom.destino,
-                        "uf": lecom.uf,
-                        "peso": lecom.peso,
-                        "m3": lecom.m3,
-                        "data": lecom.data,
-                        "observacao": lecom.observacao,
-                        "tipo_veiculo": lecom.veiculo.tipo_veiculo if hasattr(lecom, "veiculo") else "Não informado",
-                        "ot": "",
-                        "outros_separadores": "",
-                        "conferente": "",
-                        "entregas": carga.total_entregas,
-                        "mod": carga.mod,
-                    }
-                )
-
-                # Atualiza campos editáveis se já existia
-                if not created:
-                    controle.entregas = carga.total_entregas
-                    controle.mod = carga.mod
-                    controle.save()
+        sincronizar_expedicao(lecom)
 
         return redirect(self.success_url)
-    
-
-    
