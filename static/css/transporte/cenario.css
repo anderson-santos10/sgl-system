@@ -1,0 +1,19 @@
+.transporte-card {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  transition: 0.2s ease;
+}
+
+.transporte-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  background-color: #f8fafc;
+  font-size: 0.9rem;
+}
+
+.card-body p {
+  font-size: 0.9rem;
+}

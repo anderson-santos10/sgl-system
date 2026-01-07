@@ -5,6 +5,7 @@ from transport.models import Lecom
 from expedicao.models import ControleSeparacao
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 
 
 class CenarioExpedicaoView(LoginRequiredMixin, ListView):
@@ -129,34 +130,54 @@ class CenarioSeparacaoView(View):
             "separacoes": separacoes
         })
         
-class DetalheCard(View):
+class DetalheCardView(View):
     template_name = "expedicao/detalhe_carga.html"
 
     def get(self, request, pk):
         controle = get_object_or_404(ControleSeparacao, pk=pk)
 
-        return render(request, self.template_name, {
-            "controle": controle
-        })
+        context = {
+            "controle": controle,
+            # se existir relacionamento reverso, já deixamos pronto
+            "cargas": controle.cargas.all() if hasattr(controle, "cargas") else None,
+        }
+
+        return render(request, self.template_name, context)
 
     def post(self, request, pk):
         controle = get_object_or_404(ControleSeparacao, pk=pk)
 
         # =========================
-        # CAMPOS EDITÁVEIS DA EXPEDIÇÃO
+        # CAMPOS EDITÁVEIS
         # =========================
         controle.ot = request.POST.get("ot", "").strip()
         controle.outros_separadores = request.POST.get("outros_separadores", "").strip()
         controle.conferente = request.POST.get("conferente", "").strip()
         controle.observacao = request.POST.get("observacao", "").strip()
 
-        # Status da separação (se existir no form)
+        # Status (se existir no form)
         status = request.POST.get("status")
         if status:
             controle.status = status
 
         controle.save()
 
-        # 🔁 REDIRECIONA PARA O CENÁRIO DE SEPARAÇÃO
-        return redirect("expedicao:cenario_separacao")
+        messages.success(request, "Informações atualizadas com sucesso.")
+
+        # 🔁 volta para o próprio detalhe (UX melhor que jogar pra fora)
+        return redirect("expedicao:detalhe_card", pk=controle.pk)
     
+class CenarioCarregamentoView(View):
+    template_name = "expedicao/cenario_carregamento.html"
+
+    def get(self, request, *args, **kwargs):
+        # Pega o controle_id da URL
+        controle_id = kwargs.get('controle_id')
+        controle = get_object_or_404(ControleSeparacao, pk=controle_id)
+        cargas = controle.cargas.all()  # todas as SeparacaoCarga relacionadas
+
+        context = {
+            "controle": controle,
+            "cargas": cargas,
+        }
+        return render(request, self.template_name, context)

@@ -1,144 +1,112 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Expedição | Controle #{{ controle.id }}{% endblock %}
+{% block title %}Detalhe da Separação{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/transporte/cenario_transporte.css' %}">
+<div class="container mt-4">
 
-<div class="container mt-5">
+  <h4 class="mb-4">
+    Separação – Lecom {{ controle.lecom.lecom }}
+  </h4>
 
-    <div class="card shadow-sm border-0 rounded-4">
-        <div class="card-body">
+  <!-- DADOS DO CONTROLE -->
+  <div class="card mb-3">
+    <div class="card-body">
 
-            <h4 class="fw-bold text-primary mb-4">
-                Expedição • Controle #{{ controle.id }}
-            </h4>
+      <p><strong>Status:</strong> {{ controle.get_status_display }}</p>
+      <p><strong>Separadores:</strong> {{ controle.outros_separadores }}</p>
+      <p><strong>Conferente:</strong> {{ controle.conferente }}</p>
+      <p><strong>Criado em:</strong> {{ controle.criado_em|date:"d/m/Y H:i" }}</p>
 
-            <!-- ================= DADOS DO TRANSPORTE (SOMENTE LEITURA) ================= -->
-            <div class="border rounded-3 p-3 mb-4 bg-light">
-                <h6 class="fw-bold text-primary mb-3">
-                    Dados do Transporte
-                </h6>
+    </div>
+  </div>
 
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label class="form-label small">LECOM</label>
-                        <input type="text" class="form-control form-control-sm"
-                               value="{{ controle.lecom.lecom }}" readonly>
-                    </div>
+  <!-- FORMULÁRIO -->
+  <form method="post">
+    {% csrf_token %}
 
-                    <div class="col-md-3">
-                        <label class="form-label small">Destino</label>
-                        <input type="text" class="form-control form-control-sm"
-                               value="{{ controle.lecom.destino }}" readonly>
-                    </div>
+    <div class="card mb-4">
+      <div class="card-body">
 
-                    <div class="col-md-1">
-                        <label class="form-label small">UF</label>
-                        <input type="text" class="form-control form-control-sm"
-                               value="{{ controle.lecom.uf }}" readonly>
-                    </div>
+        <div class="row g-3">
 
-                    <div class="col-md-2">
-                        <label class="form-label small">Data</label>
-                        <input type="text" class="form-control form-control-sm"
-                               value="{{ controle.lecom.data|date:'d/m/Y' }}" readonly>
-                    </div>
+          <div class="col-md-4">
+            <label class="form-label">Outros Separadores</label>
+            <input
+              type="text"
+              name="outros_separadores"
+              class="form-control"
+              value="{{ controle.outros_separadores }}"
+            >
+          </div>
 
-                    <div class="col-md-3">
-                        <label class="form-label small">Veículo</label>
-                        <input type="text" class="form-control form-control-sm"
-                               value="{{ controle.lecom.veiculo.tipo_veiculo|default:'—' }}" readonly>
-                    </div>
+          <div class="col-md-4">
+            <label class="form-label">Conferente</label>
+            <input
+              type="text"
+              name="conferente"
+              class="form-control"
+              value="{{ controle.conferente }}"
+            >
+          </div>
 
-                    <div class="col-md-2">
-                        <label class="form-label small">Peso</label>
-                        <input type="text" class="form-control form-control-sm"
-                               value="{{ controle.lecom.peso }}" readonly>
-                    </div>
+          <div class="col-md-4">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+              {% for key, value in controle.STATUS_CHOICES %}
+                <option value="{{ key }}"
+                  {% if controle.status == key %}selected{% endif %}>
+                  {{ value }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
 
-                    <div class="col-md-2">
-                        <label class="form-label small">M³</label>
-                        <input type="text" class="form-control form-control-sm"
-                               value="{{ controle.lecom.m3 }}" readonly>
-                    </div>
-
-                    <div class="col-md-8">
-                        <label class="form-label small">Observação do Transporte</label>
-                        <input type="text" class="form-control form-control-sm"
-                               value="{{ controle.lecom.observacao|default:'—' }}" readonly>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= DADOS DA EXPEDIÇÃO (EDITÁVEIS) ================= -->
-            <form method="post">
-                {% csrf_token %}
-
-                <div class="border rounded-3 p-3 mb-4">
-                    <h6 class="fw-bold text-primary mb-3">
-                        Informações da Expedição
-                    </h6>
-
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <label class="form-label small">OT</label>
-                            <input type="text" name="ot"
-                                   class="form-control form-control-sm"
-                                   value="{{ controle.ot|default:'' }}">
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label small">Separador</label>
-                            <input type="text" name="outros_separadores"
-                                   class="form-control form-control-sm"
-                                   value="{{ controle.outros_separadores|default:'' }}">
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label small">Conferente</label>
-                            <input type="text" name="conferente"
-                                   class="form-control form-control-sm"
-                                   value="{{ controle.conferente|default:'' }}">
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label small">Status</label>
-                            <select name="status" class="form-select form-select-sm">
-                                <option value="Pendente" {% if controle.status == "Pendente" %}selected{% endif %}>
-                                    Pendente
-                                </option>
-                                <option value="Em Separação" {% if controle.status == "Em Separação" %}selected{% endif %}>
-                                    Em Separação
-                                </option>
-                                <option value="Finalizado" {% if controle.status == "Finalizado" %}selected{% endif %}>
-                                    Finalizado
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label small">Observações da Expedição</label>
-                            <textarea name="observacao" class="form-control" rows="4">{{ controle.observacao|default:'' }}</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ================= BOTÕES ================= -->
-                <div class="d-flex justify-content-between">
-                    <a href="{% url 'expedicao:cenario_expedicao' %}" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left me-1"></i> Voltar
-                    </a>
-
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save me-1"></i> Salvar
-                    </button>
-                </div>
-            </form>
+          <div class="col-12">
+            <label class="form-label">Observação</label>
+            <textarea
+              name="observacao"
+              class="form-control"
+              rows="2"
+            >{{ controle.observacao }}</textarea>
+          </div>
 
         </div>
+
+        <div class="text-end mt-3">
+          <button class="btn btn-success">
+            Salvar Alterações
+          </button>
+        </div>
+
+      </div>
     </div>
+  </form>
+
+  <!-- LISTA DE CARGAS -->
+  <h5 class="mb-3">Cargas da Separação</h5>
+
+  <div class="row g-3">
+    {% for carga in cargas %}
+      <div class="col-md-3">
+        <div class="card">
+          <div class="card-body">
+            <p class="mb-1"><strong>SEQ:</strong> {{ carga.seq }}</p>
+            <p class="mb-1"><strong>Carga:</strong> {{ carga.numero_transporte }}</p>
+            <p class="mb-1"><strong>MOD:</strong> {{ carga.mod }}</p>
+            <p class="mb-1"><strong>Box:</strong> {{ carga.entrega_box }}</p>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info">
+          Nenhuma carga vinculada a esta separação.
+        </div>
+      </div>
+    {% endfor %}
+  </div>
 
 </div>
 {% endblock %}
