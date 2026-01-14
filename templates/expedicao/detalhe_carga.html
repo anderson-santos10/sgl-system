@@ -1,112 +1,117 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Detalhe da Separação{% endblock %}
+{% block title %}Dados do Transporte{% endblock %}
 
 {% block content %}
+
 <div class="container mt-4">
 
-  <h4 class="mb-4">
-    Separação – Lecom {{ controle.lecom.lecom }}
-  </h4>
+  <!-- DASHBOARD -->
+  <section class="stats-wrapper">
 
-  <!-- DADOS DO CONTROLE -->
-  <div class="card mb-3">
-    <div class="card-body">
+    <!-- GRID PRINCIPAL -->
+    <section class="stats-grid">
 
-      <p><strong>Status:</strong> {{ controle.get_status_display }}</p>
-      <p><strong>Separadores:</strong> {{ controle.outros_separadores }}</p>
-      <p><strong>Conferente:</strong> {{ controle.conferente }}</p>
-      <p><strong>Criado em:</strong> {{ controle.criado_em|date:"d/m/Y H:i" }}</p>
+      <!-- CARD: DADOS LOGÍSTICOS -->
+      <article class="stats-card">
 
-    </div>
-  </div>
+        <header class="stats-header">
+          <h5 class="stats-title">Dados Transporte</h5>
+          <div class="stats-main">
+            #{{ lecom.pk }}
+          </div>
+        </header>
 
-  <!-- FORMULÁRIO -->
-  <form method="post">
-    {% csrf_token %}
+        <!-- IDENTIFICAÇÃO -->
+        <div class="stats-row stats-highlight">
+          <span class="stats-label">Lecom</span>
+          <span class="stats-value">{{ lecom.lecom }}</span>
+        </div>
 
-    <div class="card mb-4">
-      <div class="card-body">
+        <!-- LISTA DE DADOS -->
+        <div class="stats-list">
 
-        <div class="row g-3">
-
-          <div class="col-md-4">
-            <label class="form-label">Outros Separadores</label>
-            <input
-              type="text"
-              name="outros_separadores"
-              class="form-control"
-              value="{{ controle.outros_separadores }}"
-            >
+          <div class="stats-row">
+            <span class="stats-label">Peso</span>
+            <span class="stats-value">{{ lecom.peso }} kg</span>
           </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Conferente</label>
-            <input
-              type="text"
-              name="conferente"
-              class="form-control"
-              value="{{ controle.conferente }}"
-            >
+          <div class="stats-row">
+            <span class="stats-label">Destino</span>
+            <span class="stats-value">{{ lecom.destino }}</span>
           </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Status</label>
-            <select name="status" class="form-select">
-              {% for key, value in controle.STATUS_CHOICES %}
-                <option value="{{ key }}"
-                  {% if controle.status == key %}selected{% endif %}>
-                  {{ value }}
-                </option>
-              {% endfor %}
-            </select>
+          <div class="stats-row">
+            <span class="stats-label">Data</span>
+            <span class="stats-value">{{ lecom.data|date:"d/m/Y" }}</span>
           </div>
 
-          <div class="col-12">
-            <label class="form-label">Observação</label>
-            <textarea
-              name="observacao"
-              class="form-control"
-              rows="2"
-            >{{ controle.observacao }}</textarea>
+          <div class="stats-row">
+            <span class="stats-label">Veículo</span>
+            <span class="stats-value">
+              {{ lecom.veiculo.tipo_veiculo|default:"Não informado" }}
+            </span>
+          </div>
+
+          <div class="stats-row">
+            <span class="stats-label">M³</span>
+            <span class="stats-value">{{ lecom.m3 }}</span>
+          </div>
+
+          <div class="stats-row">
+            <span class="stats-label">Total de Cargas</span>
+            <span class="stats-value">{{ cargas|length }}</span>
+          </div>
+
+          <div class="stats-row">
+            <span class="stats-label">Observação</span>
+            <span class="stats-value">
+              {{ lecom.observacao|default:"—" }}
+            </span>
           </div>
 
         </div>
 
-        <div class="text-end mt-3">
-          <button class="btn btn-success">
-            Salvar Alterações
-          </button>
-        </div>
+      </article>
 
+    </section>
+
+    <!-- RESUMO -->
+    <section class="stats-summary">
+      <h5 class="section-title">Resumo</h5>
+
+      <div class="row g-3">
+        {% for carga in cargas %}
+          <div class="col-md-3">
+            <article class="carga-card">
+              <p><strong>SEQ:</strong> {{ carga.seq }}</p>
+              <p><strong>Carga:</strong> {{ carga.carga }}</p>
+              <p><strong>Entregas:</strong> {{ carga.total_entregas }}</p>
+              <p><strong>MOD:</strong> {{ carga.mod }}</p>
+            </article>
+          </div>
+        {% empty %}
+          <div class="col-12 text-muted">
+            Nenhuma carga vinculada.
+          </div>
+        {% endfor %}
       </div>
-    </div>
-  </form>
+    </section>
 
-  <!-- LISTA DE CARGAS -->
-  <h5 class="mb-3">Cargas da Separação</h5>
+    <!-- AÇÃO -->
+    <section class="stats-actions">
+      <form method="post" class="text-end mt-4">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-save">
+          Salvar Separação
+        </button>
+      </form>
+    </section>
 
-  <div class="row g-3">
-    {% for carga in cargas %}
-      <div class="col-md-3">
-        <div class="card">
-          <div class="card-body">
-            <p class="mb-1"><strong>SEQ:</strong> {{ carga.seq }}</p>
-            <p class="mb-1"><strong>Carga:</strong> {{ carga.numero_transporte }}</p>
-            <p class="mb-1"><strong>MOD:</strong> {{ carga.mod }}</p>
-            <p class="mb-1"><strong>Box:</strong> {{ carga.entrega_box }}</p>
-          </div>
-        </div>
-      </div>
-    {% empty %}
-      <div class="col-12">
-        <div class="alert alert-info">
-          Nenhuma carga vinculada a esta separação.
-        </div>
-      </div>
-    {% endfor %}
-  </div>
+  </section>
 
 </div>
+<link rel="stylesheet" href="{% static 'css/expedicao/detalhe_carga.css' %}">
+
 {% endblock %}

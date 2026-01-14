@@ -136,10 +136,13 @@ class DetalheCardView(View):
     def get(self, request, pk):
         controle = get_object_or_404(ControleSeparacao, pk=pk)
 
+        # relacionamento correto (ajuste se o nome for diferente)
+        lecom = controle.lecom  
+
         context = {
             "controle": controle,
-            # se existir relacionamento reverso, já deixamos pronto
-            "cargas": controle.cargas.all() if hasattr(controle, "cargas") else None,
+            "lecom": lecom,
+            "cargas": lecom.cargas.all()
         }
 
         return render(request, self.template_name, context)
@@ -147,15 +150,11 @@ class DetalheCardView(View):
     def post(self, request, pk):
         controle = get_object_or_404(ControleSeparacao, pk=pk)
 
-        # =========================
-        # CAMPOS EDITÁVEIS
-        # =========================
         controle.ot = request.POST.get("ot", "").strip()
         controle.outros_separadores = request.POST.get("outros_separadores", "").strip()
         controle.conferente = request.POST.get("conferente", "").strip()
         controle.observacao = request.POST.get("observacao", "").strip()
 
-        # Status (se existir no form)
         status = request.POST.get("status")
         if status:
             controle.status = status
@@ -163,9 +162,8 @@ class DetalheCardView(View):
         controle.save()
 
         messages.success(request, "Informações atualizadas com sucesso.")
-
-        # 🔁 volta para o próprio detalhe (UX melhor que jogar pra fora)
         return redirect("expedicao:detalhe_card", pk=controle.pk)
+
     
 class CenarioCarregamentoView(View):
     template_name = "expedicao/cenario_carregamento.html"

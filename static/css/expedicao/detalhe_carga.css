@@ -1,0 +1,192 @@
+/* ================================
+   VARIÁVEIS SGL
+   ================================ */
+:root {
+  --sgl-primary: #2563eb;
+  --sgl-primary-dark: #1e40af;
+  --sgl-bg-dark: #0f172a;
+  --sgl-card: #111827;
+  --sgl-border: #1f2933;
+  --sgl-text: #e5e7eb;
+  --sgl-muted: #9ca3af;
+  --sgl-success: #22c55e;
+}
+
+/* ================================
+   WRAPPER
+   ================================ */
+.stats-wrapper {
+  background-color: var(--sgl-bg-dark);
+  padding: 24px;
+  border-radius: 12px;
+}
+
+/* ================================
+   GRID
+   ================================ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+/* ================================
+   CARD PRINCIPAL
+   ================================ */
+.stats-card {
+  background-color: var(--sgl-card);
+  border: 1px solid var(--sgl-border);
+  border-radius: 10px;
+  padding: 20px;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0,0,0,.3);
+}
+
+/* ================================
+   HEADER
+   ================================ */
+.stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.stats-title {
+  font-size: 13px;
+  color: var(--sgl-muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+/* NÚMERO PRINCIPAL */
+.stats-main {
+  font-size: 44px;
+  font-weight: 700;
+  color: var(--sgl-primary);
+}
+
+/* ================================
+   LISTA DE DADOS
+   ================================ */
+.stats-list {
+  margin-top: 10px;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--sgl-border);
+}
+
+.stats-row:last-child {
+  border-bottom: none;
+}
+
+.stats-label {
+  font-size: 13px;
+  color: var(--sgl-muted);
+}
+
+.stats-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--sgl-text);
+}
+
+/* LINHA DE DESTAQUE */
+.stats-highlight {
+  background-color: rgba(37, 99, 235, 0.1);
+  border-left: 3px solid var(--sgl-primary);
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+/* ================================
+   RESUMO
+   ================================ */
+.section-title {
+  margin: 32px 0 16px;
+  font-size: 14px;
+  color: var(--sgl-text);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+/* CARD DE CARGA */
+.carga-card {
+  background-color: var(--sgl-card);
+  border: 1px solid var(--sgl-border);
+  border-radius: 10px;
+  padding: 14px;
+  height: 100%;
+  transition: border-color .2s ease;
+}
+
+.carga-card:hover {
+  border-color: var(--sgl-primary);
+}
+
+.carga-card p {
+  margin: 6px 0;
+  font-size: 13px;
+  color: var(--sgl-text);
+}
+
+.carga-card strong {
+  color: var(--sgl-primary);
+}
+
+/* ================================
+   AÇÕES
+   ================================ */
+.stats-actions {
+  margin-top: 30px;
+}
+
+.btn-save {
+  background-color: var(--sgl-success);
+  color: #fff;
+  font-weight: 600;
+  padding: 12px 28px;
+  border-radius: 8px;
+  border: none;
+}
+
+.btn-save:hover {
+  background-color: #16a34a;
+}
+
+/* ================================
+   MOBILE FINO
+   ================================ */
+@media (max-width: 576px) {
+  .stats-wrapper {
+    padding: 16px;
+  }
+
+  .stats-main {
+    font-size: 34px;
+  }
+
+  .stats-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .stats-value {
+    font-size: 13px;
+  }
+
+  .section-title {
+    margin-top: 24px;
+  }
+}
