@@ -1,0 +1,74 @@
+/* ================================
+   SGL • CARD
+   ================================ */
+.sgl-card {
+  background: var(--sgl-bg-card);
+  border: 1px solid var(--sgl-border);
+  border-radius: var(--sgl-radius-md);
+  padding: 20px;
+  box-shadow: var(--sgl-shadow-sm);
+}
+
+/* HEADER */
+.sgl-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.sgl-card-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--sgl-text-muted);
+}
+
+.sgl-card-main {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--sgl-primary);
+}
+
+/* LISTA */
+.sgl-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sgl-row {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--sgl-border-soft);
+}
+
+.sgl-row:last-child {
+  border-bottom: none;
+}
+
+.sgl-label {
+  font-size: 13px;
+  color: var(--sgl-text-muted);
+}
+
+.sgl-value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* BOTÕES */
+.sgl-btn-primary {
+  background: var(--sgl-success);
+  color: #fff;
+  border: none;
+  padding: 12px 28px;
+  border-radius: var(--sgl-radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sgl-btn-primary:hover {
+  background: #16a34a;
+}

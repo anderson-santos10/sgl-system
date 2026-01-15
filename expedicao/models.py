@@ -1,13 +1,14 @@
 from django.db import models
+from django.utils import timezone
 from transport.models import Lecom, Carga
 
 
 class ControleSeparacao(models.Model):
-    # 🔑 Lecom vira o ID da tabela
+    # 🔑 Lecom é a chave primária
     lecom = models.OneToOneField(
         Lecom,
         on_delete=models.CASCADE,
-        primary_key=True,          # <<< ESSENCIAL
+        primary_key=True,
         related_name="controle_separacao",
         verbose_name="Lecom"
     )
@@ -24,16 +25,25 @@ class ControleSeparacao(models.Model):
         default="Pendente"
     )
 
-    inicio_separacao = models.TimeField(
+    # =========================
+    # CONTROLE REAL DO PROCESSO
+    # =========================
+    liberada = models.BooleanField(
+        default=False,
+        help_text="Só aparece no cenário quando True"
+    )
+
+    inicio_separacao = models.DateTimeField(
         blank=True,
         null=True,
         verbose_name="Início da Separação"
     )
 
-    atribuida = models.BooleanField(default=False)
     finalizado = models.BooleanField(default=False)
 
-    # Separadores
+    # =========================
+    # RESPONSÁVEIS
+    # =========================
     outros_separadores = models.CharField(
         max_length=255,
         blank=True,
@@ -46,7 +56,9 @@ class ControleSeparacao(models.Model):
         default="Não informado"
     )
 
-    # Documentos
+    # =========================
+    # DOCUMENTOS
+    # =========================
     resumo_conf = models.BooleanField(default=False)
     resumo_motorista = models.BooleanField(default=False)
     etiquetas_cds = models.BooleanField(default=False)
@@ -58,6 +70,20 @@ class ControleSeparacao(models.Model):
         verbose_name = "Controle de Separação"
         verbose_name_plural = "Controles de Separação"
         ordering = ["-criado_em"]
+
+    # =========================
+    # MÉTODOS DE NEGÓCIO
+    # =========================
+    def liberar_separacao(self):
+        self.liberada = True
+        self.status = "Andamento"
+        self.inicio_separacao = timezone.now()
+        self.save()
+
+    def finalizar_separacao(self):
+        self.finalizado = True
+        self.status = "Concluido"
+        self.save()
 
     def __str__(self):
         return f"Separação Lecom {self.lecom.lecom}"
@@ -117,7 +143,11 @@ class SeparacaoCarga(models.Model):
         verbose_name = "Carga em Separação"
         verbose_name_plural = "Cargas em Separação"
         ordering = ["seq"]
-        unique_together = ("controle", "seq")  # protege SEQ duplicado
+        unique_together = ("controle", "seq")
 
     def __str__(self):
-        return f"SEQ {self.seq} | Carga {self.numero_transporte} | Lecom {self.carga.lecom.lecom}"
+        return (
+            f"SEQ {self.seq} | "
+            f"Carga {self.numero_transporte} | "
+            f"Lecom {self.carga.lecom.lecom}"
+        )

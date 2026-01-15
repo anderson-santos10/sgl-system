@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.views.generic import ListView
 from transport.models import Lecom
-from expedicao.models import ControleSeparacao
+from expedicao.models import ControleSeparacao, SeparacaoCarga
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -13,71 +13,49 @@ class CenarioExpedicaoView(LoginRequiredMixin, ListView):
     template_name = "expedicao/cenario_expedicao.html"
     context_object_name = "lecoms"
     ordering = ["-id"]
-    login_url = '/accounts/login/'
-
+    login_url = "/accounts/login/"
 
     def get_queryset(self):
-        # Começa pegando todas LECOMs LIBERADAS
         queryset = (
             super()
             .get_queryset()
-            .prefetch_related("cargas", "veiculo")
             .filter(status="LIBERADO")
+            .select_related("veiculo")
+            .prefetch_related("cargas")
         )
 
-        # FILTRO POR DATA (se houver)
-        transporte_id = self.request.GET.get("transporte_id")
-        lecom = self.request.GET.get("lecom")
-        status = self.request.GET.get("status")
-        carga = self.request.GET.get("carga")
-        veiculo = self.request.GET.get("veiculo")
-        destino = self.request.GET.get("destino")
+        # filtros
         data = self.request.GET.get("data")
+        lecom = self.request.GET.get("lecom")
+        destino = self.request.GET.get("destino")
+        veiculo = self.request.GET.get("veiculo")
+
         if data:
             queryset = queryset.filter(data=data)
-            
-        if transporte_id and transporte_id.isdigit():
-            queryset = queryset.filter(id=int(transporte_id))
-            
+
         if lecom:
             queryset = queryset.filter(lecom__icontains=lecom)
-        
-        if status in ["LIBERADO", "BLOQUEADO"]:
-            queryset = queryset.filter(status=status)
-            
-            
-        if carga:
-            queryset = queryset.filter(
-                cargas__carga__icontains=carga
-            ).distinct()
-            
-        if veiculo:
-            queryset = queryset.filter(
-                veiculo__tipo_veiculo=veiculo
-            )
-            
+
         if destino:
-            queryset = queryset.filter(
-                destino__icontains=destino
-            )
+            queryset = queryset.filter(destino__icontains=destino)
+
+        if veiculo:
+            queryset = queryset.filter(veiculo__tipo_veiculo=veiculo)
 
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Monta grupo_cargas só com LECOMs liberadas
-        grupo_cargas = []
-        for lecom in context["lecoms"]:
-            grupo_cargas.append({
+        context["grupo_cargas"] = [
+            {
                 "grupo": lecom,
                 "cargas": lecom.cargas.all().order_by("seq")
-            })
+            }
+            for lecom in context["lecoms"]
+        ]
 
-        context["grupo_cargas"] = grupo_cargas
         context["total_lecoms"] = context["lecoms"].count()
-
-        # Mantém o filtro de data no template
         context["filtro_data"] = self.request.GET.get("data", "")
 
         return context
@@ -120,62 +98,81 @@ class CenarioCardSeparacaoView(ListView):
 
         return context
 
-class CenarioSeparacaoView(View):
+class CenarioSeparacaoView(LoginRequiredMixin, View):
     template_name = "expedicao/cenario_separacao.html"
 
     def get(self, request):
-        separacoes = ControleSeparacao.objects.all().order_by("-id")
+        separacoes = (
+            ControleSeparacao.objects
+            .filter(liberada=True)
+            .select_related("lecom", "lecom__veiculo")
+            .prefetch_related("cargas", "cargas__carga")
+            .order_by("-criado_em")
+        )
 
         return render(request, self.template_name, {
             "separacoes": separacoes
         })
         
-class DetalheCardView(View):
+class DetalheCardView(LoginRequiredMixin, View):
     template_name = "expedicao/detalhe_carga.html"
 
     def get(self, request, pk):
-        controle = get_object_or_404(ControleSeparacao, pk=pk)
+        lecom = get_object_or_404(Lecom, pk=pk)
 
-        # relacionamento correto (ajuste se o nome for diferente)
-        lecom = controle.lecom  
-
-        context = {
-            "controle": controle,
+        return render(request, self.template_name, {
             "lecom": lecom,
-            "cargas": lecom.cargas.all()
-        }
-
-        return render(request, self.template_name, context)
+            "cargas": lecom.cargas.all().order_by("seq"),
+        })
 
     def post(self, request, pk):
-        controle = get_object_or_404(ControleSeparacao, pk=pk)
+        lecom = get_object_or_404(Lecom, pk=pk)
 
-        controle.ot = request.POST.get("ot", "").strip()
-        controle.outros_separadores = request.POST.get("outros_separadores", "").strip()
-        controle.conferente = request.POST.get("conferente", "").strip()
-        controle.observacao = request.POST.get("observacao", "").strip()
+        # evita duplicação
+        if hasattr(lecom, "controle_separacao"):
+            messages.warning(
+                request,
+                "Este transporte já possui separação criada."
+            )
+            return redirect("expedicao:cenario_separacao")
 
-        status = request.POST.get("status")
-        if status:
-            controle.status = status
+        # cria controle (NÃO liberado ainda)
+        controle = ControleSeparacao.objects.create(
+            lecom=lecom
+        )
 
-        controle.save()
+        # cria as cargas da separação
+        for carga in lecom.cargas.all():
+            SeparacaoCarga.objects.create(
+                controle=controle,
+                carga=carga,
+                seq=carga.seq or 1,
+                numero_transporte=carga.carga,
+                entregas=carga.total_entregas,
+                mod=carga.mod,
+            )
 
-        messages.success(request, "Informações atualizadas com sucesso.")
-        return redirect("expedicao:detalhe_card", pk=controle.pk)
+        # 🔥 LIBERAÇÃO OFICIAL
+        controle.liberar_separacao()
 
-    
-class CenarioCarregamentoView(View):
+        messages.success(
+            request,
+            "Separação criada e liberada com sucesso."
+        )
+
+        return redirect("expedicao:cenario_separacao")
+
+class CenarioCarregamentoView(LoginRequiredMixin, View):
     template_name = "expedicao/cenario_carregamento.html"
 
-    def get(self, request, *args, **kwargs):
-        # Pega o controle_id da URL
-        controle_id = kwargs.get('controle_id')
-        controle = get_object_or_404(ControleSeparacao, pk=controle_id)
-        cargas = controle.cargas.all()  # todas as SeparacaoCarga relacionadas
+    def get(self, request, controle_id):
+        controle = get_object_or_404(
+            ControleSeparacao,
+            pk=controle_id,
+            liberada=True
+        )
 
-        context = {
+        return render(request, self.template_name, {
             "controle": controle,
-            "cargas": cargas,
-        }
-        return render(request, self.template_name, context)
+            "cargas": controle.cargas.all()
+        })

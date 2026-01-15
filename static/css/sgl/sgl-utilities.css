@@ -1,0 +1,13 @@
+/* ================================
+   SGL • UTILITIES
+   ================================ */
+.mt-4 { margin-top: 24px; }
+.mt-5 { margin-top: 40px; }
+
+.text-muted {
+  color: var(--sgl-text-muted);
+}
+
+.text-right {
+  text-align: right;
+}

@@ -1,0 +1,88 @@
+/* =====================================================
+   SGL DESIGN TOKENS
+   Sistema de Gestão Logística
+   Arquivo: sgl-tokens.css
+   Responsável por variáveis globais (design system)
+===================================================== */
+
+:root {
+
+  /* =====================================================
+     🎨 CORES PRIMÁRIAS
+  ===================================================== */
+  --sgl-primary: #2563eb;          /* azul principal */
+  --sgl-primary-dark: #1e40af;     /* hover / destaque */
+  --sgl-primary-light: #dbeafe;    /* fundo suave */
+
+  /* =====================================================
+     🎨 CORES DE ESTADO
+  ===================================================== */
+  --sgl-success: #16a34a;
+  --sgl-warning: #f59e0b;
+  --sgl-danger: #dc2626;
+  --sgl-info: #0284c7;
+
+  /* =====================================================
+     🎨 CORES NEUTRAS
+  ===================================================== */
+  --sgl-bg-page: #f8fafc;
+  --sgl-bg-card: #ffffff;
+  --sgl-bg-muted: #f1f5f9;
+
+  --sgl-border: #e5e7eb;
+  --sgl-border-dark: #d1d5db;
+
+  --sgl-text-primary: #0f172a;
+  --sgl-text-secondary: #475569;
+  --sgl-text-muted: #64748b;
+
+  /* =====================================================
+     🔤 TIPOGRAFIA
+  ===================================================== */
+  --sgl-font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --sgl-font-size-xs: 0.75rem;     /* 12px */
+  --sgl-font-size-sm: 0.875rem;    /* 14px */
+  --sgl-font-size-md: 1rem;        /* 16px */
+  --sgl-font-size-lg: 1.125rem;    /* 18px */
+  --sgl-font-size-xl: 1.25rem;     /* 20px */
+
+  --sgl-font-weight-regular: 400;
+  --sgl-font-weight-medium: 500;
+  --sgl-font-weight-semibold: 600;
+  --sgl-font-weight-bold: 700;
+
+  /* =====================================================
+     📐 ESPAÇAMENTOS
+  ===================================================== */
+  --sgl-space-xxs: 4px;
+  --sgl-space-xs: 8px;
+  --sgl-space-sm: 12px;
+  --sgl-space-md: 16px;
+  --sgl-space-lg: 24px;
+  --sgl-space-xl: 32px;
+  --sgl-space-2xl: 48px;
+
+  /* =====================================================
+     📦 BORDER RADIUS
+  ===================================================== */
+  --sgl-radius-sm: 6px;
+  --sgl-radius-md: 10px;
+  --sgl-radius-lg: 14px;
+  --sgl-radius-xl: 20px;
+
+  /* =====================================================
+     🌫️ SOMBRAS
+  ===================================================== */
+  --sgl-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --sgl-shadow-md: 0 4px 10px rgba(0, 0, 0, 0.08);
+  --sgl-shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.12);
+
+  /* =====================================================
+     ⚡ TRANSIÇÕES
+  ===================================================== */
+  --sgl-transition-fast: 0.15s ease;
+  --sgl-transition-base: 0.25s ease;
+  --sgl-transition-slow: 0.4s ease;
+
+}

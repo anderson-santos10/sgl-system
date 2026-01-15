@@ -1,41 +1,54 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Dados do Transporte{% endblock %}
+{% block title %}Transporte #{{ lecom.pk }}{% endblock %}
 
 {% block content %}
 
+<link rel="stylesheet" href="{% static 'css/expedicao/detalhe_carga.css' %}">
+
 <div class="container mt-4">
+
+  <!-- HEADER DA PÁGINA -->
+  <div class="mb-4">
+    <h4 class="mb-1 fw-semibold">
+      Transporte #{{ lecom.pk }}
+    </h4>
+    <small class="text-muted">
+      Painel operacional de separação e conferência
+    </small>
+  </div>
 
   <!-- DASHBOARD -->
   <section class="stats-wrapper">
 
-    <!-- GRID PRINCIPAL -->
-    <section class="stats-grid">
+    <!-- CARD PRINCIPAL -->
+    <div class="stats-grid">
 
-      <!-- CARD: DADOS LOGÍSTICOS -->
       <article class="stats-card">
 
-        <header class="stats-header">
-          <h5 class="stats-title">Dados Transporte</h5>
+        <!-- HEADER DO CARD -->
+        <div class="stats-header">
+          <div>
+            <h5 class="stats-title mb-1">Dados do Transporte</h5>
+            <small class="text-muted">Identificação e logística</small>
+          </div>
+
           <div class="stats-main">
             #{{ lecom.pk }}
           </div>
-        </header>
-
-        <!-- IDENTIFICAÇÃO -->
-        <div class="stats-row stats-highlight">
-          <span class="stats-label">Lecom</span>
-          <span class="stats-value">{{ lecom.lecom }}</span>
         </div>
 
-        <!-- LISTA DE DADOS -->
-        <div class="stats-list">
-
+        <!-- IDENTIFICAÇÃO -->
+        <div class="stats-highlight">
           <div class="stats-row">
-            <span class="stats-label">Peso</span>
-            <span class="stats-value">{{ lecom.peso }} kg</span>
+            <span class="stats-label">LECOM</span>
+            <span class="stats-value">{{ lecom.lecom }}</span>
           </div>
+        </div>
+
+        <!-- DADOS LOGÍSTICOS -->
+        <div class="stats-list">
 
           <div class="stats-row">
             <span class="stats-label">Destino</span>
@@ -43,8 +56,10 @@
           </div>
 
           <div class="stats-row">
-            <span class="stats-label">Data</span>
-            <span class="stats-value">{{ lecom.data|date:"d/m/Y" }}</span>
+            <span class="stats-label">Data do Transporte</span>
+            <span class="stats-value">
+              {{ lecom.data|date:"d/m/Y" }}
+            </span>
           </div>
 
           <div class="stats-row">
@@ -54,14 +69,32 @@
             </span>
           </div>
 
+        </div>
+
+        <hr class="my-3">
+
+        <!-- DADOS OPERACIONAIS -->
+        <div class="stats-list">
+
           <div class="stats-row">
-            <span class="stats-label">M³</span>
-            <span class="stats-value">{{ lecom.m3 }}</span>
+            <span class="stats-label">Peso Total</span>
+            <span class="stats-value">
+              {{ lecom.peso }} kg
+            </span>
           </div>
 
           <div class="stats-row">
-            <span class="stats-label">Total de Cargas</span>
-            <span class="stats-value">{{ cargas|length }}</span>
+            <span class="stats-label">Volume Total</span>
+            <span class="stats-value">
+              {{ lecom.m3 }} m³
+            </span>
+          </div>
+
+          <div class="stats-row">
+            <span class="stats-label">Quantidade de Cargas</span>
+            <span class="stats-value">
+              {{ cargas|length }}
+            </span>
           </div>
 
           <div class="stats-row">
@@ -75,36 +108,62 @@
 
       </article>
 
-    </section>
+    </div>
 
-    <!-- RESUMO -->
-    <section class="stats-summary">
-      <h5 class="section-title">Resumo</h5>
+    <!-- RESUMO DAS CARGAS -->
+    <section class="stats-summary mt-5">
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="section-title mb-0">
+          Cargas Vinculadas
+        </h5>
+        <small class="text-muted">
+          {{ cargas|length }} carga(s)
+        </small>
+      </div>
 
       <div class="row g-3">
         {% for carga in cargas %}
-          <div class="col-md-3">
-            <article class="carga-card">
-              <p><strong>SEQ:</strong> {{ carga.seq }}</p>
-              <p><strong>Carga:</strong> {{ carga.carga }}</p>
-              <p><strong>Entregas:</strong> {{ carga.total_entregas }}</p>
-              <p><strong>MOD:</strong> {{ carga.mod }}</p>
+          <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+
+            <article class="carga-card h-100">
+
+              <p class="mb-1">
+                <strong class="text-primary">
+                  SEQ {{ carga.seq }}
+                </strong>
+              </p>
+
+              <p class="mb-1">
+                <strong>Carga:</strong> {{ carga.carga }}
+              </p>
+
+              <p class="mb-1">
+                <strong>Entregas:</strong> {{ carga.total_entregas }}
+              </p>
+
+              <p class="mb-0">
+                <strong>MOD:</strong> {{ carga.mod }}
+              </p>
+
             </article>
+
           </div>
         {% empty %}
           <div class="col-12 text-muted">
-            Nenhuma carga vinculada.
+            Nenhuma carga vinculada a este transporte.
           </div>
         {% endfor %}
       </div>
+
     </section>
 
-    <!-- AÇÃO -->
-    <section class="stats-actions">
-      <form method="post" class="text-end mt-4">
+    <!-- AÇÕES -->
+    <section class="stats-actions mt-5">
+      <form method="post" class="d-flex justify-content-end">
         {% csrf_token %}
-        <button type="submit" class="btn btn-save">
-          Salvar Separação
+        <button type="submit" class="btn-save">
+          ✔ Liberar Separação
         </button>
       </form>
     </section>
@@ -112,6 +171,5 @@
   </section>
 
 </div>
-<link rel="stylesheet" href="{% static 'css/expedicao/detalhe_carga.css' %}">
 
 {% endblock %}

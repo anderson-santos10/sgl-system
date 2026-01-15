@@ -1,0 +1,17 @@
+/* ================================
+   SGL • LAYOUT
+   ================================ */
+.sgl-container {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.sgl-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.sgl-grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+}

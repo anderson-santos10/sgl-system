@@ -1,0 +1,125 @@
+/* =====================================================
+   SGL BASE
+   Base visual do Sistema de Gestão Logística
+   Arquivo: sgl-base.css
+===================================================== */
+
+/* ===========================
+   RESET BÁSICO
+=========================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+/* ===========================
+   BODY
+=========================== */
+body {
+  font-family: var(--sgl-font-family);
+  font-size: var(--sgl-font-size-md);
+  font-weight: var(--sgl-font-weight-regular);
+  color: var(--sgl-text-primary);
+  background-color: var(--sgl-bg-page);
+  line-height: 1.6;
+}
+
+/* ===========================
+   TÍTULOS
+=========================== */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: var(--sgl-font-weight-semibold);
+  color: var(--sgl-text-primary);
+}
+
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.125rem; }
+h5 { font-size: 1rem; }
+h6 { font-size: 0.875rem; }
+
+/* ===========================
+   TEXTOS
+=========================== */
+p {
+  margin: 0;
+  color: var(--sgl-text-secondary);
+  font-size: var(--sgl-font-size-sm);
+}
+
+small {
+  font-size: var(--sgl-font-size-xs);
+  color: var(--sgl-text-muted);
+}
+
+/* ===========================
+   LINKS
+=========================== */
+a {
+  color: var(--sgl-primary);
+  text-decoration: none;
+  transition: color var(--sgl-transition-fast);
+}
+
+a:hover {
+  color: var(--sgl-primary-dark);
+}
+
+/* ===========================
+   HR
+=========================== */
+hr {
+  border: none;
+  border-top: 1px solid var(--sgl-border);
+}
+
+/* ===========================
+   UTILITÁRIOS BÁSICOS
+=========================== */
+.text-muted {
+  color: var(--sgl-text-muted);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* ===========================
+   CONTAINER PADRÃO
+=========================== */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: var(--sgl-space-md);
+}
+
+/* ===========================
+   FORM ELEMENTS (BASE)
+=========================== */
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: var(--sgl-font-size-sm);
+  color: var(--sgl-text-primary);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
