@@ -15,6 +15,7 @@ class ControleSeparacao(models.Model):
 
     STATUS_CHOICES = [
         ("Pendente", "Pendente"),
+        ("Aguardando", "Aguardando"),
         ("Andamento", "Em Andamento"),
         ("Concluido", "Concluído"),
     ]
@@ -40,10 +41,8 @@ class ControleSeparacao(models.Model):
     )
 
     finalizado = models.BooleanField(default=False)
-
-    # =========================
+    
     # RESPONSÁVEIS
-    # =========================
     outros_separadores = models.CharField(
         max_length=255,
         blank=True,
@@ -56,9 +55,7 @@ class ControleSeparacao(models.Model):
         default="Não informado"
     )
 
-    # =========================
     # DOCUMENTOS
-    # =========================
     resumo_conf = models.BooleanField(default=False)
     resumo_motorista = models.BooleanField(default=False)
     etiquetas_cds = models.BooleanField(default=False)
@@ -71,14 +68,12 @@ class ControleSeparacao(models.Model):
         verbose_name_plural = "Controles de Separação"
         ordering = ["-criado_em"]
 
-    # =========================
-    # MÉTODOS DE NEGÓCIO
-    # =========================
+
     def liberar_separacao(self):
         self.liberada = True
-        self.status = "Andamento"
-        self.inicio_separacao = timezone.now()
+        self.status = "Aguardando"
         self.save()
+
 
     def finalizar_separacao(self):
         self.finalizado = True

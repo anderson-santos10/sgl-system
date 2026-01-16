@@ -3,173 +3,102 @@
 
 {% block title %}Transporte #{{ lecom.pk }}{% endblock %}
 
-{% block content %}
-
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/expedicao/detalhe_carga.css' %}">
+{% endblock %}
 
-<div class="container mt-4">
+{% block content %}
+<div class="sgl-page">
 
-  <!-- HEADER DA PÁGINA -->
-  <div class="mb-4">
-    <h4 class="mb-1 fw-semibold">
-      Transporte #{{ lecom.pk }}
-    </h4>
-    <small class="text-muted">
-      Painel operacional de separação e conferência
-    </small>
-  </div>
-
-  <!-- DASHBOARD -->
-  <section class="stats-wrapper">
-
-    <!-- CARD PRINCIPAL -->
-    <div class="stats-grid">
-
-      <article class="stats-card">
-
-        <!-- HEADER DO CARD -->
-        <div class="stats-header">
-          <div>
-            <h5 class="stats-title mb-1">Dados do Transporte</h5>
-            <small class="text-muted">Identificação e logística</small>
-          </div>
-
-          <div class="stats-main">
-            #{{ lecom.pk }}
-          </div>
-        </div>
-
-        <!-- IDENTIFICAÇÃO -->
-        <div class="stats-highlight">
-          <div class="stats-row">
-            <span class="stats-label">LECOM</span>
-            <span class="stats-value">{{ lecom.lecom }}</span>
-          </div>
-        </div>
-
-        <!-- DADOS LOGÍSTICOS -->
-        <div class="stats-list">
-
-          <div class="stats-row">
-            <span class="stats-label">Destino</span>
-            <span class="stats-value">{{ lecom.destino }}</span>
-          </div>
-
-          <div class="stats-row">
-            <span class="stats-label">Data do Transporte</span>
-            <span class="stats-value">
-              {{ lecom.data|date:"d/m/Y" }}
-            </span>
-          </div>
-
-          <div class="stats-row">
-            <span class="stats-label">Veículo</span>
-            <span class="stats-value">
-              {{ lecom.veiculo.tipo_veiculo|default:"Não informado" }}
-            </span>
-          </div>
-
-        </div>
-
-        <hr class="my-3">
-
-        <!-- DADOS OPERACIONAIS -->
-        <div class="stats-list">
-
-          <div class="stats-row">
-            <span class="stats-label">Peso Total</span>
-            <span class="stats-value">
-              {{ lecom.peso }} kg
-            </span>
-          </div>
-
-          <div class="stats-row">
-            <span class="stats-label">Volume Total</span>
-            <span class="stats-value">
-              {{ lecom.m3 }} m³
-            </span>
-          </div>
-
-          <div class="stats-row">
-            <span class="stats-label">Quantidade de Cargas</span>
-            <span class="stats-value">
-              {{ cargas|length }}
-            </span>
-          </div>
-
-          <div class="stats-row">
-            <span class="stats-label">Observação</span>
-            <span class="stats-value">
-              {{ lecom.observacao|default:"—" }}
-            </span>
-          </div>
-
-        </div>
-
-      </article>
-
+  <!-- HEADER -->
+  <header class="sgl-header">
+    <div>
+      <h3>Transporte #{{ lecom.pk }}</h3>
+      <span>LECOM {{ lecom.lecom }} • {{ lecom.destino }}</span>
     </div>
 
-    <!-- RESUMO DAS CARGAS -->
-    <section class="stats-summary mt-5">
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn-primary">
+        Liberar Separação
+      </button>
+    </form>
+  </header>
 
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="section-title mb-0">
-          Cargas Vinculadas
-        </h5>
-        <small class="text-muted">
-          {{ cargas|length }} carga(s)
-        </small>
+  <!-- KPIs -->
+  <section class="sgl-kpis">
+    <div class="kpi">
+      <span>Peso</span>
+      <strong>{{ lecom.peso }} kg</strong>
+    </div>
+
+    <div class="kpi">
+      <span>Volume</span>
+      <strong>{{ lecom.m3 }} m³</strong>
+    </div>
+
+    <div class="kpi">
+      <span>Cargas</span>
+      <strong>{{ cargas|length }}</strong>
+    </div>
+
+    <div class="kpi">
+      <span>Veículo</span>
+      <strong>{{ lecom.veiculo.tipo_veiculo|default:"—" }}</strong>
+    </div>
+  </section>
+
+  <!-- DADOS DO TRANSPORTE -->
+  <section class="sgl-card">
+    <h5>Dados do Transporte</h5>
+
+    <div class="sgl-grid">
+      <div>
+        <label>Destino</label>
+        <p>{{ lecom.destino }}</p>
       </div>
 
-      <div class="row g-3">
-        {% for carga in cargas %}
-          <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
-
-            <article class="carga-card h-100">
-
-              <p class="mb-1">
-                <strong class="text-primary">
-                  SEQ {{ carga.seq }}
-                </strong>
-              </p>
-
-              <p class="mb-1">
-                <strong>Carga:</strong> {{ carga.carga }}
-              </p>
-
-              <p class="mb-1">
-                <strong>Entregas:</strong> {{ carga.total_entregas }}
-              </p>
-
-              <p class="mb-0">
-                <strong>MOD:</strong> {{ carga.mod }}
-              </p>
-
-            </article>
-
-          </div>
-        {% empty %}
-          <div class="col-12 text-muted">
-            Nenhuma carga vinculada a este transporte.
-          </div>
-        {% endfor %}
+      <div>
+        <label>Data</label>
+        <p>{{ lecom.data|date:"d/m/Y" }}</p>
       </div>
 
-    </section>
+      <div>
+        <label>Observação</label>
+        <p>{{ lecom.observacao|default:"—" }}</p>
+      </div>
+    </div>
+  </section>
 
-    <!-- AÇÕES -->
-    <section class="stats-actions mt-5">
-      <form method="post" class="d-flex justify-content-end">
-        {% csrf_token %}
-        <button type="submit" class="btn-save">
-          ✔ Liberar Separação
-        </button>
-      </form>
-    </section>
+  <!-- CARGAS -->
+  <section class="sgl-card">
+    <div class="sgl-card-header">
+      <h5>Cargas Vinculadas</h5>
+      <span>{{ cargas|length }} registro(s)</span>
+    </div>
 
+    <div class="sgl-table">
+      <div class="sgl-table-head">
+        <span>SEQ</span>
+        <span>Carga</span>
+        <span>Entregas</span>
+        <span>MOD</span>
+      </div>
+
+      {% for carga in cargas %}
+      <div class="sgl-table-row">
+        <span>{{ carga.seq }}</span>
+        <span>{{ carga.carga }}</span>
+        <span>{{ carga.total_entregas }}</span>
+        <span>{{ carga.mod }}</span>
+      </div>
+      {% empty %}
+      <div class="sgl-empty">
+        Nenhuma carga vinculada
+      </div>
+      {% endfor %}
+    </div>
   </section>
 
 </div>
-
 {% endblock %}

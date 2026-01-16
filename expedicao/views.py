@@ -98,21 +98,24 @@ class CenarioCardSeparacaoView(ListView):
 
         return context
 
-class CenarioSeparacaoView(LoginRequiredMixin, View):
-    template_name = "expedicao/cenario_separacao.html"
 
-    def get(self, request):
-        separacoes = (
+class CenarioSeparacaoView(LoginRequiredMixin, ListView):
+    template_name = "expedicao/cenario_separacao.html"
+    context_object_name = "separacoes"
+
+    def get_queryset(self):
+        return (
             ControleSeparacao.objects
-            .filter(liberada=True)
             .select_related("lecom", "lecom__veiculo")
-            .prefetch_related("cargas", "cargas__carga")
+            .prefetch_related("cargas")
+            .filter(
+                liberada=True,
+                status__in=["Aguardando", "Andamento"]
+            )
             .order_by("-criado_em")
         )
 
-        return render(request, self.template_name, {
-            "separacoes": separacoes
-        })
+
         
 class DetalheCardView(LoginRequiredMixin, View):
     template_name = "expedicao/detalhe_carga.html"
@@ -128,39 +131,45 @@ class DetalheCardView(LoginRequiredMixin, View):
     def post(self, request, pk):
         lecom = get_object_or_404(Lecom, pk=pk)
 
-        # evita duplicação
-        if hasattr(lecom, "controle_separacao"):
+        # tenta pegar o controle se já existir
+        controle = getattr(lecom, "controle_separacao", None)
+
+        # CASO 1: ainda NÃO existe controle
+
+        if not controle:
+            controle = ControleSeparacao.objects.create(
+                lecom=lecom
+            )
+
+            # cria as cargas da separação
+            for carga in lecom.cargas.all():
+                SeparacaoCarga.objects.create(
+                    controle=controle,
+                    carga=carga,
+                    seq=carga.seq or 1,
+                    numero_transporte=carga.carga,
+                    entregas=carga.total_entregas,
+                    mod=carga.mod,
+                )
+                
+        # CASO 2: existe mas ainda NÃO foi liberado
+
+        if not controle.liberada:
+            controle.liberar_separacao()
+
+            messages.success(
+                request,
+                "Separação liberada e enviada para o cenário."
+            )
+        else:
             messages.warning(
                 request,
-                "Este transporte já possui separação criada."
+                "Esta separação já está liberada."
             )
-            return redirect("expedicao:cenario_separacao")
-
-        # cria controle (NÃO liberado ainda)
-        controle = ControleSeparacao.objects.create(
-            lecom=lecom
-        )
-
-        # cria as cargas da separação
-        for carga in lecom.cargas.all():
-            SeparacaoCarga.objects.create(
-                controle=controle,
-                carga=carga,
-                seq=carga.seq or 1,
-                numero_transporte=carga.carga,
-                entregas=carga.total_entregas,
-                mod=carga.mod,
-            )
-
-        # 🔥 LIBERAÇÃO OFICIAL
-        controle.liberar_separacao()
-
-        messages.success(
-            request,
-            "Separação criada e liberada com sucesso."
-        )
 
         return redirect("expedicao:cenario_separacao")
+
+    
 
 class CenarioCarregamentoView(LoginRequiredMixin, View):
     template_name = "expedicao/cenario_carregamento.html"

@@ -1,223 +1,174 @@
-/* ================================
-   VARIÁVEIS SGL (TEMA CLARO)
-   ================================ */
+/* =====================
+   VARIÁVEIS
+===================== */
 :root {
-  --sgl-primary: #2563eb;
-  --sgl-primary-dark: #1e40af;
-
-  --sgl-bg-page: #f7f7f8;
-  --sgl-card: #ffffff;
-
-  --sgl-border: #e5e7eb;
-  --sgl-border-soft: #eef2f7;
-
-  --sgl-text: #111827;        /* texto principal */
-  --sgl-muted: #6b7280;       /* texto secundário */
-
-  --sgl-success: #22c55e;
-
-  --sgl-radius-sm: 6px;
-  --sgl-radius-md: 10px;
-  --sgl-radius-lg: 14px;
-
-  --sgl-shadow-sm: 0 1px 2px rgba(0,0,0,.05);
-  --sgl-shadow-md: 0 10px 25px rgba(0,0,0,.08);
+  --primary: #2563eb;
+  --success: #22c55e;
+  --bg: #f7f7f8;
+  --card: #ffffff;
+  --border: #e5e7eb;
+  --muted: #6b7280;
+  --text: #111827;
 }
 
-/* ================================
-   WRAPPER
-   ================================ */
-.stats-wrapper {
-  background-color: var(--sgl-bg-page);
-  padding: 24px;
-  border-radius: var(--sgl-radius-lg);
+/* =====================
+   BASE
+===================== */
+body {
+  background: var(--bg);
 }
 
-/* ================================
-   GRID
-   ================================ */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
+.sgl-page {
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-/* ================================
-   CARD PRINCIPAL
-   ================================ */
-.stats-card {
-  background-color: var(--sgl-card);
-  border: 1px solid var(--sgl-border);
-  border-radius: var(--sgl-radius-md);
-  padding: 20px;
-  box-shadow: var(--sgl-shadow-sm);
-  transition: all .2s ease;
+label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
-.stats-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--sgl-primary);
-  box-shadow: var(--sgl-shadow-md);
+h3, h5 {
+  margin: 0;
 }
 
-/* ================================
+/* =====================
    HEADER
-   ================================ */
-.stats-header {
+===================== */
+.sgl-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 16px 20px;
+  border-radius: 10px;
 }
 
-.stats-title {
-  font-size: 12px;
-  color: var(--sgl-muted);
-  text-transform: uppercase;
-  letter-spacing: .12em;
-}
-
-/* NÚMERO PRINCIPAL */
-.stats-main {
-  font-size: 42px;
-  font-weight: 700;
-  color: var(--sgl-primary);
-  line-height: 1.1;
-}
-
-/* ================================
-   LISTA DE DADOS
-   ================================ */
-.stats-list {
-  margin-top: 10px;
-}
-
-.stats-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--sgl-border-soft);
-}
-
-.stats-row:last-child {
-  border-bottom: none;
-}
-
-.stats-label {
+.sgl-header span {
   font-size: 13px;
-  color: var(--sgl-muted);
+  color: var(--muted);
 }
 
-.stats-value {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--sgl-text);
-}
-
-/* ================================
-   LINHA DE DESTAQUE
-   ================================ */
-.stats-highlight {
-  background-color: rgba(37, 99, 235, 0.08);
-  border-left: 4px solid var(--sgl-primary);
-  padding: 10px 14px;
-  border-radius: var(--sgl-radius-sm);
-  margin-bottom: 14px;
-}
-
-.stats-highlight .stats-label {
-  font-weight: 600;
-}
-
-/* ================================
-   RESUMO
-   ================================ */
-.section-title {
-  margin: 32px 0 16px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--sgl-muted);
-  text-transform: uppercase;
-  letter-spacing: .12em;
-}
-
-/* ================================
-   CARD DE CARGA
-   ================================ */
-.carga-card {
-  background-color: var(--sgl-card);
-  border: 1px solid var(--sgl-border);
-  border-radius: var(--sgl-radius-md);
-  padding: 14px;
-  height: 100%;
-  transition: all .2s ease;
-}
-
-.carga-card:hover {
-  border-color: var(--sgl-primary);
-  box-shadow: var(--sgl-shadow-sm);
-}
-
-.carga-card p {
-  margin: 6px 0;
-  font-size: 13px;
-  color: var(--sgl-text);
-}
-
-.carga-card strong {
-  color: var(--sgl-primary);
-  font-weight: 600;
-}
-
-/* ================================
-   AÇÕES
-   ================================ */
-.stats-actions {
-  margin-top: 32px;
-  text-align: right;
-}
-
-.btn-save {
-  background-color: var(--sgl-success);
+/* =====================
+   BOTÃO
+===================== */
+.btn-primary {
+  background: var(--success);
   color: #fff;
-  font-weight: 600;
-  padding: 12px 30px;
-  border-radius: var(--sgl-radius-sm);
   border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: var(--sgl-shadow-sm);
-  transition: all .2s ease;
 }
 
-.btn-save:hover {
-  background-color: #16a34a;
-  transform: translateY(-1px);
+.btn-primary:hover {
+  background: #16a34a;
 }
 
-.btn-save:active {
-  transform: translateY(0);
+/* =====================
+   KPIs
+===================== */
+.sgl-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
 }
 
-/* ================================
-   MOBILE
-   ================================ */
-@media (max-width: 576px) {
-  .stats-wrapper {
-    padding: 16px;
+.kpi {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.kpi span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.kpi strong {
+  font-size: 16px;
+}
+
+/* =====================
+   CARD
+===================== */
+.sgl-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.sgl-card-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+/* =====================
+   GRID
+===================== */
+.sgl-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.sgl-grid p {
+  margin: 2px 0 0;
+  font-size: 14px;
+}
+
+/* =====================
+   TABELA
+===================== */
+.sgl-table-head,
+.sgl-table-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 120px 80px;
+  padding: 8px 10px;
+  align-items: center;
+}
+
+.sgl-table-head {
+  background: #f1f5f9;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.sgl-table-row {
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.sgl-table-row:hover {
+  background: #f9fafb;
+}
+
+.sgl-empty {
+  padding: 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* =====================
+   RESPONSIVO
+===================== */
+@media (max-width: 768px) {
+  .sgl-kpis {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .stats-main {
-    font-size: 34px;
-  }
-
-  .stats-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
-
-  .stats-actions {
-    text-align: center;
+  .sgl-grid {
+    grid-template-columns: 1fr;
   }
 }
