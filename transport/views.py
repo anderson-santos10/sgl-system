@@ -26,7 +26,14 @@ class CriarTransporteView(View):
     template_name = "transport/inserir_carga.html"
 
     def get(self, request):
-        return render(request, self.template_name)
+        return render(
+            request,
+            self.template_name,
+            {
+                "status_default": "BLOQUEADO"
+            }
+        )
+
 
     def post(self, request):
         lecom_code = request.POST.get("lecom", "").strip()
@@ -130,7 +137,6 @@ class CriarTransporteView(View):
         messages.success(request, f"LECOM {lecom.lecom} criada com sucesso.")
         return render(request, self.template_name)
 
-# Cenário Transporte
 
 class CenarioTransporteView(ListView):
     model = Lecom

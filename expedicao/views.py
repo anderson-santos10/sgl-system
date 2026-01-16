@@ -6,7 +6,7 @@ from expedicao.models import ControleSeparacao, SeparacaoCarga
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-
+from django.db import transaction
 
 class CenarioExpedicaoView(LoginRequiredMixin, ListView):
     model = Lecom
@@ -98,7 +98,6 @@ class CenarioCardSeparacaoView(ListView):
 
         return context
 
-
 class CenarioSeparacaoView(LoginRequiredMixin, ListView):
     template_name = "expedicao/cenario_separacao.html"
     context_object_name = "separacoes"
@@ -114,8 +113,6 @@ class CenarioSeparacaoView(LoginRequiredMixin, ListView):
             )
             .order_by("-criado_em")
         )
-
-
         
 class DetalheCardView(LoginRequiredMixin, View):
     template_name = "expedicao/detalhe_carga.html"
@@ -169,8 +166,6 @@ class DetalheCardView(LoginRequiredMixin, View):
 
         return redirect("expedicao:cenario_separacao")
 
-    
-
 class CenarioCarregamentoView(LoginRequiredMixin, View):
     template_name = "expedicao/cenario_carregamento.html"
 
@@ -185,3 +180,55 @@ class CenarioCarregamentoView(LoginRequiredMixin, View):
             "controle": controle,
             "cargas": controle.cargas.all()
         })
+
+class EditarSeparacaoView(View):
+    template_name = "expedicao/editar_separacao.html"
+
+    def get(self, request, pk):
+        controle = get_object_or_404(ControleSeparacao, pk=pk)
+
+        # normalmente 1 separação por controle
+        separacao = SeparacaoCarga.objects.filter(controle=controle).first()
+
+        context = {
+            "controle": controle,
+            "lecom": controle.lecom,
+            "cargas": controle.cargas.all(),
+            "separacao": separacao,
+        }
+
+        return render(request, self.template_name, context)
+
+    def post(self, request, pk):
+        controle = get_object_or_404(ControleSeparacao, pk=pk)
+        separacao = SeparacaoCarga.objects.filter(controle=controle).first()
+
+        try:
+            with transaction.atomic():
+
+         
+                # CONTROLE SEPARAÇÃO
+                controle.resumo_conf = bool(request.POST.get("resumo_conf"))
+                controle.resumo_motorista = bool(request.POST.get("resumo_motorista"))
+                controle.etiquetas_cds = bool(request.POST.get("etiquetas_cds"))
+                controle.carga_gerada = bool(request.POST.get("carga_gerada"))
+
+                controle.save()
+
+                # SEPARAÇÃO CARGA
+                if separacao:
+                    separacao.ot = request.POST.get("ot", "").strip()
+                    separacao.atribuida = bool(request.POST.get("atribuida"))
+                    separacao.finalizada = bool(request.POST.get("finalizada"))
+                    separacao.conferente = request.POST.get(
+                        "conferente", "Não informado"
+                    ).strip()
+
+                    separacao.save()
+
+        except Exception as e:
+            messages.error(request, f"Erro ao salvar separação: {e}")
+            return redirect("expedicao:editar_separacao", pk=pk)
+
+        messages.success(request, "Separação atualizada com sucesso.")
+        return redirect("expedicao:editar_separacao", pk=pk)

@@ -10,23 +10,24 @@
 {% block content %}
 <div class="sgl-page">
 
-  <!-- HEADER -->
-  <header class="sgl-header">
-    <div>
+  <!-- ================= HEADER ================= -->
+  <header class="sgl-header sgl-header-inline">
+    <div class="sgl-header-left">
       <h3>Transporte #{{ lecom.pk }}</h3>
-      <span>LECOM {{ lecom.lecom }} • {{ lecom.destino }}</span>
+      <small>
+        LECOM {{ lecom.lecom }} • {{ lecom.destino }} / {{ lecom.uf }}
+      </small>
     </div>
 
-    <form method="post">
-      {% csrf_token %}
-      <button type="submit" class="btn-primary">
-        Liberar Separação
-      </button>
-    </form>
+    <div class="sgl-header-right">
+      <span class="sgl-badge sgl-badge-{{ lecom.status|lower }}">
+        {{ lecom.get_status_display }}
+      </span>
+    </div>
   </header>
 
-  <!-- KPIs -->
-  <section class="sgl-kpis">
+  <!-- ================= KPIs ================= -->
+  <section class="sgl-kpis sgl-kpis-compact">
     <div class="kpi">
       <span>Peso</span>
       <strong>{{ lecom.peso }} kg</strong>
@@ -48,11 +49,13 @@
     </div>
   </section>
 
-  <!-- DADOS DO TRANSPORTE -->
-  <section class="sgl-card">
-    <h5>Dados do Transporte</h5>
+  <!-- ================= DADOS ================= -->
+  <section class="sgl-card sgl-card-compact">
+    <div class="sgl-card-header">
+      <h5>Dados do Transporte</h5>
+    </div>
 
-    <div class="sgl-grid">
+    <div class="sgl-grid sgl-grid-3">
       <div>
         <label>Destino</label>
         <p>{{ lecom.destino }}</p>
@@ -70,11 +73,11 @@
     </div>
   </section>
 
-  <!-- CARGAS -->
+  <!-- ================= CARGAS ================= -->
   <section class="sgl-card">
-    <div class="sgl-card-header">
+    <div class="sgl-card-header sgl-card-header-inline">
       <h5>Cargas Vinculadas</h5>
-      <span>{{ cargas|length }} registro(s)</span>
+      <span class="sgl-muted">{{ cargas|length }} registro(s)</span>
     </div>
 
     <div class="sgl-table">
@@ -98,6 +101,16 @@
       </div>
       {% endfor %}
     </div>
+  </section>
+
+  <!-- ================= AÇÃO ================= -->
+  <section class="sgl-actions">
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary btn-lg">
+        Liberar Separação
+      </button>
+    </form>
   </section>
 
 </div>

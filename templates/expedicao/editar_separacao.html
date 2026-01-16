@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Editar Separação{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-lg-4">
+
+    <!-- ================= HEADER ================= -->
+    <div class="card shadow-sm border-0 mb-4 rounded-4">
+        <div class="card-body">
+
+            <h4 class="fw-bold text-primary mb-3">
+                <i class="bi bi-box-seam"></i>
+                Separação – Transporte {{ controle.lecom.lecom }}
+            </h4>
+
+            <div class="row small">
+                <div class="col-md-3">
+                    <strong>Destino:</strong><br>
+                    {{ controle.lecom.destino }}
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Data:</strong><br>
+                    {{ controle.lecom.data|date:"d/m/Y" }}
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Veículo:</strong><br>
+                    {{ controle.lecom.veiculo.tipo_veiculo|default:"—" }}
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Status:</strong><br>
+                    <span class="badge bg-warning text-dark">
+                        {{ controle.status }}
+                    </span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================= DOCUMENTOS ================= -->
+    <form method="post" class="card shadow-sm border-0 mb-4 rounded-4">
+        {% csrf_token %}
+        <div class="card-body">
+
+            <h5 class="fw-bold mb-3">
+                <i class="bi bi-file-earmark-check"></i>
+                Documentos da Separação
+            </h5>
+
+            <div class="row small">
+                <div class="col-md-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="resumo_conf"
+                               {% if controle.resumo_conf %}checked{% endif %}>
+                        <label class="form-check-label">
+                            Resumo Conferente
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="resumo_motorista"
+                               {% if controle.resumo_motorista %}checked{% endif %}>
+                        <label class="form-check-label">
+                            Resumo Motorista
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="etiquetas_cds"
+                               {% if controle.etiquetas_cds %}checked{% endif %}>
+                        <label class="form-check-label">
+                            Etiquetas CDs
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="carga_gerada"
+                               {% if controle.carga_gerada %}checked{% endif %}>
+                        <label class="form-check-label">
+                            Carga Gerada
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- ================= CARGAS ================= -->
+    <h5 class="fw-bold mb-3">
+        <i class="bi bi-layers"></i> Cargas e Sequências
+    </h5>
+
+    <div class="row g-4">
+
+        {% for carga in cargas %}
+        <div class="col-md-6 col-lg-4">
+
+            <div class="card h-100 shadow-sm border-0 rounded-4">
+                <div class="card-body">
+
+                    <h6 class="fw-bold text-primary mb-2">
+                        Carga {{ carga.numero_carga }}
+                    </h6>
+
+                    <p class="mb-2">
+                        <strong>Sequência:</strong> {{ carga.sequencia }}
+                    </p>
+
+                    <div class="mb-2">
+                        <strong>Separadores responsáveis:</strong>
+                        <ul class="mb-0 ps-3 small">
+                            {% for separador in carga.separadores.all %}
+                                <li>{{ separador.nome }}</li>
+                            {% empty %}
+                                <li class="text-muted">Nenhum separador definido</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <span class="badge bg-info">
+                        {{ carga.status }}
+                    </span>
+
+                </div>
+            </div>
+
+        </div>
+        {% empty %}
+        <p class="text-muted text-center">
+            Nenhuma carga vinculada
+        </p>
+        {% endfor %}
+
+    </div>
+        <div class="text-end mt-4">
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="bi bi-save"></i> Salvar
+            </button>
+        </div>
+</div>
+{% endblock %}
