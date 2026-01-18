@@ -65,50 +65,69 @@
             </h4>
             <small class="text-muted">Transportes liberados aguardando separação</small>
         </div>
-
-        <button class="btn btn-outline-primary btn-sm"
-                data-bs-toggle="offcanvas"
-                data-bs-target="#offcanvasFiltro">
+        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFiltro">
             <i class="bi bi-funnel me-1"></i> Filtros
         </button>
     </div>
 
-    <!-- GRID DE CARDS -->
+    <!-- GRID DE CARDS PRINCIPAIS -->
     <div class="row g-4">
         {% for grupo in grupo_cargas %}
         <div class="col-md-6 col-lg-3">
 
-            <!-- CARD PRINCIPAL DO TRANSPORTE -->
-            <div class="card shadow-sm border-0 h-100 rounded-4 bg-light separacao-card"
-                 data-url="{% url 'expedicao:editar_separacao' grupo.grupo.pk %}">
+            <!-- CARD PRINCIPAL -->
+            <div class="card shadow-sm border-0 h-100 rounded-4 bg-light sgl-card">
 
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Transporte: {{ grupo.grupo.lecom.lecom }}</span>
-                    {% if grupo.grupo.status == "Aguardando" %}
-                        <span class="badge bg-info">Aguardando</span>
-                    {% elif grupo.grupo.status == "Andamento" %}
-                        <span class="badge bg-warning text-dark">Em andamento</span>
-                    {% else %}
-                        <span class="badge bg-success">Concluído</span>
-                    {% endif %}
+                <div class="card-header">
+                    <div class="d-flex flex-column gap-1">
+                        <div>
+                            {% if grupo.grupo.status == "Aguardando" %}
+                                <span class="badge bg-info">Aguardando</span>
+                            {% elif grupo.grupo.status == "Andamento" %}
+                                <span class="badge bg-warning text-dark">Em andamento</span>
+                            {% else %}
+                                <span class="badge bg-success">Concluído</span>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span><strong>Transporte:</strong> {{ grupo.grupo.lecom.lecom }}</span>
+                            <span><strong>ID:</strong> {{ grupo.grupo.id }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span><strong>Destino:</strong> {{ grupo.grupo.lecom.destino }}</span>
+                            <span><strong>Veículo:</strong> {{ grupo.grupo.lecom.veiculo.tipo_veiculo|default:"—" }}</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="card-body">
-                    <h6 class="fw-bold text-primary mb-2">
-                        <i class="bi bi-geo-alt"></i> {{ grupo.grupo.lecom.destino }}
-                    </h6>
-                    <p>
-                        <i class="bi bi-truck-front"></i> Veículo: {{ grupo.grupo.lecom.veiculo.tipo_veiculo|default:"—" }}
-                    </p>
+                <div class="card-body p-2">
 
-                    <!-- SUB-CARDS PARA CADA CARGA -->
+                    <!-- SUB-CARDS CLICÁVEIS -->
                     {% for carga in grupo.cargas %}
-                    <div class="card mb-2 p-2 shadow-sm bg-white sub-card">
-                        <p class="mb-1"><strong>Seg: {{ carga.seq }}</strong> | Carga: {{ carga.carga }}</p>
-                        <p class="mb-1"><strong>OT:</strong> {{ carga.ot }}</p>
-                        <p class="mb-1"><strong>Conferentes:</strong>
-                            {% for c in carga.conferentes.all %}{{ c.nome }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                        </p>
+                    <div class="card mb-2 p-2 shadow-sm bg-white sgl-subcard hover-shadow"
+                         data-url="{% url 'expedicao:editar_carga' carga.pk %}">
+                        <div class="d-flex justify-content-between flex-wrap">
+                            <span><strong>Seg:</strong> {{ carga.seq|default:"Não informado" }}</span>
+                            <span><strong>Carga:</strong> {{ carga.carga|default:"Não informado" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between flex-wrap">
+                            <span><strong>OT:</strong> {{ carga.ot|default:"Não informado" }}</span>
+                            <span><strong>Box:</strong> {{ carga.box|default:"Não informado" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between flex-wrap">
+                            <span><strong>Hora Início:</strong> {{ carga.hora_inicio_separacao|default:"Não informado" }}</span>
+                            <span><strong>Separadores:</strong> 
+                                {% if carga.separadores.exists %}
+                                    {% for s in carga.separadores.all %}{{ s.nome }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                {% else %}Não informado{% endif %}
+                            </span>
+                        </div>
+                        <div class="mb-1">
+                            <strong>Conferentes:</strong> 
+                            {% if carga.conferentes.exists %}
+                                {% for c in carga.conferentes.all %}{{ c.nome }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                            {% else %}Não informado{% endif %}
+                        </div>
                         <ul class="ps-3 mb-0 small">
                             {% if carga.resumo_conf %}<li>Resumo Conferente</li>{% endif %}
                             {% if carga.resumo_motorista %}<li>Resumo Motorista</li>{% endif %}
@@ -120,21 +139,16 @@
                         </ul>
                     </div>
                     {% empty %}
-                    <p class="text-muted small">Nenhuma carga</p>
+                        <p class="text-muted small">Nenhuma carga</p>
                     {% endfor %}
-
                 </div>
             </div>
         </div>
         {% empty %}
-        <p class="text-center text-muted mt-4">
-            Nenhum transporte no cenário de separação
-        </p>
+        <p class="text-center text-muted mt-4">Nenhum transporte no cenário de separação</p>
         {% endfor %}
     </div>
 </div>
 
-<!-- JS -->
 <script src="{% static 'js/expedicao/cenario_separacao.js' %}"></script>
-
 {% endblock %}

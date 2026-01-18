@@ -10,7 +10,7 @@ urlpatterns = [
     path('detalhe/<int:pk>/', DetalheCardView.as_view(), name = "detalhe_card"),
     path("separacao/", CenarioSeparacaoView.as_view(),name="cenario_separacao"),
     path('cenario/carregamento/<int:controle_id>/', CenarioCarregamentoView.as_view(), name='cenario_carregamento'),
-    path("separacao/editar/<int:pk>/",EditarSeparacaoView.as_view(),name="editar_separacao")
+    path("separacao/editar/<int:pk>/",EditarSeparacaoView.as_view(),name="editar_carga")
 
     
 
