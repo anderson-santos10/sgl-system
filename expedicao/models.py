@@ -16,7 +16,7 @@ class ControleSeparacao(models.Model):
     STATUS_CHOICES = [
         ("Pendente", "Pendente"),
         ("Aguardando", "Aguardando"),
-        ("Andamento", "Em Andamento"),
+        ("Em Andamento", "Em Andamento"),
         ("Concluido", "Concluído"),
     ]
 

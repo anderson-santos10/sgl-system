@@ -60,15 +60,14 @@ class Mod(models.Model):
 
 class Veiculo(models.Model):
     TIPO_VEICULO_CHOICES = [
-        ("3/4", "3/4"),
-        ("Toco", "Toco"),
+        ("Utilitario", "Utilitário"),
+        ("Container", "Container"),
+        ("Bi-Truck", "Bi-Truck"),
+        ("Rodotrem", "Rodotrem"),
         ("Carreta", "Carreta"),
         ("Truck", "Truck"),
-        ("Rodotrem", "Rodotrem"),
-        ("Container", "Container"),
-        ("Utilitario", "Utilitário"),
-    ]
-    tipo_veiculo = models.CharField(
-        max_length=20, choices=TIPO_VEICULO_CHOICES, blank=True, default="Não informado")
-    lecom = models.OneToOneField(
-        Lecom, on_delete=models.CASCADE, related_name="veiculo")
+        ("Toco", "Toco"),
+        ("3/4", "3/4"),
+        ]
+    tipo_veiculo = models.CharField(max_length=20, choices=TIPO_VEICULO_CHOICES, blank=True, default="Não informado")
+    lecom = models.OneToOneField(Lecom, on_delete=models.CASCADE, related_name="veiculo")

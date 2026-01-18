@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.views.generic import ListView
-from transport.models import Lecom
+from transport.models import Carga, Lecom, Veiculo
 from expedicao.models import ControleSeparacao, SeparacaoCarga
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -29,6 +29,11 @@ class CenarioExpedicaoView(LoginRequiredMixin, ListView):
         lecom = self.request.GET.get("lecom")
         destino = self.request.GET.get("destino")
         veiculo = self.request.GET.get("veiculo")
+        controle_id = self.request.GET.get("controle_id")
+        carga = self.request.GET.get("carga")
+        
+        if controle_id:
+            queryset = queryset.filter(id=controle_id)
 
         if data:
             queryset = queryset.filter(data=data)
@@ -41,11 +46,16 @@ class CenarioExpedicaoView(LoginRequiredMixin, ListView):
 
         if veiculo:
             queryset = queryset.filter(veiculo__tipo_veiculo=veiculo)
+        
+        if carga:
+            queryset = queryset.filter(cargas__carga__icontains=carga).distinct()
 
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        context["veiculos"] = Veiculo.TIPO_VEICULO_CHOICES
 
         context["grupo_cargas"] = [
             {
@@ -60,59 +70,78 @@ class CenarioExpedicaoView(LoginRequiredMixin, ListView):
 
         return context
 
-class CenarioCardSeparacaoView(ListView):
-    model = Lecom
-    template_name = "expedicao/cenario_card_separacao.html"
-    context_object_name = "lecoms"
-    ordering = ["-id"]
-
-    def get_queryset(self):
-        # Retorna apenas LECOMs liberadas e faz prefetch para otimizar queries
-        queryset = (
-            super()
-            .get_queryset()
-            .filter(status="LIBERADO")
-            .prefetch_related("cargas", "veiculo")
-        )
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # Agrupa cargas por LECOM
-        grupo_cargas = []
-        for lecom in context["lecoms"]:
-            grupo_cargas.append({
-                "grupo": lecom,
-                "cargas": lecom.cargas.all().order_by("seq")
-            })
-
-        context["grupo_cargas"] = grupo_cargas
-        context["total_lecoms"] = context["lecoms"].count()
-
-        # Opcional: manter filtros, se tiver algum
-        context["filtro_data"] = self.request.GET.get("data", "")
-        context["filtro_lecom"] = self.request.GET.get("lecom", "")
-        context["filtro_carga"] = self.request.GET.get("carga", "")
-        context["filtro_veiculo"] = self.request.GET.get("veiculo", "")
-
-        return context
-
 class CenarioSeparacaoView(LoginRequiredMixin, ListView):
     template_name = "expedicao/cenario_separacao.html"
-    context_object_name = "separacoes"
+    context_object_name = "grupo_cargas"
+    login_url = "/accounts/login/"
 
     def get_queryset(self):
-        return (
+        # queryset base
+        queryset = (
             ControleSeparacao.objects
             .select_related("lecom", "lecom__veiculo")
             .prefetch_related("cargas")
             .filter(
                 liberada=True,
-                status__in=["Aguardando", "Andamento"]
+                status__in=["Aguardando", "Andamento", "Concluido"]
             )
             .order_by("-criado_em")
         )
+
+        # filtros GET
+        controle_id = self.request.GET.get("controle_id")
+        data = self.request.GET.get("data")
+        lecom_val = self.request.GET.get("lecom")
+        destino_val = self.request.GET.get("destino")
+        veiculo_val = self.request.GET.get("veiculo")
+        carga_val = self.request.GET.get("carga")
+        status_val = self.request.GET.get("status")
+
+        if controle_id and controle_id.isdigit():
+            queryset = queryset.filter(id=int(controle_id))
+
+        if data:
+            queryset = queryset.filter(lecom__data=data)
+
+        if lecom_val:
+            queryset = queryset.filter(lecom__lecom__icontains=lecom_val)
+
+        if destino_val:
+            queryset = queryset.filter(lecom__destino__icontains=destino_val)
+
+        if veiculo_val:
+            queryset = queryset.filter(lecom__veiculo__tipo_veiculo=veiculo_val)
+
+        if carga_val:
+            # filtra pelas cargas relacionadas
+            queryset = queryset.filter(
+                cargas__carga__icontains=carga_val
+            ).distinct()
+
+        if status_val:
+            queryset = queryset.filter(status=status_val)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # montar grupo de cargas legível para template
+        grupo_cargas = []
+        for controle in context["grupo_cargas"]:
+            grupo_cargas.append({
+                "grupo": controle,  # o card principal (ControleSeparacao)
+                "cargas": controle.cargas.all().order_by("seq")  # sub-cards das cargas
+            })
+
+        context["grupo_cargas"] = grupo_cargas
+
+        # opções de veículos para filtro
+        context["veiculos"] = Veiculo.TIPO_VEICULO_CHOICES
+
+        return context
+
+
         
 class DetalheCardView(LoginRequiredMixin, View):
     template_name = "expedicao/detalhe_carga.html"

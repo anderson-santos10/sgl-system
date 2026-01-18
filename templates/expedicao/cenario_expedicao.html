@@ -41,11 +41,8 @@
     <label class="form-label">Veículo</label>
     <select name="veiculo" class="form-select form-select-sm">
         <option value="">Todos</option>
-        {% for tipo in veiculos %}
-            <option value="{{ tipo }}"
-                {% if request.GET.veiculo == tipo %}selected{% endif %}>
-                {{ tipo }}
-            </option>
+        {% for value, label in veiculos %}
+            <option value="{{ value }}">{{ label }}</option>
         {% endfor %}
     </select>
 </div>
@@ -163,7 +160,7 @@
                             <tr>
                                 <td colspan="14" class="text-center text-muted py-4">
                                     <i class="bi bi-inbox me-1"></i>
-                                    Nenhum transporte pendente encontrado
+                                    Nenhum transporte encontrado
                                 </td>
                             </tr>
                         {% endfor %}

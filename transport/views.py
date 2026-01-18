@@ -9,8 +9,8 @@ from django.utils.dateparse import parse_date
 from .models import Lecom, Carga, Entrega, Veiculo
 from expedicao.services import sincronizar_expedicao
 
-# Função auxiliar para Decimal
 
+# Função auxiliar para Decimal
 def safe_decimal(value, default=Decimal("0.00")):
     if value is None:
         return default
@@ -21,7 +21,6 @@ def safe_decimal(value, default=Decimal("0.00")):
         return default
 
 # Criar Transporte
-
 class CriarTransporteView(View):
     template_name = "transport/inserir_carga.html"
 
@@ -137,7 +136,6 @@ class CriarTransporteView(View):
         messages.success(request, f"LECOM {lecom.lecom} criada com sucesso.")
         return render(request, self.template_name)
 
-
 class CenarioTransporteView(ListView):
     model = Lecom
     template_name = "transport/cenario_transporte.html"
@@ -147,6 +145,7 @@ class CenarioTransporteView(ListView):
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related("cargas", "veiculo")
 
+        # Filtragem via GET
         transporte_id = self.request.GET.get("transporte_id")
         lecom = self.request.GET.get("lecom")
         status = self.request.GET.get("status")
@@ -180,32 +179,21 @@ class CenarioTransporteView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['veiculos'] = (
-            Veiculo.objects
-            .exclude(tipo_veiculo="Não informado")
-            .values_list('tipo_veiculo', flat=True)
-            .distinct()
-            .order_by('tipo_veiculo')
-        )
+        # Veículos para o filtro 
+        context["veiculos"] = Veiculo.TIPO_VEICULO_CHOICES
 
+        # Agrupamento de cargas por lecom
         grupo_cargas = []
-        for lecom in context["lecoms"]:
+        for lecom_obj in context["lecoms"]:
             grupo_cargas.append({
-                "grupo": lecom,
-                "cargas": lecom.cargas.all().order_by("seq")
+                "grupo": lecom_obj,
+                "cargas": lecom_obj.cargas.all().order_by("seq")
             })
         context["grupo_cargas"] = grupo_cargas
         context["total_lecoms"] = context["lecoms"].count()
 
-        # Mantém filtros
-        context["filtro_transporte_id"] = self.request.GET.get("transporte_id", "")
-        context["filtro_lecom"] = self.request.GET.get("lecom", "")
-        context["filtro_status"] = self.request.GET.get("status", "")
-        context["filtro_veiculo"] = self.request.GET.get("veiculo", "")
-        context["filtro_carga"] = self.request.GET.get("carga", "")
-        context["filtro_data"] = self.request.GET.get("data", "")
-
         return context
+
 # Editar Transporte
 
 class EditarTransporteView(View):
