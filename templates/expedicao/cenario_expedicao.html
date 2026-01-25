@@ -46,8 +46,6 @@
         {% endfor %}
     </select>
 </div>
-
-<input type="hidden" name="status" value="PENDENTE">
 {% endblock %}
 
 {% block content %}
@@ -75,7 +73,7 @@
             </button>
         </div>
     </div>
-    
+
     <div class="card shadow-sm border-0 rounded-4">
         <div class="card-body p-0">
             <div class="table-wrapper">
@@ -97,7 +95,7 @@
                             <th style="width:90px">Entregas</th>
                             <th style="width:80px">MOD</th>
                             <th style="width:220px">Observação</th>
-                            <th style="width:90px">Status</th>
+                            <th style="width:120px">Status</th>
                         </tr>
                     </thead>
 
@@ -109,7 +107,7 @@
 
                                     {% if forloop.first %}
                                         <td rowspan="{{ item.cargas|length }}" class="bg-light fw-semibold">
-                                            {% with controle=item.grupo.controles.first %}
+                                            {% with controle=item.grupo.controle_separacao %}
                                                 <a href="{% url 'expedicao:detalhe_card' controle.id|default:item.grupo.id %}"
                                                    class="text-decoration-none text-primary fw-semibold">
                                                     #{{ item.grupo.id }}
@@ -147,10 +145,25 @@
                                         <td rowspan="{{ item.cargas|length }}" class="text-truncate">
                                             {{ item.grupo.observacao|default:"—" }}
                                         </td>
+
                                         <td rowspan="{{ item.cargas|length }}">
-                                            <span class="badge bg-warning text-dark">
-                                                Pendente
-                                            </span>
+                                            {% with controle=item.grupo.controle_separacao %}
+                                                {% if controle %}
+                                                    {% if controle.status == "Pendente" %}
+                                                        <span class="badge bg-warning text-dark">Pendente</span>
+                                                    {% elif controle.status == "Aguardando" %}
+                                                        <span class="badge bg-info text-dark">Aguardando</span>
+                                                    {% elif controle.status == "Em Andamento" %}
+                                                        <span class="badge bg-primary">Em andamento</span>
+                                                    {% elif controle.status == "Concluido" %}
+                                                        <span class="badge bg-success">Concluído</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">{{ controle.status }}</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark">Pendente</span>
+                                                {% endif %}
+                                            {% endwith %}
                                         </td>
                                     {% endif %}
 

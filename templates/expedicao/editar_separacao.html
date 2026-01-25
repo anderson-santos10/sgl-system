@@ -42,60 +42,6 @@
         </div>
     </div>
 
-    <!-- ================= DOCUMENTOS ================= -->
-    <form method="post" class="card shadow-sm border-0 mb-4 rounded-4">
-        {% csrf_token %}
-        <div class="card-body">
-
-            <h5 class="fw-bold mb-3">
-                <i class="bi bi-file-earmark-check"></i>
-                Documentos da Separação
-            </h5>
-
-            <div class="row small">
-                <div class="col-md-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="resumo_conf"
-                               {% if controle.resumo_conf %}checked{% endif %}>
-                        <label class="form-check-label">
-                            Resumo Conferente
-                        </label>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="resumo_motorista"
-                               {% if controle.resumo_motorista %}checked{% endif %}>
-                        <label class="form-check-label">
-                            Resumo Motorista
-                        </label>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="etiquetas_cds"
-                               {% if controle.etiquetas_cds %}checked{% endif %}>
-                        <label class="form-check-label">
-                            Etiquetas CDs
-                        </label>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="carga_gerada"
-                               {% if controle.carga_gerada %}checked{% endif %}>
-                        <label class="form-check-label">
-                            Carga Gerada
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
-
     <!-- ================= CARGAS ================= -->
     <h5 class="fw-bold mb-3">
         <i class="bi bi-layers"></i> Cargas e Sequências
@@ -106,7 +52,9 @@
         {% for carga in cargas %}
         <div class="col-md-6 col-lg-4">
 
-            <div class="card h-100 shadow-sm border-0 rounded-4">
+            <form method="post" class="card h-100 shadow-sm border-0 rounded-4">
+                {% csrf_token %}
+
                 <div class="card-body">
 
                     <h6 class="fw-bold text-primary mb-2">
@@ -114,11 +62,11 @@
                     </h6>
 
                     <p class="mb-2">
-                        <strong>Sequência:</strong> {{ carga.sequencia }}
+                        <strong>Resumo:</strong> {{ carga.seq }}
                     </p>
 
                     <div class="mb-2">
-                        <strong>Separadores responsáveis:</strong>
+                        <strong>Separadores:</strong>
                         <ul class="mb-0 ps-3 small">
                             {% for separador in carga.separadores.all %}
                                 <li>{{ separador.nome }}</li>
@@ -128,25 +76,78 @@
                         </ul>
                     </div>
 
-                    <span class="badge bg-info">
+                    <span class="badge bg-info mb-3">
                         {{ carga.status }}
                     </span>
 
+                    <hr>
+
+                    <!-- ===== DOCUMENTOS DA CARGA ===== -->
+                    <h6 class="fw-bold mb-2">
+                        <i class="bi bi-file-earmark-check"></i>
+                        Documentos
+                    </h6>
+
+                    <div class="small">
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   name="resumo_conf"
+                                   {% if carga.resumo_conf %}checked{% endif %}>
+                            <label class="form-check-label">
+                                Resumo Conferente
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   name="resumo_motorista"
+                                   {% if carga.resumo_motorista %}checked{% endif %}>
+                            <label class="form-check-label">
+                                Resumo Motorista
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   name="etiquetas_cds"
+                                   {% if carga.etiquetas_cds %}checked{% endif %}>
+                            <label class="form-check-label">
+                                Etiquetas CDs
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   name="carga_gerada"
+                                   {% if carga.carga_gerada %}checked{% endif %}>
+                            <label class="form-check-label">
+                                Carga Gerada
+                            </label>
+                        </div>
+
+                    </div>
+
                 </div>
-            </div>
+
+                <!-- ===== AÇÕES DA CARGA ===== -->
+                <div class="card-footer bg-white border-0 text-end">
+                    <input type="hidden" name="carga_id" value="{{ carga.id }}">
+                    <button type="submit" class="btn btn-success btn-sm">
+                        <i class="bi bi-play-circle"></i> Iniciar
+                    </button>
+                </div>
+
+            </form>
 
         </div>
         {% empty %}
-        <p class="text-muted text-center">
-            Nenhuma carga vinculada
-        </p>
+            <p class="text-muted text-center">
+                Nenhuma carga vinculada
+            </p>
         {% endfor %}
 
     </div>
-        <div class="text-end mt-4">
-            <button type="submit" class="btn btn-primary btn-sm">
-                <i class="bi bi-save"></i> Salvar
-            </button>
-        </div>
+
 </div>
 {% endblock %}
