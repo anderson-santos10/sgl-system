@@ -1,11 +1,14 @@
 from pathlib import Path
+from django.contrib.messages import constants as messages
 from decouple import config, Csv
 from dj_database_url import parse as db_url
 import os
-
 import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+MESSAGE_TAGS = {
+    messages.ERROR: "danger",
+}
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 

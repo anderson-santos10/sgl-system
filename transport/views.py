@@ -33,7 +33,6 @@ class CriarTransporteView(View):
             }
         )
 
-
     def post(self, request):
         lecom_code = request.POST.get("lecom", "").strip()
         destino = request.POST.get("destino", "").strip()
@@ -42,7 +41,7 @@ class CriarTransporteView(View):
         m3 = safe_decimal(request.POST.get("m3"))
         data = parse_date(request.POST.get("data", "").strip())
         observacao = request.POST.get("observacao", "").strip()
-        status = request.POST.get("status", "BLOQUEADO")  # pega o status do formulário
+        status = request.POST.get("status", "BLOQUEADO")
 
         errors = []
         if not lecom_code:
@@ -60,7 +59,7 @@ class CriarTransporteView(View):
             return render(request, self.template_name)
 
         if Lecom.objects.filter(lecom=lecom_code).exists():
-            messages.error(request, "Esse Número de LECOM já existe.")
+            messages.error(request, "Já existe um transporte com esse número de LECOM.")
             return render(request, self.template_name)
 
         tipo_veiculo = request.POST.get("tipo_veiculo", "Não informado")
@@ -86,7 +85,7 @@ class CriarTransporteView(View):
                     m3=m3,
                     data=data,
                     observacao=observacao,
-                    status=status,  # salva o status
+                    status=status,
                 )
 
                 # Veículo
@@ -103,7 +102,7 @@ class CriarTransporteView(View):
                             request,
                             f"A carga {carga_num} já existe para este LECOM."
                         )
-                        raise ValueError("Carga duplicada")
+                        raise ValueError
 
                     carga_obj = Carga.objects.create(
                         lecom=lecom,
@@ -129,12 +128,14 @@ class CriarTransporteView(View):
 
         except ValueError:
             return render(request, self.template_name)
-        except Exception as e:
-            messages.error(request, f"Erro ao salvar: {e}")
+
+        except Exception:
+            messages.error(request, "Erro inesperado ao salvar o transporte.")
             return render(request, self.template_name)
 
-        messages.success(request, f"LECOM {lecom.lecom} criada com sucesso.")
+        messages.success(request, f"LECOM {lecom.lecom} criado com sucesso.")
         return render(request, self.template_name)
+
 
 class CenarioTransporteView(ListView):
     model = Lecom
@@ -194,7 +195,6 @@ class CenarioTransporteView(ListView):
 
         return context
 
-# Editar Transporte
 
 class EditarTransporteView(View):
     template_name = "transport/inserir_carga.html"
@@ -212,50 +212,67 @@ class EditarTransporteView(View):
     def post(self, request, pk):
         lecom = get_object_or_404(Lecom, pk=pk)
 
-        # Atualiza campos do Lecom
-        lecom.lecom = request.POST.get("lecom")
-        lecom.destino = request.POST.get("destino")
-        lecom.uf = request.POST.get("uf")
-        lecom.data = request.POST.get("data")
-        lecom.observacao = request.POST.get("observacao")
-        lecom.status = request.POST.get("status", "BLOQUEADO")
-        lecom.peso = safe_decimal(request.POST.get("peso"))
-        lecom.m3 = safe_decimal(request.POST.get("m3"))
-        lecom.save()
+        try:
+            # Atualiza campos do Lecom
+            lecom.lecom = request.POST.get("lecom")
+            lecom.destino = request.POST.get("destino")
+            lecom.uf = request.POST.get("uf")
+            lecom.data = request.POST.get("data")
+            lecom.observacao = request.POST.get("observacao")
+            lecom.status = request.POST.get("status", "BLOQUEADO")
+            lecom.peso = safe_decimal(request.POST.get("peso"))
+            lecom.m3 = safe_decimal(request.POST.get("m3"))
+            lecom.save()
 
-        # Atualiza veículo
-        tipo_veiculo = request.POST.get("tipo_veiculo", "Não informado")
-        Veiculo.objects.update_or_create(
-            lecom=lecom,
-            defaults={"tipo_veiculo": tipo_veiculo}
-        )
-
-        # Atualiza cargas
-        carga_nomes = request.POST.getlist("carga[]")
-        seqs = request.POST.getlist("seq[]")
-        total_entregas_list = request.POST.getlist("total_entregas[]")
-        mods = request.POST.getlist("mod[]")
-        carga_ids = request.POST.getlist("carga_id[]")
-        cargas_existentes = list(lecom.cargas.all().order_by("seq"))
-
-        for i, carga_nome in enumerate(carga_nomes):
-            if carga_ids and i < len(carga_ids):
-                carga = get_object_or_404(Carga, pk=carga_ids[i])
-            elif i < len(cargas_existentes):
-                carga = cargas_existentes[i]
-            else:
-                continue
-
-            carga.carga = carga_nome
-            carga.seq = int(seqs[i]) if i < len(seqs) and seqs[i] else i + 1
-            carga.total_entregas = (
-                total_entregas_list[i] if i < len(total_entregas_list) and total_entregas_list[i] else "1"
+            # Atualiza veículo
+            tipo_veiculo = request.POST.get("tipo_veiculo", "Não informado")
+            Veiculo.objects.update_or_create(
+                lecom=lecom,
+                defaults={"tipo_veiculo": tipo_veiculo}
             )
-            carga.mod = mods[i] if i < len(mods) and mods[i] else "-"
-            carga.save()
 
-        # 🔄 Regras de negócio da expedição
-        sincronizar_expedicao(lecom)
+            # Atualiza cargas
+            carga_nomes = request.POST.getlist("carga[]")
+            seqs = request.POST.getlist("seq[]")
+            total_entregas_list = request.POST.getlist("total_entregas[]")
+            mods = request.POST.getlist("mod[]")
+            carga_ids = request.POST.getlist("carga_id[]")
+            cargas_existentes = list(lecom.cargas.all().order_by("seq"))
 
-        return redirect(self.success_url)
+            for i, carga_nome in enumerate(carga_nomes):
+                if carga_ids and i < len(carga_ids):
+                    carga = get_object_or_404(Carga, pk=carga_ids[i])
+                elif i < len(cargas_existentes):
+                    carga = cargas_existentes[i]
+                else:
+                    continue
+
+                carga.carga = carga_nome
+                carga.seq = int(seqs[i]) if i < len(seqs) and seqs[i] else i + 1
+                carga.total_entregas = (
+                    total_entregas_list[i]
+                    if i < len(total_entregas_list) and total_entregas_list[i]
+                    else "1"
+                )
+                carga.mod = mods[i] if i < len(mods) and mods[i] else "-"
+                carga.save()
+
+            # 🔄 Regras de negócio da expedição
+            sincronizar_expedicao(lecom)
+
+            messages.success(request, "Transporte atualizado com sucesso.")
+            return redirect(self.success_url)
+
+        except Exception:
+            messages.error(request, "Erro ao atualizar o transporte.")
+
+            cargas = lecom.cargas.all().order_by("seq")
+
+            return render(request, self.template_name, {
+                "lecom": lecom,
+                "cargas": cargas,
+                "modo_edicao": True
+            })
+
+
 

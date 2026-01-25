@@ -22,23 +22,8 @@
             Gestão de LECOM, veículo, cargas e entregas
           </small>
         </div>
-
-        {% if lecom %}
-          <span class="badge rounded-pill px-3 py-2
-            {% if lecom.status == 'LIBERADO' %}bg-success{% else %}bg-danger{% endif %}">
-            {{ lecom.status }}
-          </span>
-        {% endif %}
       </div>
-
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags|default:'info' }} py-2 small">
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-
+      
       <form method="post">
         {% csrf_token %}
 

@@ -10,33 +10,59 @@
     <div class="card shadow-sm border-0 mb-4 rounded-4">
         <div class="card-body">
 
-            <h4 class="fw-bold text-primary mb-3">
-                <i class="bi bi-box-seam"></i>
-                Separação – Transporte {{ controle.lecom.lecom }}
-            </h4>
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
 
-            <div class="row small">
-                <div class="col-md-3">
-                    <strong>Destino:</strong><br>
-                    {{ controle.lecom.destino }}
+                <div>
+                    <h4 class="fw-bold text-primary mb-1">
+                        <i class="bi bi-box-seam me-1"></i>
+                        Transporte {{ controle.lecom.lecom }}
+                    </h4>
+                    <small class="text-muted">Controle de separação</small>
                 </div>
 
-                <div class="col-md-3">
-                    <strong>Data:</strong><br>
-                    {{ controle.lecom.data|date:"d/m/Y" }}
+                <span class="badge px-3 py-2 fs-6 d-flex align-items-center gap-1
+                    {% if controle.status == 'Pendente' %}bg-warning text-dark
+                    {% elif controle.status == 'Em Andamento' %}bg-primary
+                    {% elif controle.status == 'Concluido' %}bg-success
+                    {% else %}bg-secondary{% endif %}">
+                    {% if controle.status == 'Pendente' %}
+                        <i class="bi bi-hourglass-split"></i>
+                    {% elif controle.status == 'Em Andamento' %}
+                        <i class="bi bi-arrow-repeat"></i>
+                    {% elif controle.status == 'Concluido' %}
+                        <i class="bi bi-check-circle-fill"></i>
+                    {% else %}
+                        <i class="bi bi-info-circle"></i>
+                    {% endif %}
+                    {{ controle.status }}
+                </span>
+
+            </div>
+
+            <hr class="my-3">
+
+            <div class="row g-3 small">
+
+                <div class="col-6 col-md-2">
+                    <span class="text-muted">ID</span>
+                    <div class="fw-semibold">#{{ controle.lecom.pk }}</div>
                 </div>
 
-                <div class="col-md-3">
-                    <strong>Veículo:</strong><br>
-                    {{ controle.lecom.veiculo.tipo_veiculo|default:"—" }}
+                <div class="col-6 col-md-3">
+                    <span class="text-muted">Destino</span>
+                    <div class="fw-semibold">{{ controle.lecom.destino }}</div>
                 </div>
 
-                <div class="col-md-3">
-                    <strong>Status:</strong><br>
-                    <span class="badge bg-warning text-dark">
-                        {{ controle.status }}
-                    </span>
+                <div class="col-6 col-md-2">
+                    <span class="text-muted">Data</span>
+                    <div class="fw-semibold">{{ controle.lecom.data|date:"d/m/Y" }}</div>
                 </div>
+
+                <div class="col-6 col-md-3">
+                    <span class="text-muted">Veículo</span>
+                    <div class="fw-semibold">{{ controle.lecom.veiculo.tipo_veiculo|default:"—" }}</div>
+                </div>
+
             </div>
 
         </div>
@@ -44,7 +70,7 @@
 
     <!-- ================= CARGAS ================= -->
     <h5 class="fw-bold mb-3">
-        <i class="bi bi-layers"></i> Cargas e Sequências
+        <i class="bi bi-layers me-1"></i> Cargas e Sequências
     </h5>
 
     <div class="row g-4">
@@ -57,95 +83,137 @@
 
                 <div class="card-body">
 
-                    <h6 class="fw-bold text-primary mb-2">
-                        Carga {{ carga.numero_carga }}
-                    </h6>
+                    <!-- HEADER DA CARGA -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold text-primary mb-0">
+                            <i class="bi bi-truck me-1"></i>
+                            Carga {{ carga.carga.carga }}
+                        </h6>
 
-                    <p class="mb-2">
-                        <strong>Resumo:</strong> {{ carga.seq }}
-                    </p>
-
-                    <div class="mb-2">
-                        <strong>Separadores:</strong>
-                        <ul class="mb-0 ps-3 small">
-                            {% for separador in carga.separadores.all %}
-                                <li>{{ separador.nome }}</li>
-                            {% empty %}
-                                <li class="text-muted">Nenhum separador definido</li>
-                            {% endfor %}
-                        </ul>
+                        <span class="badge d-flex align-items-center gap-1
+                            {% if carga.status == 'Pendente' %}bg-warning text-dark
+                            {% elif carga.status == 'Em Andamento' %}bg-primary
+                            {% elif carga.status == 'Concluido' %}bg-success
+                            {% else %}bg-secondary{% endif %}">
+                            {% if carga.status == 'Pendente' %}
+                                <i class="bi bi-hourglass"></i>
+                            {% elif carga.status == 'Em Andamento' %}
+                                <i class="bi bi-arrow-repeat"></i>
+                            {% elif carga.status == 'Concluido' %}
+                                <i class="bi bi-check-circle-fill"></i>
+                            {% else %}
+                                <i class="bi bi-info-circle"></i>
+                            {% endif %}
+                            {{ carga.status }}
+                        </span>
                     </div>
 
-                    <span class="badge bg-info mb-3">
-                        {{ carga.status }}
-                    </span>
+                    <p class="mb-3 small">
+                        <span class="text-muted">Sequência:</span>
+                        <strong>{{ carga.seq }}</strong>
+                    </p>
 
-                    <hr>
+                    <!-- DADOS -->
+                    <div class="row g-2 mb-3">
 
-                    <!-- ===== DOCUMENTOS DA CARGA ===== -->
+                        <div class="col-6">
+                            <label class="form-label small">Conferente</label>
+                            <input type="text" name="Conferente"
+                                   class="form-control form-control-sm"
+                                   placeholder="Nome do conferente">
+                        </div>
+
+                        <div class="col-6">
+                            <label class="form-label small">Separadores</label>
+                            <input type="text" name="Separadores"
+                                   class="form-control form-control-sm"
+                                   placeholder="Separadores">
+                        </div>
+
+                        <div class="col-6">
+                            <label class="form-label small">OT</label>
+                            <input type="text" name="OT"
+                                   class="form-control form-control-sm"
+                                   placeholder="Número da OT">
+                        </div>
+
+                        <div class="col-6">
+                            <label class="form-label small">Box</label>
+                            <input type="text" name="BOX"
+                                   class="form-control form-control-sm"
+                                   placeholder="Box">
+                        </div>
+
+                    </div>
+
+                    <hr class="my-3">
+
+                    <!-- DOCUMENTOS -->
                     <h6 class="fw-bold mb-2">
-                        <i class="bi bi-file-earmark-check"></i>
+                        <i class="bi bi-file-earmark-check me-1"></i>
                         Documentos
                     </h6>
 
-                    <div class="small">
+                    <div class="small d-grid gap-2">
 
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox"
                                    name="resumo_conf"
                                    {% if carga.resumo_conf %}checked{% endif %}>
-                            <label class="form-check-label">
-                                Resumo Conferente
-                            </label>
+                            <label class="form-check-label">Resumo do Conferente</label>
                         </div>
 
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox"
                                    name="resumo_motorista"
                                    {% if carga.resumo_motorista %}checked{% endif %}>
-                            <label class="form-check-label">
-                                Resumo Motorista
-                            </label>
+                            <label class="form-check-label">Resumo do Motorista</label>
                         </div>
 
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox"
                                    name="etiquetas_cds"
                                    {% if carga.etiquetas_cds %}checked{% endif %}>
-                            <label class="form-check-label">
-                                Etiquetas CDs
-                            </label>
+                            <label class="form-check-label">Etiquetas de CDs</label>
                         </div>
 
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox"
                                    name="carga_gerada"
                                    {% if carga.carga_gerada %}checked{% endif %}>
-                            <label class="form-check-label">
-                                Carga Gerada
-                            </label>
+                            <label class="form-check-label">Carga Gerada</label>
                         </div>
 
                     </div>
 
                 </div>
 
-                <!-- ===== AÇÕES DA CARGA ===== -->
-                <div class="card-footer bg-white border-0 text-end">
+                <!-- FOOTER -->
+                <div class="card-footer bg-white border-0 d-flex justify-content-end gap-2">
                     <input type="hidden" name="carga_id" value="{{ carga.id }}">
-                    <button type="submit" class="btn btn-success btn-sm">
-                        <i class="bi bi-play-circle"></i> Iniciar
+
+                    <button type="submit" class="btn btn-primary btn-sm px-3">
+                        <i class="bi bi-play-fill me-1"></i> Iniciar
+                    </button>
+
+                    <button type="submit" class="btn btn-outline-success btn-sm px-3">
+                        <i class="bi bi-save me-1"></i> Atualizar
                     </button>
                 </div>
 
             </form>
-
         </div>
         {% empty %}
-            <p class="text-muted text-center">
-                Nenhuma carga vinculada
-            </p>
+            <p class="text-muted text-center">Nenhuma carga vinculada</p>
         {% endfor %}
+
+        <!-- VOLTAR -->
+        <div class="col-12">
+            <a href="{% url 'expedicao:cenario_separacao' %}"
+               class="btn btn-outline-secondary btn-sm px-4">
+                <i class="bi bi-arrow-left me-1"></i> Voltar
+            </a>
+        </div>
 
     </div>
 
