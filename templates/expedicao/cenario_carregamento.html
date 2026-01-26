@@ -3,26 +3,8 @@
 
 {% block title %}Cenário de Carregamento{% endblock %}
 
-{% block filter_action %}
-    {% url 'expedicao:cenario_carregamento' %} 
-{% endblock %}
-
-{% block filter_fields %}
-<div class="mb-3">
-    <label class="form-label small">Data</label>
-    <input type="date" name="data" class="form-control form-control-sm" value="{{ request.GET.data }}">
-</div>
-
-<div class="mb-3">
-    <label class="form-label small">Lecom</label>
-    <input type="text" name="lecom" class="form-control form-control-sm" placeholder="Ex: 123" value="{{ request.GET.lecom }}">
-</div>
-
-<input type="hidden" name="status" value="PENDENTE">
-{% endblock %}
-
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/table.css' %}">
+<link rel="stylesheet" href="{% static 'css/sgl-base.css' %}">
 
 <div class="container mt-4">
 
@@ -31,109 +13,70 @@
             <h4 class="fw-bold text-primary mb-1">
                 <i class="bi bi-card-checklist me-1"></i> Cenário Carregamento
             </h4>
-            <small class="text-muted">Visualização das cargas do transporte selecionado</small>
+            <small class="text-muted">Visualização das cargas do transporte</small>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="row g-4 justify-content-start">
-                {% for carga in cargas %}
-                <div class="col-md-6 col-lg-3" id="carga-{{ carga.id }}">
-                    <div class="card shadow-sm border-0 h-100 d-flex flex-column position-relative" style="border-radius:1rem; background-color:#f8f9fa;">
-                        
-                        <div class="position-absolute" style="top:0.5rem; right:0.5rem;">
-                            {% if carga.status == "Pendente" %}
-                                <span class="badge bg-secondary"><i class="bi bi-hourglass-split"></i> Pendente</span>
-                            {% elif carga.status == "Andamento" %}
-                                <span class="badge bg-warning text-dark"><i class="bi bi-arrow-repeat"></i> Em Andamento</span>
-                            {% elif carga.status == "Concluido" %}
-                                <span class="badge bg-success"><i class="bi bi-check-circle"></i> Concluído</span>
-                            {% endif %}
-                        </div>
+    <div class="row g-4">
+        {% for carga in cargas %}
+        <div class="col-md-6 col-lg-3" id="carga-{{ carga.id }}">
+            <div class="sgl-card shadow-sm border-0 h-100 d-flex flex-column position-relative">
 
-                        <div class="card-body d-flex flex-column mt-4">
-                            <h5 class="card-title fw-bold mb-2" style="color:#1e3a8a;">
-                                <i class="bi bi-truck"></i> Destino: 
-                                <span class="text-dark">{{ carga.controle.lecom.lecom|default:"Não informado" }}</span>
-                            </h5>
-
-                            <h6 class="mb-3">
-                                <i class="bi bi-hash"></i> N° Transporte: 
-                                <span class="fw-bold" style="color:#d4af37;">{{ carga.numero_transporte|default:"Não informado" }}</span>
-                            </h6>
-
-                            <ul class="list-unstyled mb-2">
-                                <li><i class="bi bi-calendar-date"></i> <strong>Início Separação:</strong> {{ carga.controle.inicio_separacao|default:"Não informado" }}</li>
-                                <li><i class="bi bi-people"></i> <strong>Separador:</strong> {{ carga.controle.outros_separadores|default:"Não informado" }}</li>
-                                <li><i class="bi bi-person-check"></i> <strong>Conferente:</strong> {{ carga.controle.conferente|default:"Não informado" }}</li>
-                            </ul>
-
-                            <div class="mb-2">
-                                <p class="mb-1"><strong>Atribuída:</strong> 
-                                    {% if carga.atribuida %}<span class="text-success">Sim</span>{% else %}<span class="text-danger">Não</span>{% endif %}
-                                </p>
-                                <p class="mb-1"><strong>Finalizado:</strong> 
-                                    {% if carga.finalizada %}<span class="text-success">Sim</span>{% else %}<span class="text-danger">Não</span>{% endif %}
-                                </p>
-                            </div>
-
-                            <div class="mb-3">
-                                <strong>Documentos:</strong>
-                                <ul class="mb-0 ps-3">
-                                    {% if carga.controle.resumo_conf %}<li><i class="bi bi-file-earmark-check"></i> Resumo Conf. Impresso</li>{% endif %}
-                                    {% if carga.controle.resumo_motorista %}<li><i class="bi bi-file-earmark-person"></i> Resumo Motorista Impresso</li>{% endif %}
-                                    {% if carga.controle.etiquetas_cds %}<li><i class="bi bi-tags"></i> Etiquetas Enviadas CDs</li>{% endif %}
-                                    {% if carga.controle.carga_gerada %}<li><i class="bi bi-file-earmark-text"></i> Carga Gerada</li>{% endif %}
-                                    {% if not carga.controle.resumo_conf and not carga.controle.resumo_motorista and not carga.controle.etiquetas_cds and not carga.controle.carga_gerada %}
-                                        <li><i class="bi bi-x-circle"></i> Nenhum documento gerado</li>
-                                    {% endif %}
-                                </ul>
-                            </div>
-
-                            <div class="mt-auto">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <a href="{% url 'expedicao:editar_carga' carga.id %}" class="btn btn-sm btn-outline-warning">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <a href="{% url 'expedicao:excluir_carga' pk=carga.id %}" class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-                                </div>
-
-                                <div class="d-flex justify-content-center">
-                                    {% if carga.status == "Pendente" %}
-                                    <form method="post" action="#carga-{{ carga.id }}" class="w-100">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="carga_id" value="{{ carga.id }}">
-                                        <button type="submit" class="btn btn-outline-secondary w-100">
-                                            <i class="bi bi-play-circle"></i> Iniciar
-                                        </button>
-                                    </form>
-                                    {% elif carga.status == "Andamento" %}
-                                    <form method="post" action="#carga-{{ carga.id }}" class="w-100">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="carga_id" value="{{ carga.id }}">
-                                        <button type="submit" class="btn btn-outline-warning w-100">
-                                            <i class="bi bi-check2-circle"></i> Finalizar
-                                        </button>
-                                    </form>
-                                    {% else %}
-                                    <button type="button" class="btn btn-outline-success w-100" disabled>
-                                        <i class="bi bi-check-circle-fill"></i> Concluído
-                                    </button>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
+                <!-- Badge Status -->
+                <div class="sgl-badge position-absolute top-2 end-2
+                    {% if carga.status == 'Pendente' %}sgl-badge-secondary
+                    {% elif carga.status == 'Em Andamento' %}sgl-badge-warning
+                    {% elif carga.status == 'Concluido' %}sgl-badge-success{% endif %}">
+                    {% if carga.status == 'Pendente' %}<i class="bi bi-hourglass-split me-1"></i> Pendente{% endif %}
+                    {% if carga.status == 'Em Andamento' %}<i class="bi bi-arrow-repeat me-1"></i> Em Andamento{% endif %}
+                    {% if carga.status == 'Concluido' %}<i class="bi bi-check-circle-fill me-1"></i> Concluído{% endif %}
                 </div>
-                {% empty %}
-                <p class="text-center text-muted mt-4">Nenhuma carga encontrada.</p>
-                {% endfor %}
+
+                <div class="card-body d-flex flex-column mt-4">
+
+                    <!-- Info básica -->
+                    <h5 class="fw-bold mb-2"><i class="bi bi-truck me-1"></i> Transporte: {{ carga.controle.lecom.lecom|default:"—" }}</h5>
+                    <h6 class="mb-3"><i class="bi bi-hash me-1"></i> N°: <span class="fw-bold">{{ carga.numero_transporte|default:"—" }}</span></h6>
+
+                    <ul class="list-unstyled mb-2 small">
+                        <li><i class="bi bi-calendar-date me-1"></i> Início Carregamento: {{ carga.inicio_separacao|default:"—" }}</li>
+                        <li><i class="bi bi-people me-1"></i> Carregadores: {{ carga.separadores|default:"—" }}</li>
+                        <li><i class="bi bi-person-check me-1"></i> Conferente: {{ carga.conferente|default:"—" }}</li>
+                    </ul>
+
+                    <!-- Ações -->
+
+                    <div class="mt-2">
+                        {% if carga.status == 'Pendente' %}
+                        <form method="post" action="#carga-{{ carga.id }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="carga_id" value="{{ carga.id }}">
+                            <button type="submit" class="sgl-btn sgl-btn-outline-secondary w-100">
+                                <i class="bi bi-play-circle me-1"></i> Iniciar
+                            </button>
+                        </form>
+                        {% elif carga.status == 'Em Andamento' %}
+                        <form method="post" action="#carga-{{ carga.id }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="carga_id" value="{{ carga.id }}">
+                            <button type="submit" class="sgl-btn sgl-btn-outline-warning w-100">
+                                <i class="bi bi-check2-circle me-1"></i> Finalizar
+                            </button>
+                        </form>
+                        {% else %}
+                        <button type="button" class="sgl-btn sgl-btn-outline-success w-100" disabled>
+                            <i class="bi bi-check-circle-fill me-1"></i> Concluído
+                        </button>
+                        {% endif %}
+                    </div>
+
+                </div>
             </div>
         </div>
+        {% empty %}
+        <p class="text-center text-muted mt-4">Nenhuma carga encontrada.</p>
+        {% endfor %}
     </div>
+
 </div>
 {% endblock %}

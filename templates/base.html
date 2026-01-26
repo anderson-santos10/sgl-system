@@ -16,12 +16,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css">
 
     <!-- CSS base -->
+     <link rel="stylesheet" href="{% static 'css/sgl/base.css' %}">
     <link rel="stylesheet" href="{% static 'css/sgl/variables.css' %}">
     <link rel="stylesheet" href="{% static 'css/sgl/sgl-tokens.css' %}">
     <link rel="stylesheet" href="{% static 'css/sgl/sgl-base.css' %}">
     <link rel="stylesheet" href="{% static 'css/sgl/layouts.css' %}">
     <link rel="stylesheet" href="{% static 'css/sgl/components.css' %}">
-    <link rel="stylesheet" href="{% static 'css/sgl/base.css' %}">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
 
     {% block extra_css %}{% endblock %}
@@ -105,6 +105,11 @@
                     <div class="accordion-body">
                         <a href="{% url 'expedicao:cenario_separacao' %}" class="sidebar-sub">
                             Cenário Separação
+                        </a>
+                    </div>
+                     <div class="accordion-body">
+                        <a href="{% url 'expedicao:cenario_carregamento' %}" class="sidebar-sub">
+                            Cenário Carregameto
                         </a>
                     </div>
                 </div>

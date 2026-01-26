@@ -1,8 +1,8 @@
-from datetime import timezone
+from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.views.generic import ListView
-from transport.models import Carga, Lecom, Veiculo
+from transport.models import Lecom, Veiculo
 from expedicao.models import ControleSeparacao, SeparacaoCarga
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -215,86 +215,89 @@ class DetalheCardView(LoginRequiredMixin, View):
         return redirect("expedicao:cenario_separacao")
 
 
+
 class CenarioCarregamentoView(LoginRequiredMixin, View):
     template_name = "expedicao/cenario_carregamento.html"
 
-    def get(self, request, controle_id):
-        controle = get_object_or_404(
-            ControleSeparacao,
-            pk=controle_id,
+    def get(self, request):
+        # Pega todas as cargas concluídas ou em andamento
+        cargas = SeparacaoCarga.objects.filter(
             status__in=[
-                ControleSeparacao.STATUS_EM_ANDAMENTO,
-                ControleSeparacao.STATUS_CONCLUIDO,
-            ],
-        )
+                SeparacaoCarga.STATUS_EM_ANDAMENTO,
+                SeparacaoCarga.STATUS_CONCLUIDO,
+            ]
+        ).order_by('-inicio_separacao')  # mais recentes primeiro
 
-        return render(
-            request,
-            self.template_name,
-            {
-                "controle": controle,
-                "cargas": controle.cargas.all(),
-            },
-        )
+        return render(request, self.template_name, {"cargas": cargas})
 
 
-class EditarSeparacaoView(LoginRequiredMixin, View):
+
+
+class EditarSeparacaoView(View):
     template_name = "expedicao/editar_separacao.html"
 
     def get(self, request, pk):
         lecom = get_object_or_404(Lecom, pk=pk)
         controle, _ = ControleSeparacao.objects.get_or_create(lecom=lecom)
-
-        return render(
-            request,
-            self.template_name,
-            {
-                "controle": controle,
-                "lecom": lecom,
-                "cargas": controle.cargas.all(),
-            },
-        )
+        cargas = controle.cargas.all()  # todas as cargas do controle
+        return render(request, self.template_name, {
+            "controle": controle,
+            "lecom": lecom,
+            "cargas": cargas,
+        })
 
     def post(self, request, pk):
         lecom = get_object_or_404(Lecom, pk=pk)
         controle = get_object_or_404(ControleSeparacao, lecom=lecom)
 
-        # 🚫 Se já estiver concluído, não deixa alterar
-        if controle.status == ControleSeparacao.STATUS_CONCLUIDO:
-            messages.warning(request, "Separação já concluída. Não é possível alterar.")
-            return redirect("expedicao:editar_separacao", pk=lecom.pk)
-
         carga_id = request.POST.get("carga_id")
         carga = get_object_or_404(SeparacaoCarga, id=carga_id, controle=controle)
 
-        acao = request.POST.get("acao")  
+        acao = request.POST.get("acao")
 
         try:
             with transaction.atomic():
-
-                # ATUALIZA DADOS 
+                # =================== ATUALIZA CAMPOS DO FORMULÁRIO ===================
                 carga.conferente = request.POST.get("Conferente", "").strip()
                 carga.separadores = request.POST.get("Separadores", "").strip()
                 carga.ot = request.POST.get("OT", "").strip()
                 carga.box = request.POST.get("BOX", "").strip()
-
                 carga.resumo_conf = bool(request.POST.get("resumo_conf"))
                 carga.resumo_motorista = bool(request.POST.get("resumo_motorista"))
                 carga.etiquetas_cds = bool(request.POST.get("etiquetas_cds"))
                 carga.carga_gerada = bool(request.POST.get("carga_gerada"))
 
-                carga.save()
+                # =================== INICIAR CARGA ===================
+                if acao == "iniciar" and carga.status == carga.STATUS_PENDENTE:
+                    carga.status = carga.STATUS_EM_ANDAMENTO
+                    carga.atribuida = True
+                    if not carga.inicio_separacao:
+                        carga.inicio_separacao = timezone.now()
+                    carga.save()
 
-                #BOTÃO INICIAR
-                if acao == "iniciar":
-                    if controle.status == ControleSeparacao.STATUS_PENDENTE:
-                        controle.status = ControleSeparacao.STATUS_EM_ANDAMENTO
-                        controle.inicio_separacao = timezone.now()
+                    # Atualiza controle se ainda estiver pendente
+                    if controle.status == controle.STATUS_PENDENTE:
+                        controle.status = controle.STATUS_EM_ANDAMENTO
+                        if not controle.inicio_separacao:
+                            controle.inicio_separacao = timezone.now()
                         controle.save()
 
-                # BOTÃO CONCLUIR
-                if acao == "concluir":
-                    controle.finalizar_separacao()
+                # =================== CONCLUIR CARGA ===================
+                elif acao == "concluir" and carga.status != carga.STATUS_CONCLUIDO:
+                    carga.status = carga.STATUS_CONCLUIDO
+                    carga.finalizada = True
+                    carga.save()
+
+                    # Se todas as cargas estiverem concluídas, finaliza o controle
+                    cargas_pendentes = controle.cargas.filter(
+                        status__in=[SeparacaoCarga.STATUS_PENDENTE, SeparacaoCarga.STATUS_EM_ANDAMENTO]
+                    )
+                    if not cargas_pendentes.exists():
+                        controle.finalizar_separacao()
+
+                else:
+                    # Apenas salva alterações de campos (atualização sem iniciar/concluir)
+                    carga.save()
 
         except Exception as e:
             messages.error(request, f"Erro ao atualizar carga: {e}")
@@ -302,5 +305,8 @@ class EditarSeparacaoView(LoginRequiredMixin, View):
 
         messages.success(request, "Carga atualizada com sucesso.")
         return redirect("expedicao:editar_carga", pk=lecom.pk)
+
+
+
 
 

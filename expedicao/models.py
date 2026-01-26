@@ -52,10 +52,7 @@ class ControleSeparacao(models.Model):
 
 
 class SeparacaoCarga(models.Model):
-    controle = models.ForeignKey(
-        ControleSeparacao,
-        on_delete=models.CASCADE,
-        related_name="cargas"
+    controle = models.ForeignKey(ControleSeparacao,on_delete=models.CASCADE, related_name="cargas"
     )
 
     carga = models.ForeignKey(
@@ -91,7 +88,7 @@ class SeparacaoCarga(models.Model):
     seg = models.CharField(max_length=10, default="")
 
     conferente = models.CharField(max_length=50, blank=True, null=True)
-    separadores = models.CharField(max_length=50, blank=True, null=True)
+    separadores = models.CharField(max_length=100, blank=True, null=True)
 
     atribuida = models.BooleanField(default=False)
     finalizada = models.BooleanField(default=False)
@@ -100,6 +97,7 @@ class SeparacaoCarga(models.Model):
     resumo_motorista = models.BooleanField(default=False)
     etiquetas_cds = models.BooleanField(default=False)
     carga_gerada = models.BooleanField(default=False)
+    inicio_separacao = models.DateTimeField(null=True,blank=True,) 
 
     class Meta:
         ordering = ["seq"]
