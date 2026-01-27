@@ -5,54 +5,17 @@
 ===================================================== */
 
 /* ===========================
-   VARIÁVEIS CSS (opcionais)
-=========================== */
-:root {
-    --sgl-font-family: 'Inter', sans-serif;
-    --sgl-font-size-xs: 0.75rem;
-    --sgl-font-size-sm: 0.875rem;
-    --sgl-font-size-md: 1rem;
-    --sgl-font-size-lg: 1.125rem;
-    --sgl-font-size-xl: 1.25rem;
-    --sgl-font-weight-regular: 400;
-    --sgl-font-weight-semibold: 600;
-
-    --sgl-primary: #0d6efd;
-    --sgl-primary-dark: #0b5ed7;
-    --sgl-success: #198754;
-    --sgl-warning: #f0ad4e;
-    --sgl-danger: #dc3545;
-    --sgl-info: #20c997;
-    --sgl-muted: #6c757d;
-
-    --sgl-text-primary: #212529;
-    --sgl-text-secondary: #495057;
-    --sgl-text-muted: #6c757d;
-    --sgl-bg-page: #f8f9fa;
-    --sgl-border: #dee2e6;
-
-    --sgl-space-xs: 0.25rem;
-    --sgl-space-sm: 0.5rem;
-    --sgl-space-md: 1rem;
-    --sgl-space-lg: 1.5rem;
-    --sgl-space-xl: 2rem;
-
-    --sgl-transition-fast: 0.2s ease-in-out;
-}
-
-/* ===========================
    RESET BÁSICO
 =========================== */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 html, body {
-  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 /* ===========================
@@ -71,9 +34,9 @@ body {
    TÍTULOS
 =========================== */
 h1, h2, h3, h4, h5, h6 {
+  margin: 0;
   font-weight: var(--sgl-font-weight-semibold);
   color: var(--sgl-text-primary);
-  margin-bottom: 0.5rem;
 }
 
 h1 { font-size: 1.75rem; }
@@ -87,9 +50,9 @@ h6 { font-size: 0.875rem; }
    TEXTOS
 =========================== */
 p {
-  font-size: var(--sgl-font-size-sm);
+  margin: 0;
   color: var(--sgl-text-secondary);
-  margin-bottom: 1rem;
+  font-size: var(--sgl-font-size-sm);
 }
 
 small {
@@ -116,15 +79,22 @@ a:hover {
 hr {
   border: none;
   border-top: 1px solid var(--sgl-border);
-  margin: var(--sgl-space-md) 0;
 }
 
 /* ===========================
    UTILITÁRIOS BÁSICOS
 =========================== */
-.text-muted { color: var(--sgl-text-muted); }
-.text-center { text-align: center; }
-.text-right { text-align: right; }
+.text-muted {
+  color: var(--sgl-text-muted);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
 
 /* ===========================
    CONTAINER PADRÃO
@@ -145,104 +115,11 @@ textarea {
   font-family: inherit;
   font-size: var(--sgl-font-size-sm);
   color: var(--sgl-text-primary);
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--sgl-border);
-  border-radius: 0.5rem;
-  outline: none;
-  transition: border-color var(--sgl-transition-fast);
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: var(--sgl-primary);
-}
-
-/* ===========================
-   BUTTONS (BASE)
-=========================== */
 button {
   font-family: inherit;
   cursor: pointer;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
   border: none;
-  font-weight: var(--sgl-font-weight-semibold);
-  transition: background var(--sgl-transition-fast), color var(--sgl-transition-fast);
+  background: none;
 }
-
-button.primary {
-  background-color: var(--sgl-primary);
-  color: #fff;
-}
-
-button.primary:hover {
-  background-color: var(--sgl-primary-dark);
-}
-
-button.success {
-  background-color: var(--sgl-success);
-  color: #fff;
-}
-
-button.warning {
-  background-color: var(--sgl-warning);
-  color: #fff;
-}
-
-button.danger {
-  background-color: var(--sgl-danger);
-  color: #fff;
-}
-
-/* ===========================
-   STATUS BADGES
-=========================== */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.25rem 0.6rem;
-  border-radius: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #fff;
-  transition: background 0.3s ease;
-}
-
-.status-pendente { background-color: var(--sgl-warning); }
-.status-em-andamento { background-color: var(--sgl-primary); }
-.status-concluido { background-color: var(--sgl-success); }
-.status-liberado { background-color: var(--sgl-info); }
-.status-bloqueado { background-color: var(--sgl-danger); }
-.status-default { background-color: var(--sgl-muted); }
-
-/* ===========================
-   CARDS BASE
-=========================== */
-.card {
-  background-color: #fff;
-  border-radius: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  padding: 1rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-}
-
-/* ===========================
-   GRID FLEX
-=========================== */
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.col-6 { flex: 0 0 50%; }
-.col-12 { flex: 0 0 100%; }
