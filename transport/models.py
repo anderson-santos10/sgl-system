@@ -6,8 +6,8 @@ from django.db import models
 class Lecom(models.Model):
 
     STATUS_CHOICES = [
-        ('LIBERADO', 'Liberado'),
-        ('BLOQUEADO', 'Bloqueado'),
+        ('Liberado', 'Liberado'),
+        ('Bloqueado', 'Bloqueado'),
     ]
 
     lecom = models.CharField(max_length=10, unique=True)
@@ -32,7 +32,7 @@ class Lecom(models.Model):
     status = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES,
-        default='BLOQUEADO'
+        default='Bloqueado'
     )
 
     def __str__(self):

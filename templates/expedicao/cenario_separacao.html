@@ -8,7 +8,6 @@
 {% endblock %}
 
 {% block filter_fields %}
-<!-- FILTROS -->
 <div class="mb-3">
   <label class="form-label small">Data</label>
   <input type="date" name="data" class="form-control form-control-sm" value="{{ request.GET.data }}">
@@ -52,7 +51,6 @@
 {% block content %}
 <div class="container-fluid mt-4 px-lg-4">
 
-    <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <div>
             <h4 class="fw-bold text-primary mb-1">
@@ -65,26 +63,19 @@
         </button>
     </div>
 
-    <!-- GRID DE CARDS PRINCIPAIS -->
     <div class="row g-4">
         {% for grupo in grupo_cargas %}
         <div class="col-md-6 col-lg-3">
 
-            <!-- CARD PRINCIPAL -->
             <div class="card shadow-sm border-0 h-100 rounded-4 bg-light sgl-card">
 
                 <!-- HEADER DO CARD -->
                 <div class="card-header">
                     <div class="d-flex flex-column gap-1">
-                        <div>
-                            {% if grupo.grupo.status == "Aguardando" %}
-                                <span class="badge bg-info">Aguardando</span>
-                            {% elif grupo.grupo.status == "Andamento" %}
-                                <span class="badge bg-warning text-dark">Em andamento</span>
-                            {% else %}
-                                <span class="badge bg-success">Concluído</span>
-                            {% endif %}
-                        </div>
+                        <span>
+                            {% include "components/status_badge.html" with status=grupo.grupo.controle_separacao.status|default:"Aguardando" %}
+                        </span>
+
                         <div class="d-flex justify-content-between">
                             <span><strong>Transporte:</strong> {{ grupo.grupo.lecom.lecom|default:"Não informado" }}</span>
                             <span><strong>ID:</strong> #{{ grupo.grupo.lecom.id|default:"—" }}</span>
@@ -99,25 +90,18 @@
                 <!-- BODY DO CARD -->
                 <div class="card-body p-2">
 
-                    <!-- SUB-CARDS COMO LINKS -->
                     {% for carga in grupo.cargas %}
                     <a href="{% url 'expedicao:editar_carga' carga.controle.lecom.pk %}" class="text-decoration-none text-dark">
                         <div class="card mb-2 p-2 shadow-sm bg-white sgl-subcard hover-shadow">
 
-                            <!-- Campos com ícones e fallback -->
+                            <!-- STATUS -->
                             <span>
-                                <i class="bi bi-list-ul me-1"></i> Status: 
-                                {% if carga.controle.status == 'Em Andamento' %}
-                                    <span class="badge bg-primary"><i class="bi bi-arrow-repeat me-1"></i> Em Andamento</span>
-                                {% elif carga.controle.status == 'Concluido' %}
-                                    <span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i> Concluído</span>
-                                {% else %}
-                                    <span class="badge bg-secondary"><i class="bi bi-info-circle me-1">Aguardando</i></span>
-                                {% endif %}
+                                {% include "components/status_badge.html" with status=carga.controle.status|default:"Aguardando" %}
                             </span>
 
-
-                            <h6 class="fw-bold mb-1"><i class="bi bi-box-seam me-1"></i> Informações da Carga</h6>
+                            <h6 class="fw-bold mb-1">
+                                <i class="bi bi-box-seam me-1"></i> Informações da Carga
+                            </h6>
 
                             <div class="d-flex justify-content-between flex-wrap mb-1">
                                 <span><i class="bi bi-list-ul me-1"></i> Resumo: {{ carga.seq|default:"Não informado" }}</span>
@@ -138,7 +122,6 @@
                                 <span><i class="bi bi-people me-1"></i> Separadores: {{ carga.separadores|default:"Não informado" }}</span>
                             </div>
 
-                            <!-- Documentos -->
                             <h6 class="fw-bold mb-2"><i class="bi bi-file-earmark-check me-1"></i> Documentos</h6>
                             <ul class="ps-3 mb-0 small">
                                 {% if carga.resumo_conf %}<li>Resumo Conferente</li>{% endif %}

@@ -54,7 +54,6 @@
 
 <div class="container mt-4">
 
-    <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <div class="page-header">
             <h4 class="fw-bold text-primary mb-1">
@@ -107,12 +106,10 @@
 
                                     {% if forloop.first %}
                                         <td rowspan="{{ item.cargas|length }}" class="bg-light fw-semibold">
-                                            {% with controle=item.grupo.controle_separacao %}
-                                                <a href="{% url 'expedicao:detalhe_card' controle.id|default:item.grupo.id %}"
-                                                   class="text-decoration-none text-primary fw-semibold">
-                                                    #{{ item.grupo.id }}
-                                                </a>
-                                            {% endwith %}
+                                            <a href="{% url 'expedicao:detalhe_card' item.grupo.id %}"
+                                               class="text-decoration-none text-primary fw-semibold">
+                                                #{{ item.grupo.id }}
+                                            </a>
                                         </td>
 
                                         <td rowspan="{{ item.cargas|length }}" class="bg-light fw-semibold">
@@ -147,22 +144,8 @@
                                         </td>
 
                                         <td rowspan="{{ item.cargas|length }}">
-                                            {% with controle=item.grupo.controle_separacao %}
-                                                {% if controle %}
-                                                    {% if controle.status == "Pendente" %}
-                                                        <span class="badge bg-warning text-dark">Pendente</span>
-                                                    {% elif controle.status == "Aguardando" %}
-                                                        <span class="badge bg-info text-dark">Aguardando</span>
-                                                    {% elif controle.status == "Em Andamento" %}
-                                                        <span class="badge bg-primary">Em andamento</span>
-                                                    {% elif controle.status == "Concluido" %}
-                                                        <span class="badge bg-success">Concluído</span>
-                                                    {% else %}
-                                                        <span class="badge bg-secondary">{{ controle.status }}</span>
-                                                    {% endif %}
-                                                {% else %}
-                                                    <span class="badge bg-warning text-dark">Pendente</span>
-                                                {% endif %}
+                                            {% with status=item.grupo.controle_separacao.status|default:"Pendente" %}
+                                                {% include "components/status_badge.html" %}
                                             {% endwith %}
                                         </td>
                                     {% endif %}

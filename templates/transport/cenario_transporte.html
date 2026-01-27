@@ -46,13 +46,11 @@
 
 <div class="mb-3">
     <label class="form-label">Destino</label>
-    <input
-        type="text"
-        name="destino"
-        class="form-control"
-        placeholder="Ex: São Paulo"
-        value="{{ request.GET.destino }}"
-    >
+    <input type="text"
+           name="destino"
+           class="form-control"
+           placeholder="Ex: São Paulo"
+           value="{{ request.GET.destino }}">
 </div>
 
 <div class="mb-3">
@@ -63,7 +61,6 @@
             <option value="{{ value }}">{{ label }}</option>
         {% endfor %}
     </select>
-
 </div>
 
 <div class="mb-3">
@@ -129,7 +126,7 @@
                             <th style="width:90px">Entregas</th>
                             <th style="width:80px">MOD</th>
                             <th style="width:220px">Observação</th>
-                            <th style="width:90px">Status</th>
+                            <th style="width:120px">Status</th>
                         </tr>
                     </thead>
 
@@ -142,8 +139,8 @@
                                     {% if forloop.first %}
                                         <td rowspan="{{ item.cargas|length }}" class="bg-light fw-semibold">
                                             <a href="{% url 'transport:editar_transporte' item.grupo.id %}"
-                                            class="text-decoration-none text-primary fw-semibold">
-                                            #{{ item.grupo.id }}
+                                               class="text-decoration-none text-primary fw-semibold">
+                                                #{{ item.grupo.id }}
                                             </a>
                                         </td>
 
@@ -173,15 +170,7 @@
                                         </td>
 
                                         <td rowspan="{{ item.cargas|length }}">
-                                            {% if item.grupo.status == 'LIBERADO' %}
-                                                <span class="badge-status badge-liberado">
-                                                    <i class="bi bi-unlock-fill"></i> Liberado
-                                                </span>
-                                            {% elif item.grupo.status == 'BLOQUEADO' %}
-                                                <span class="badge-status badge-bloqueado">
-                                                    <i class="bi bi-lock-fill"></i> Bloqueado
-                                                </span>
-                                            {% endif %}
+                                            {% include "components/status_badge.html" with status=item.grupo.status %}
                                         </td>
                                     {% endif %}
 
@@ -203,6 +192,7 @@
         </div>
     </div>
 </div>
+
 <script src="{% static 'js/transporte/cenario_transporte.js' %}"></script>
 <script src="{% static 'js/transporte/editar_transporte.js' %}"></script>
 {% endblock %}

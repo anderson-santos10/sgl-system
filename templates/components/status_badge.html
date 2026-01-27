@@ -1,0 +1,36 @@
+{% if status == "Pendente" %}
+    <span class="badge bg-warning text-dark">
+        <i class="bi bi-hourglass-split me-1"></i>Pendente
+    </span>
+
+{% elif status == "Aguardando" %}
+    <span class="badge bg-info text-dark">
+        <i class="bi bi-clock me-1"></i>Aguardando
+    </span>
+
+{% elif status == "Em Andamento" %}
+    <span class="badge bg-primary">
+        <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+        Em andamento
+    </span>
+
+{% elif status == "Concluido" %}
+    <span class="badge bg-success">
+        <i class="bi bi-check-circle-fill me-1"></i>Concluído
+    </span>
+
+{% elif status == "Bloqueado" %}
+    <span class="badge bg-danger">
+        <i class="bi bi-lock-fill me-1"></i>Bloqueado
+    </span>
+
+{% elif status == "Liberado" %}
+    <span class="badge bg-success">
+        <i class="bi bi-unlock-fill me-1"></i>Liberado
+    </span>
+
+{% else %}
+    <span class="badge bg-secondary">
+        <i class="bi bi-flag me-1"></i>{{ status|default:"-" }}
+    </span>
+{% endif %}

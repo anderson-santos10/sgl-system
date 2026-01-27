@@ -20,9 +20,7 @@
     </div>
 
     <div class="sgl-header-right">
-      <span class="sgl-badge sgl-badge-{{ lecom.status|lower }}">
-        {{ lecom.get_status_display }}
-      </span>
+      {% include "components/status_badge.html" with status=lecom.status %}
     </div>
   </header>
 
