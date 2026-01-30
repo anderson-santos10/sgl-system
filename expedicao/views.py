@@ -23,7 +23,7 @@ class CenarioExpedicaoView(LoginRequiredMixin, ListView):
             .filter(status="LIBERADO")
             .select_related(
                 "veiculo",
-                "controle_separacao", 
+                "controle_separacao",
             )
             .prefetch_related("cargas")
         )
@@ -51,7 +51,8 @@ class CenarioExpedicaoView(LoginRequiredMixin, ListView):
             queryset = queryset.filter(veiculo__tipo_veiculo=veiculo)
 
         if carga:
-            queryset = queryset.filter(cargas__carga__icontains=carga).distinct()
+            queryset = queryset.filter(
+                cargas__carga__icontains=carga).distinct()
 
         return queryset
 
@@ -87,7 +88,7 @@ class CenarioSeparacaoView(LoginRequiredMixin, ListView):
                 ControleSeparacao.STATUS_EM_ANDAMENTO,
                 ControleSeparacao.STATUS_CONCLUIDO,
             ])
-            .order_by("-criado_em")
+            .order_by("lecom_id")
         )
 
         filtros = {
@@ -107,13 +108,16 @@ class CenarioSeparacaoView(LoginRequiredMixin, ListView):
             queryset = queryset.filter(lecom__data=filtros["data"])
 
         if filtros["lecom"]:
-            queryset = queryset.filter(lecom__lecom__icontains=filtros["lecom"])
+            queryset = queryset.filter(
+                lecom__lecom__icontains=filtros["lecom"])
 
         if filtros["destino"]:
-            queryset = queryset.filter(lecom__destino__icontains=filtros["destino"])
+            queryset = queryset.filter(
+                lecom__destino__icontains=filtros["destino"])
 
         if filtros["veiculo"]:
-            queryset = queryset.filter(lecom__veiculo__tipo_veiculo=filtros["veiculo"])
+            queryset = queryset.filter(
+                lecom__veiculo__tipo_veiculo=filtros["veiculo"])
 
         if filtros["carga"]:
             queryset = queryset.filter(
@@ -162,13 +166,12 @@ class CenarioSeparacaoView(LoginRequiredMixin, ListView):
         ]
 
         context["veiculos"] = Veiculo.TIPO_VEICULO_CHOICES
-        
 
         return context
 
 
 class DetalheCardView(LoginRequiredMixin, View):
-    template_name = "expedicao/detalhe_carga.html"
+    template_name = "expedicao/analise_carga.html"
 
     def get(self, request, pk):
         lecom = get_object_or_404(Lecom, pk=pk)
@@ -200,11 +203,11 @@ class DetalheCardView(LoginRequiredMixin, View):
                 )
 
         if controle.status == ControleSeparacao.STATUS_PENDENTE:
-            controle.liberar_separacao() 
+            controle.liberar_separacao()
 
             messages.success(
                 request,
-                "Separação liberada e enviada para o cenário.",
+                f"Separação {lecom} liberada e enviada para o cenário.",
             )
         else:
             messages.warning(
@@ -213,7 +216,6 @@ class DetalheCardView(LoginRequiredMixin, View):
             )
 
         return redirect("expedicao:cenario_separacao")
-
 
 
 class CenarioCarregamentoView(LoginRequiredMixin, View):
@@ -229,8 +231,6 @@ class CenarioCarregamentoView(LoginRequiredMixin, View):
         ).order_by('-inicio_separacao')  # mais recentes primeiro
 
         return render(request, self.template_name, {"cargas": cargas})
-
-
 
 
 class EditarSeparacaoView(View):
@@ -251,7 +251,8 @@ class EditarSeparacaoView(View):
         controle = get_object_or_404(ControleSeparacao, lecom=lecom)
 
         carga_id = request.POST.get("carga_id")
-        carga = get_object_or_404(SeparacaoCarga, id=carga_id, controle=controle)
+        carga = get_object_or_404(
+            SeparacaoCarga, id=carga_id, controle=controle)
 
         acao = request.POST.get("acao")
 
@@ -263,7 +264,8 @@ class EditarSeparacaoView(View):
                 carga.ot = request.POST.get("OT", "").strip()
                 carga.box = request.POST.get("BOX", "").strip()
                 carga.resumo_conf = bool(request.POST.get("resumo_conf"))
-                carga.resumo_motorista = bool(request.POST.get("resumo_motorista"))
+                carga.resumo_motorista = bool(
+                    request.POST.get("resumo_motorista"))
                 carga.etiquetas_cds = bool(request.POST.get("etiquetas_cds"))
                 carga.carga_gerada = bool(request.POST.get("carga_gerada"))
 
@@ -290,7 +292,8 @@ class EditarSeparacaoView(View):
 
                     # Se todas as cargas estiverem concluídas, finaliza o controle
                     cargas_pendentes = controle.cargas.filter(
-                        status__in=[SeparacaoCarga.STATUS_PENDENTE, SeparacaoCarga.STATUS_EM_ANDAMENTO]
+                        status__in=[SeparacaoCarga.STATUS_PENDENTE,
+                                    SeparacaoCarga.STATUS_EM_ANDAMENTO]
                     )
                     if not cargas_pendentes.exists():
                         controle.finalizar_separacao()
@@ -305,8 +308,3 @@ class EditarSeparacaoView(View):
 
         messages.success(request, "Carga atualizada com sucesso.")
         return redirect("expedicao:editar_carga", pk=lecom.pk)
-
-
-
-
-

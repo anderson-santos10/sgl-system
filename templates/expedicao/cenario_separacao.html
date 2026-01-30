@@ -9,27 +9,44 @@
 
 {% block filter_fields %}
 <div class="mb-3">
-  <label class="form-label small">Data</label>
+  <label class="form-label small">
+    <i class="bi bi-calendar-event me-1"></i> Data
+  </label>
   <input type="date" name="data" class="form-control form-control-sm" value="{{ request.GET.data }}">
 </div>
+
 <div class="mb-3">
-  <label class="form-label small">ID</label>
-  <input type="text" name="transporte_id" class="form-control form-control-sm" placeholder="Ex: 123" value="{{ request.GET.transporte_id }}">
+  <label class="form-label small">
+    <i class="bi bi-hash me-1"></i> ID
+  </label>
+  <input type="text" name="transporte_id" class="form-control form-control-sm" value="{{ request.GET.transporte_id }}">
 </div>
+
 <div class="mb-3">
-  <label class="form-label">Carga</label>
-  <input type="text" name="carga" class="form-control form-control-sm" placeholder="Ex: 1023" value="{{ request.GET.carga }}">
+  <label class="form-label">
+    <i class="bi bi-box-seam me-1"></i> Carga
+  </label>
+  <input type="text" name="carga" class="form-control form-control-sm" value="{{ request.GET.carga }}">
 </div>
+
 <div class="mb-3">
-  <label class="form-label">Lecom</label>
-  <input type="text" name="lecom" class="form-control" placeholder="Ex: 123" value="{{ request.GET.lecom }}">
+  <label class="form-label">
+    <i class="bi bi-list-ul me-1"></i> Lecom
+  </label>
+  <input type="text" name="lecom" class="form-control form-control-sm" value="{{ request.GET.lecom }}">
 </div>
+
 <div class="mb-3">
-  <label class="form-label">Destino</label>
-  <input type="text" name="destino" class="form-control" placeholder="Ex: São Paulo" value="{{ request.GET.destino }}">
+  <label class="form-label">
+    <i class="bi bi-geo-alt me-1"></i> Destino
+  </label>
+  <input type="text" name="destino" class="form-control form-control-sm" value="{{ request.GET.destino }}">
 </div>
+
 <div class="mb-3">
-  <label class="form-label">Veículo</label>
+  <label class="form-label">
+    <i class="bi bi-truck me-1"></i> Veículo
+  </label>
   <select name="veiculo" class="form-select form-select-sm">
       <option value="">Todos</option>
       {% for value, label in veiculos %}
@@ -37,9 +54,12 @@
       {% endfor %}
   </select>
 </div>
+
 <div class="mb-3">
-  <label class="form-label">Status</label>
-  <select name="status" class="form-select">
+  <label class="form-label">
+    <i class="bi bi-flag me-1"></i> Status
+  </label>
+  <select name="status" class="form-select form-select-sm">
       <option value="">Todos</option>
       <option value="Aguardando" {% if request.GET.status == 'Aguardando' %}selected{% endif %}>Aguardando</option>
       <option value="Andamento" {% if request.GET.status == 'Andamento' %}selected{% endif %}>Em Andamento</option>
@@ -49,103 +69,132 @@
 {% endblock %}
 
 {% block content %}
+<style>
+.masonry {
+  column-count: 4;
+  column-gap: 1rem;
+}
+@media (max-width: 1200px) { .masonry { column-count: 3; } }
+@media (max-width: 768px) { .masonry { column-count: 2; } }
+@media (max-width: 576px) { .masonry { column-count: 1; } }
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 1rem;
+}
+
+.hover-shadow:hover {
+  transform: scale(1.01);
+  transition: 0.2s;
+}
+</style>
+
 <div class="container-fluid mt-4 px-lg-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <div>
-            <h4 class="fw-bold text-primary mb-1">
-                <i class="bi bi-truck me-1"></i> Cenário de Separação
-            </h4>
-            <small class="text-muted">Transportes liberados aguardando separação</small>
-        </div>
-        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFiltro">
-            <i class="bi bi-funnel me-1"></i> Filtros
-        </button>
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div>
+      <h4 class="fw-bold text-primary mb-1">
+        <i class="bi bi-truck me-1"></i> Cenário de Separação
+      </h4>
+      <small class="text-muted">
+        <i class="bi bi-clock me-1"></i> Transportes liberados aguardando separação
+      </small>
     </div>
 
-    <div class="row g-4">
-        {% for grupo in grupo_cargas %}
-        <div class="col-md-6 col-lg-3">
+    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFiltro">
+      <i class="bi bi-funnel me-1"></i> Filtros
+    </button>
+  </div>
 
-            <div class="card shadow-sm border-0 h-100 rounded-4 bg-light sgl-card">
+  <div class="masonry">
 
-                <!-- HEADER DO CARD -->
-                <div class="card-header">
-                    <div class="d-flex flex-column gap-1">
-                        <span>
-                            {% include "components/status_badge.html" with status=grupo.grupo.controle_separacao.status|default:"Aguardando" %}
-                        </span>
+    {% for grupo in grupo_cargas %}
+    <div class="masonry-item">
 
-                        <div class="d-flex justify-content-between">
-                            <span><strong>Transporte:</strong> {{ grupo.grupo.lecom.lecom|default:"Não informado" }}</span>
-                            <span><strong>ID:</strong> #{{ grupo.grupo.lecom.id|default:"—" }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span><strong>Destino:</strong> {{ grupo.grupo.lecom.destino|default:"Não informado" }}</span>
-                            <span><strong>Veículo:</strong> {{ grupo.grupo.lecom.veiculo.tipo_veiculo|default:"—" }}</span>
-                        </div>
-                    </div>
-                </div>
+      <div class="card shadow-sm border-0 rounded-4 bg-light sgl-card">
 
-                <!-- BODY DO CARD -->
-                <div class="card-body p-2">
+        <div class="card-header">
+          {% include "components/status_badge.html" with status=grupo.grupo.controle_separacao.status|default:"Aguardando" %}
 
-                    {% for carga in grupo.cargas %}
-                    <a href="{% url 'expedicao:editar_carga' carga.controle.lecom.pk %}" class="text-decoration-none text-dark">
-                        <div class="card mb-2 p-2 shadow-sm bg-white sgl-subcard hover-shadow">
+          <div class="d-flex justify-content-between mt-1">
+            <span><i class="bi bi-truck me-1"></i> <strong>Transporte:</strong> {{ grupo.grupo.lecom.lecom|default:"—" }}</span>
+            <span><strong>ID:</strong> #{{ grupo.grupo.lecom.id|default:"—" }}</span>
+          </div>
 
-                            <!-- STATUS -->
-                            <span>
-                                {% include "components/status_badge.html" with status=carga.controle.status|default:"Aguardando" %}
-                            </span>
+          <div class="d-flex justify-content-between">
+            <span><i class="bi bi-geo-alt me-1"></i> <strong>Destino:</strong> {{ grupo.grupo.lecom.destino|default:"—" }}</span>
+            <span><i class="bi bi-truck me-1"></i> <strong>Veículo:</strong> {{ grupo.grupo.lecom.veiculo.tipo_veiculo|default:"—" }}</span>
+          </div>
+        </div>
 
-                            <h6 class="fw-bold mb-1">
-                                <i class="bi bi-box-seam me-1"></i> Informações da Carga
-                            </h6>
+        <div class="card-body p-2">
 
-                            <div class="d-flex justify-content-between flex-wrap mb-1">
-                                <span><i class="bi bi-list-ul me-1"></i> Resumo: {{ carga.seq|default:"Não informado" }}</span>
-                                <span><i class="bi bi-box-seam me-1"></i> Carga: {{ carga.carga.carga|default:"Não informado" }}</span>
-                            </div>
+          {% for carga in grupo.cargas %}
+          <a href="{% url 'expedicao:editar_carga' carga.controle.lecom.pk %}" class="text-decoration-none text-dark">
 
-                            <div class="d-flex justify-content-between flex-wrap mb-1">
-                                <span><i class="bi bi-pencil-square me-1"></i> OT: {{ carga.ot|default:"Não informado" }}</span>
-                                <span><i class="bi bi-grid-1x2 me-1"></i> Box: {{ carga.box|default:"Não informado" }}</span>
-                            </div>
+            <div class="card mb-2 p-2 shadow-sm bg-white sgl-subcard hover-shadow">
 
-                            <div class="d-flex justify-content-between flex-wrap mb-1">
-                                <span><i class="bi bi-clock me-1"></i> Hora Início: {{ carga.inicio_separacao|default:"Não informado" }}</span>
-                                <span><i class="bi bi-person me-1"></i> Conferente: {{ carga.conferente|default:"Não informado" }}</span>
-                            </div>
+              <div class="d-flex justify-content-between">
+                <span>
+                  <i class="bi bi-flag me-1"></i><strong> Status:</strong>
+                </span>
+                {% include "components/status_badge.html" with status=carga.controle.status|default:"Aguardando" %}
+              </div>
 
-                            <div class="mb-1">
-                                <span><i class="bi bi-people me-1"></i> Separadores: {{ carga.separadores|default:"Não informado" }}</span>
-                            </div>
+              <div>
+                <i class="bi bi-list-ul me-1"></i>
+                <strong>Resumo:</strong> {{ carga.seq }}
+              </div>
 
-                            <h6 class="fw-bold mb-2"><i class="bi bi-file-earmark-check me-1"></i> Documentos</h6>
-                            <ul class="ps-3 mb-0 small">
-                                {% if carga.resumo_conf %}<li>Resumo Conferente</li>{% endif %}
-                                {% if carga.resumo_motorista %}<li>Resumo Motorista</li>{% endif %}
-                                {% if carga.etiquetas_cds %}<li>Etiquetas CDs</li>{% endif %}
-                                {% if carga.carga_gerada %}<li>Carga Gerada</li>{% endif %}
-                                {% if not carga.resumo_conf and not carga.resumo_motorista and not carga.etiquetas_cds and not carga.carga_gerada %}
-                                    <li class="text-muted">Nenhum documento</li>
-                                {% endif %}
-                            </ul>
+              <div>
+                <i class="bi bi-box-seam me-1"></i>
+                <strong>Carga:</strong> {{ carga.carga.carga }}
+              </div>
 
-                        </div>
-                    </a>
-                    {% empty %}
-                        <p class="text-muted small">Nenhuma carga</p>
-                    {% endfor %}
+              <div>
+                <i class="bi bi-receipt me-1"></i>
+                <strong>OT:</strong> {{ carga.ot }}
+              </div>
 
-                </div>
+              <div>
+                <i class="bi bi-grid me-1"></i>
+                <strong>Box:</strong> {{ carga.box }}
+              </div>
+
+              <div>
+                <i class="bi bi-person-check me-1"></i>
+                <strong>Conferente:</strong> {{ carga.conferente }}
+              </div>
+            <h6 class="fw-bold mb-2"><i class="bi bi-file-earmark-check me-1"></i> Documentos</h6>
+            <ul class="ps-3 mb-0 small">
+                {% if carga.resumo_conf %}<li>Resumo Conferente</li>{% endif %}
+                {% if carga.resumo_motorista %}<li>Resumo Motorista</li>{% endif %}
+                {% if carga.etiquetas_cds %}<li>Etiquetas CDs</li>{% endif %}
+                {% if carga.carga_gerada %}<li>Carga Gerada</li>{% endif %}
+                {% if not carga.resumo_conf and not carga.resumo_motorista and not carga.etiquetas_cds and not carga.carga_gerada %}
+                    <li class="text-muted">Nenhum documento</li>
+                {% endif %}
+            </ul>
 
             </div>
+          </a>
+          {% empty %}
+            <p class="text-muted small">
+              <i class="bi bi-exclamation-circle me-1"></i> Nenhuma carga
+            </p>
+          {% endfor %}
+
         </div>
-        {% empty %}
-        <p class="text-center text-muted mt-4">Nenhum transporte no cenário de separação</p>
-        {% endfor %}
+
+      </div>
+
     </div>
+    {% empty %}
+      <p class="text-center text-muted mt-4">
+        <i class="bi bi-inbox me-1"></i> Nenhum transporte
+      </p>
+    {% endfor %}
+
+  </div>
 </div>
 {% endblock %}

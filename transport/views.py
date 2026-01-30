@@ -21,8 +21,10 @@ def safe_decimal(value, default=Decimal("0.00")):
         return default
 
 # Criar Transporte
+
+
 class CriarTransporteView(View):
-    template_name = "transport/inserir_carga.html"
+    template_name = "transport/editar_transporte.html"
 
     def get(self, request):
         return render(
@@ -59,7 +61,8 @@ class CriarTransporteView(View):
             return render(request, self.template_name)
 
         if Lecom.objects.filter(lecom=lecom_code).exists():
-            messages.error(request, "Já existe um transporte com esse número de LECOM.")
+            messages.error(
+                request, "Já existe um transporte com esse número de LECOM.")
             return render(request, self.template_name)
 
         tipo_veiculo = request.POST.get("tipo_veiculo", "Não informado")
@@ -107,7 +110,8 @@ class CriarTransporteView(View):
                     carga_obj = Carga.objects.create(
                         lecom=lecom,
                         carga=carga_num,
-                        seq=int(seq_list[i]) if seq_list and seq_list[i] else i + 1,
+                        seq=int(
+                            seq_list[i]) if seq_list and seq_list[i] else i + 1,
                         total_entregas=total_entregas_list[i] if total_entregas_list and total_entregas_list[i] else "1",
                         mod=mod_list[i] if mod_list and mod_list[i] else "-",
                     )
@@ -154,7 +158,7 @@ class CenarioTransporteView(ListView):
         carga = self.request.GET.get("carga")
         veiculo = self.request.GET.get("veiculo")
         destino = self.request.GET.get("destino")
-        
+
         if transporte_id and transporte_id.isdigit():
             queryset = queryset.filter(id=int(transporte_id))
         if lecom:
@@ -164,7 +168,8 @@ class CenarioTransporteView(ListView):
         if data:
             queryset = queryset.filter(data=data)
         if carga:
-            queryset = queryset.filter(cargas__carga__icontains=carga).distinct()
+            queryset = queryset.filter(
+                cargas__carga__icontains=carga).distinct()
         if veiculo:
             queryset = queryset.filter(veiculo__tipo_veiculo=veiculo)
         if destino:
@@ -180,7 +185,7 @@ class CenarioTransporteView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Veículos para o filtro 
+        # Veículos para o filtro
         context["veiculos"] = Veiculo.TIPO_VEICULO_CHOICES
 
         # Agrupamento de cargas por lecom
@@ -197,7 +202,7 @@ class CenarioTransporteView(ListView):
 
 
 class EditarTransporteView(View):
-    template_name = "transport/inserir_carga.html"
+    template_name = "transport/editar_transporte.html"
     success_url = reverse_lazy("transport:cenario_transporte")
 
     def get(self, request, pk):
@@ -248,7 +253,8 @@ class EditarTransporteView(View):
                     continue
 
                 carga.carga = carga_nome
-                carga.seq = int(seqs[i]) if i < len(seqs) and seqs[i] else i + 1
+                carga.seq = int(seqs[i]) if i < len(
+                    seqs) and seqs[i] else i + 1
                 carga.total_entregas = (
                     total_entregas_list[i]
                     if i < len(total_entregas_list) and total_entregas_list[i]
@@ -273,6 +279,3 @@ class EditarTransporteView(View):
                 "cargas": cargas,
                 "modo_edicao": True
             })
-
-
-

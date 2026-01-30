@@ -4,20 +4,29 @@
 {% block title %}Editar Separação{% endblock %}
 
 {% block content %}
+<style>
+.card-hover:hover {
+  transform: translateY(-2px);
+  transition: 0.2s;
+}
+</style>
+
 <div class="container-fluid mt-4 px-lg-4">
 
     <!-- ================= HEADER ================= -->
-    <div class="card shadow-sm border-0 mb-4 rounded-4">
+    <div class="card shadow border-0 mb-4 rounded-4">
         <div class="card-body">
 
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
 
                 <div>
                     <h4 class="fw-bold text-primary mb-1">
-                        <i class="bi bi-box-seam me-1"></i>
+                        <i class="bi bi-truck me-1"></i>
                         Transporte {{ controle.lecom.lecom }}
                     </h4>
-                    <small class="text-muted">Controle de separação</small>
+                    <small class="text-muted">
+                        <i class="bi bi-clipboard-check me-1"></i> Controle de separação
+                    </small>
                 </div>
 
                 {% include "components/status_badge.html" with status=controle.status %}
@@ -27,60 +36,87 @@
             <hr class="my-3">
 
             <div class="row g-3 small">
-                <div class="col-6 col-md-2"><span class="text-muted">ID</span><div class="fw-semibold">#{{ controle.lecom.pk }}</div></div>
-                <div class="col-6 col-md-3"><span class="text-muted">Destino</span><div class="fw-semibold">{{ controle.lecom.destino }}</div></div>
-                <div class="col-6 col-md-2"><span class="text-muted">Data</span><div class="fw-semibold">{{ controle.lecom.data|date:"d/m/Y" }}</div></div>
-                <div class="col-6 col-md-3"><span class="text-muted">Veículo</span><div class="fw-semibold">{{ controle.lecom.veiculo.tipo_veiculo|default:"—" }}</div></div>
+                <div class="col-6 col-md-2">
+                    <span class="text-muted"><i class="bi bi-hash me-1"></i>ID</span>
+                    <div class="fw-semibold">#{{ controle.lecom.pk }}</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <span class="text-muted"><i class="bi bi-geo-alt me-1"></i>Destino</span>
+                    <div class="fw-semibold">{{ controle.lecom.destino }}</div>
+                </div>
+                <div class="col-6 col-md-2">
+                    <span class="text-muted"><i class="bi bi-calendar-event me-1"></i>Data</span>
+                    <div class="fw-semibold">{{ controle.lecom.data|date:"d/m/Y" }}</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <span class="text-muted"><i class="bi bi-truck me-1"></i>Veículo</span>
+                    <div class="fw-semibold">{{ controle.lecom.veiculo.tipo_veiculo|default:"—" }}</div>
+                </div>
             </div>
 
         </div>
     </div>
 
     <!-- ================= CARGAS ================= -->
-    <h5 class="fw-bold mb-3"><i class="bi bi-layers me-1"></i> Cargas e Sequências</h5>
+    <h5 class="fw-bold mb-3">
+      <i class="bi bi-layers me-1"></i> Cargas e Sequências
+    </h5>
 
     <div class="row g-4">
+
         {% for carga in cargas %}
         <div class="col-md-6 col-lg-4">
-            <!-- Card por carga -->
-            <form method="post" class="card h-100 shadow-sm border-0 rounded-4">
+            <form method="post"
+                  class="card h-100 shadow-sm border-0 rounded-4 card-hover d-flex flex-column">
                 {% csrf_token %}
                 <input type="hidden" name="carga_id" value="{{ carga.id }}">
 
-                <!-- BODY -->
-                <div class="card-body d-flex flex-column">
+                <div class="card-body d-flex flex-column flex-grow-1">
 
-                    <!-- HEADER DA CARGA -->
+                    <!-- HEADER CARGA -->
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h6 class="fw-bold text-primary mb-0">
-                            <i class="bi bi-truck me-1"></i>Carga {{ carga.carga.carga }}
+                            <i class="bi bi-box-seam me-1"></i> Carga {{ carga.carga.carga }}
                         </h6>
-
                         {% include "components/status_badge.html" with status=carga.status %}
-
                     </div>
 
-                    <p class="mb-3 small"><span class="text-muted">Sequência:</span> <strong>{{ carga.seq }}</strong></p>
+                    <div class="small mb-2">
+                        <i class="bi bi-list-ol me-1"></i>
+                        <span class="text-muted">Sequência:</span>
+                        <strong>{{ carga.seq }}</strong>
+                    </div>
 
                     <!-- DADOS -->
                     <div class="row g-2 mb-3">
                         <div class="col-6">
-                            <label class="form-label small">Conferente</label>
+                            <label class="form-label small">
+                              <i class="bi bi-person-check me-1"></i>Conferente
+                            </label>
                             <input type="text" name="Conferente" class="form-control form-control-sm"
                                    placeholder="Nome do conferente" value="{{ carga.conferente|default:'' }}">
                         </div>
+
                         <div class="col-6">
-                            <label class="form-label small">Separadores</label>
+                            <label class="form-label small">
+                              <i class="bi bi-people me-1"></i>Separadores
+                            </label>
                             <input type="text" name="Separadores" class="form-control form-control-sm"
                                    placeholder="Separadores" value="{{ carga.separadores|default:'' }}">
                         </div>
+
                         <div class="col-6">
-                            <label class="form-label small">OT</label>
+                            <label class="form-label small">
+                              <i class="bi bi-receipt me-1"></i>OT
+                            </label>
                             <input type="text" name="OT" class="form-control form-control-sm"
                                    placeholder="Número da OT" value="{{ carga.ot|default:'' }}">
                         </div>
+
                         <div class="col-6">
-                            <label class="form-label small">Box</label>
+                            <label class="form-label small">
+                              <i class="bi bi-grid me-1"></i>Box
+                            </label>
                             <input type="text" name="BOX" class="form-control form-control-sm"
                                    placeholder="Box" value="{{ carga.box|default:'' }}">
                         </div>
@@ -89,7 +125,10 @@
                     <hr class="my-2">
 
                     <!-- DOCUMENTOS -->
-                    <h6 class="fw-bold mb-2"><i class="bi bi-file-earmark-check me-1"></i> Documentos</h6>
+                    <h6 class="fw-bold mb-2">
+                      <i class="bi bi-file-earmark-check me-1"></i> Documentos
+                    </h6>
+
                     <div class="small d-grid gap-2">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="resumo_conf" {% if carga.resumo_conf %}checked{% endif %}>
@@ -112,20 +151,30 @@
                 </div>
 
                 <!-- FOOTER -->
-                <div class="card-footer bg-white border-0 d-flex flex-column gap-2">
+                <div class="card-footer bg-white border-0 mt-auto d-flex gap-2">
+
+                    <button type="submit" name="acao" value="atualizar"
+                            class="sgl-btn sgl-btn-outline-primary flex-fill">
+                        <i class="bi bi-save me-1"></i> Atualizar
+                    </button>
+
                     {% if carga.status == 'Pendente' %}
-                        <button type="submit" name="acao" value="iniciar" class="sgl-btn sgl-btn-outline-secondary w-100">
+                        <button type="submit" name="acao" value="iniciar"
+                                class="sgl-btn sgl-btn-outline-secondary flex-fill">
                             <i class="bi bi-play-circle me-1"></i> Iniciar
                         </button>
                     {% elif carga.status == 'Em Andamento' %}
-                        <button type="submit" name="acao" value="atualizar" class="sgl-btn sgl-btn-outline-success w-100">
-                            <i class="bi bi-save me-1"></i> Finalizar
+                        <button type="submit" name="acao" value="finalizar"
+                                class="sgl-btn sgl-btn-outline-success flex-fill">
+                            <i class="bi bi-check2-circle me-1"></i> Finalizar
                         </button>
                     {% else %}
-                        <button type="submit" name="acao" value="concluir" class="sgl-btn sgl-btn-outline-warning w-100" disabled>
-                            <i class="bi bi-check2-circle me-1"></i> Concluído
+                        <button type="button"
+                                class="sgl-btn sgl-btn-outline-warning flex-fill" disabled>
+                            <i class="bi bi-lock me-1"></i> Concluído
                         </button>
                     {% endif %}
+
                 </div>
 
             </form>
@@ -135,7 +184,7 @@
         {% endfor %}
 
         <!-- VOLTAR -->
-        <div class="col-12">
+        <div class="col-12 text-center">
             <a href="{% url 'expedicao:cenario_separacao' %}" class="sgl-btn sgl-btn-outline-secondary px-4">
                 <i class="bi bi-arrow-left me-1"></i> Voltar
             </a>
