@@ -86,7 +86,6 @@ class CenarioSeparacaoView(LoginRequiredMixin, ListView):
             .filter(status__in=[
                 ControleSeparacao.STATUS_AGUARDANDO,
                 ControleSeparacao.STATUS_EM_ANDAMENTO,
-                ControleSeparacao.STATUS_CONCLUIDO,
             ])
             .order_by("lecom_id")
         )
@@ -142,7 +141,6 @@ class CenarioSeparacaoView(LoginRequiredMixin, ListView):
         return context
 
 
-
 class DetalheCardView(LoginRequiredMixin, View):
     template_name = "expedicao/analise_carga.html"
 
@@ -162,8 +160,17 @@ class DetalheCardView(LoginRequiredMixin, View):
         lecom = get_object_or_404(Lecom, pk=pk)
         controle = getattr(lecom, "controle_separacao", None)
 
+        turno = request.POST.get("turno")
+        data = request.POST.get("data_carregamento")
+        hora = request.POST.get("hora_carregamento")
+
         if not controle:
-            controle = ControleSeparacao.objects.create(lecom=lecom)
+            controle = ControleSeparacao.objects.create(
+                lecom=lecom,
+                turno=turno,
+                data_carregamento=data,
+                hora_carregamento=hora,
+            )
 
             for carga in lecom.cargas.all():
                 SeparacaoCarga.objects.create(
@@ -174,20 +181,28 @@ class DetalheCardView(LoginRequiredMixin, View):
                     entregas=carga.total_entregas,
                     mod=carga.mod,
                 )
+        else:
+            # 🔥 AQUI estava faltando
+            controle.turno = turno
+            controle.data_carregamento = data
+            controle.hora_carregamento = hora
+            controle.save()
 
         if controle.status == ControleSeparacao.STATUS_PENDENTE:
-            controle.status = ControleSeparacao.STATUS_AGUARDANDO
             controle.liberar_separacao()
-            controle.save()
-            
-            SeparacaoCarga.objects.filter(controle=controle).update(status=SeparacaoCarga.STATUS_AGUARDANDO)
+            SeparacaoCarga.objects.filter(controle=controle).update(
+                status=SeparacaoCarga.STATUS_AGUARDANDO
+            )
 
             messages.success(
                 request,
                 f"Separação {lecom} liberada e enviada para o cenário.",
             )
         else:
-            messages.warning(request,f"Transporte {lecom} já foi liberado.",)
+            messages.warning(
+                request,
+                f"Transporte {lecom} já foi liberado.",
+            )
 
         return redirect("expedicao:cenario_separacao")
 

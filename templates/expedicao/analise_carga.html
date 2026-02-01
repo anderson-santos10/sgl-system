@@ -13,9 +13,10 @@
   <!-- ================= HEADER ================= -->
   <header class="sgl-header sgl-header-inline">
     <div class="sgl-header-left">
-      <h3>Transporte #{{ lecom.pk }}</h3>
+      <h3>ID #{{ lecom.pk }}</h3>
       <small>
-        LECOM {{ lecom.lecom }} • {{ lecom.destino }} / {{ lecom.uf }}
+        LECOM: {{ lecom.lecom }} 
+        <br>DESTINO: {{ lecom.destino }} / {{ lecom.uf }}
       </small>
     </div>
 
@@ -71,6 +72,48 @@
     </div>
   </section>
 
+  <!-- ================= DEFINIÇÃO DE CARREGAMENTO ================= -->
+  <section class="sgl-card">
+    <div class="sgl-card-header">
+      <h5>Agendamento de Carregamento</h5>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="sgl-grid sgl-grid-3">
+
+        <div>
+          <label>Turno</label>
+          <select name="turno" class="form-select" required>
+            <option value="">Selecione</option>
+            <option value="Manhã">Manhã</option>
+            <option value="Tarde">Tarde</option>
+            <option value="Noite">Noite</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Data do Carregamento</label>
+          <input type="date" name="data_carregamento" class="form-control" required>
+        </div>
+
+        <div>
+          <label>Horário na Doca</label>
+          <input type="time" name="hora_carregamento" class="form-control" required>
+        </div>
+
+      </div>
+
+      <div class="sgl-actions mt-4">
+        <button type="submit" class="btn btn-primary btn-lg">
+          Liberar Separação
+        </button>
+      </div>
+
+    </form>
+  </section>
+
   <!-- ================= CARGAS ================= -->
   <section class="sgl-card">
     <div class="sgl-card-header sgl-card-header-inline">
@@ -99,16 +142,6 @@
       </div>
       {% endfor %}
     </div>
-  </section>
-
-  <!-- ================= AÇÃO ================= -->
-  <section class="sgl-actions">
-    <form method="post">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-primary btn-lg">
-        Liberar Separação
-      </button>
-    </form>
   </section>
 
 </div>

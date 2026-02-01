@@ -29,12 +29,26 @@ class ControleSeparacao(models.Model):
         choices=STATUS_CHOICES,
         default=STATUS_PENDENTE
     )
+    
+    
+    TURNO_MANHA = "Manhã"
+    TURNO_TARDE = "Tarde"
+    TURNO_NOITE = "Noite"
+
+    TURNO_CHOICES = [
+        (TURNO_MANHA, "Manhã"),
+        (TURNO_TARDE, "Tarde"),
+        (TURNO_NOITE, "Noite"),
+    ]
+    
+    turno = models.CharField(max_length=10, choices=TURNO_CHOICES, blank=True, null=True)
 
     liberada = models.BooleanField(default=False)
     inicio_separacao = models.DateTimeField(blank=True, null=True)
     finalizado = models.BooleanField(default=False)
-
     criado_em = models.DateTimeField(auto_now_add=True)
+    data_carregamento = models.DateField(blank=True, null=True)
+    hora_carregamento = models.TimeField(blank=True, null=True)
 
     class Meta:
         ordering = ["-criado_em"]
@@ -84,7 +98,7 @@ class SeparacaoCarga(models.Model):
     mod = models.CharField(max_length=10, default="-")
     resumo = models.CharField(max_length=2, default="1")
     ot = models.CharField(max_length=10, blank=True, default="")
-    box = models.CharField(max_length=3, blank=True, null=True, default="Não informado")
+    box = models.CharField(max_length=3, blank=True, null=True, default="")
     seg = models.CharField(max_length=10, default="")
 
     conferente = models.CharField(max_length=50, blank=True, null=True)
@@ -118,6 +132,11 @@ class SeparacaoCarga(models.Model):
         self.status = self.STATUS_CONCLUIDO
         self.finalizada = True
         self.save()
+
+        controle = self.controle
+        if not controle.cargas.exclude(status=self.STATUS_CONCLUIDO).exists():
+            controle.finalizar_separacao()
+
 
     def __str__(self):
         return f"SEQ {self.seq} | Carga {self.numero_transporte}"

@@ -134,8 +134,7 @@
 
                         {% for item in grupo_cargas %}
                             {% for carga in item.cargas %}
-                                <tr>
-
+                                <tr class="row-clickable" data-url="{% url 'transport:editar_transporte' item.grupo.id %}">
                                     {% if forloop.first %}
                                         <td rowspan="{{ item.cargas|length }}" class="bg-light fw-semibold">
                                             <a href="{% url 'transport:editar_transporte' item.grupo.id %}"
@@ -195,4 +194,5 @@
 
 <script src="{% static 'js/transporte/cenario_transporte.js' %}"></script>
 <script src="{% static 'js/transporte/editar_transporte.js' %}"></script>
+<script src="{% static 'js/base/base.js' %}"></script>
 {% endblock %}
