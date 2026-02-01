@@ -1,5 +1,7 @@
 from django.db import models
 from transport.models import Lecom, Carga
+from django.utils import timezone
+
 
 
 class ControleSeparacao(models.Model):
@@ -52,9 +54,7 @@ class ControleSeparacao(models.Model):
 
 
 class SeparacaoCarga(models.Model):
-    controle = models.ForeignKey(ControleSeparacao,on_delete=models.CASCADE, related_name="cargas"
-    )
-
+    controle = models.ForeignKey(ControleSeparacao,on_delete=models.CASCADE, related_name="cargas")
     carga = models.ForeignKey(
         Carga,
         on_delete=models.CASCADE,
@@ -107,7 +107,13 @@ class SeparacaoCarga(models.Model):
         self.status = self.STATUS_EM_ANDAMENTO
         self.atribuida = True
         self.save()
-
+        
+        # Atualiza status da model ControleSeparação
+        controle = self.controle
+        controle.status = ControleSeparacao.STATUS_EM_ANDAMENTO
+        controle.inicio_separacao = timezone.now()
+        controle.save()
+        
     def concluir(self):
         self.status = self.STATUS_CONCLUIDO
         self.finalizada = True

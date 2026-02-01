@@ -5,6 +5,13 @@
 ===================================================== */
 
 /* ===========================
+   VARIÁVEIS DE LAYOUT
+=========================== */
+:root {
+  --sgl-navbar-width: 260px; /* AJUSTE para a largura real da sua navbar */
+}
+
+/* ===========================
    RESET BÁSICO
 =========================== */
 *,
@@ -45,6 +52,30 @@ h3 { font-size: 1.25rem; }
 h4 { font-size: 1.125rem; }
 h5 { font-size: 1rem; }
 h6 { font-size: 0.875rem; }
+
+/* ===========================
+   HEADER DE PÁGINA (H1 + SMALL)
+=========================== */
+.sgl-page-header {
+  width: calc(100% - var(--sgl-navbar-width));
+  margin-left: var(--sgl-navbar-width);
+  padding: var(--sgl-space-md) 0;
+  text-align: center;
+  border-bottom: 1px solid var(--sgl-border);
+}
+
+.sgl-page-header h1 {
+  font-size: 1.9rem;
+  letter-spacing: 0.5px;
+}
+
+.sgl-page-header small {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: var(--sgl-font-size-xs);
+  color: var(--sgl-text-muted);
+  letter-spacing: 0.5px;
+}
 
 /* ===========================
    TEXTOS

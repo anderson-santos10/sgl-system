@@ -58,7 +58,7 @@ body {
   padding: 0;
   background: linear-gradient(135deg, var(--sgl-primary), var(--sgl-primary-dark));
   z-index: 1000;
-  flex-shrink: 0; /* garante que não encolha */
+  flex-shrink: 0;
 }
 
 /* Logo */
@@ -109,7 +109,7 @@ body {
   background-color: rgba(255, 255, 255, 0.12);
 }
 
-/* ACCORDION (BOOTSTRAP OVERRIDE) */
+/* ACCORDION */
 .app-layout .accordion-button {
   background: transparent;
   color: #fff;
@@ -127,7 +127,7 @@ body {
 }
 
 .app-layout .accordion-button::after {
-  filter: invert(1); /* seta branca */
+  filter: invert(1);
 }
 
 .app-layout .accordion-body {
@@ -144,6 +144,32 @@ body {
   min-height: 100vh;
   width: 100%;
   background-color: var(--sgl-bg-light);
+}
+
+/* ===============================
+   TÍTULO DAS PÁGINAS
+================================ */
+.content > h1,
+.content .page-header h1 {
+  text-align: center;
+  font-size: 1.9rem;
+  letter-spacing: 0.5px;
+  margin-top: 0.5rem;
+}
+
+.content > small,
+.content .page-header small {
+  display: block;
+  text-align: center;
+  margin-top: 0.25rem;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
+
+.page-header {
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 /* ===============================
@@ -225,6 +251,6 @@ body {
   }
 
   .app-layout .content {
-    margin-left: 0; /* sidebar colapsa em mobile */
+    margin-left: 0;
   }
 }

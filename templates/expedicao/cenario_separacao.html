@@ -93,9 +93,9 @@
 
   <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <div>
-      <h4 class="fw-bold text-primary mb-1">
+      <h1 class="fw-bold text-primary mb-1">
         <i class="bi bi-truck me-1"></i> Cenário de Separação
-      </h4>
+      </h1>
       <small class="text-muted">
         <i class="bi bi-clock me-1"></i> Transportes liberados aguardando separação
       </small>
@@ -138,7 +138,7 @@
                 <span>
                   <i class="bi bi-flag me-1"></i><strong> Status:</strong>
                 </span>
-                {% include "components/status_badge.html" with status=carga.controle.status|default:"Aguardando" %}
+                {% include "components/status_badge.html" with status=carga.status|default:"Aguardando" %}
               </div>
 
               <div>
@@ -160,11 +160,15 @@
                 <i class="bi bi-grid me-1"></i>
                 <strong>Box:</strong> {{ carga.box }}
               </div>
-
               <div>
+                <i class="bi bi-people me-1"></i>
+                <strong>Separadores:</strong> {{ carga.separadores }}
+              </div>
+               <div>
                 <i class="bi bi-person-check me-1"></i>
                 <strong>Conferente:</strong> {{ carga.conferente }}
               </div>
+
             <h6 class="fw-bold mb-2"><i class="bi bi-file-earmark-check me-1"></i> Documentos</h6>
             <ul class="ps-3 mb-0 small">
                 {% if carga.resumo_conf %}<li>Resumo Conferente</li>{% endif %}

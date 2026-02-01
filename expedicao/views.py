@@ -212,7 +212,7 @@ class DetalheCardView(LoginRequiredMixin, View):
         else:
             messages.warning(
                 request,
-                "Esta separação já foi liberada.",
+                "Transporte já foi liberado.",
             )
 
         return redirect("expedicao:cenario_separacao")
@@ -249,11 +249,8 @@ class EditarSeparacaoView(View):
     def post(self, request, pk):
         lecom = get_object_or_404(Lecom, pk=pk)
         controle = get_object_or_404(ControleSeparacao, lecom=lecom)
-
         carga_id = request.POST.get("carga_id")
-        carga = get_object_or_404(
-            SeparacaoCarga, id=carga_id, controle=controle)
-
+        carga = get_object_or_404(SeparacaoCarga, id=carga_id, controle=controle)
         acao = request.POST.get("acao")
 
         try:
@@ -264,15 +261,14 @@ class EditarSeparacaoView(View):
                 carga.ot = request.POST.get("OT", "").strip()
                 carga.box = request.POST.get("BOX", "").strip()
                 carga.resumo_conf = bool(request.POST.get("resumo_conf"))
-                carga.resumo_motorista = bool(
-                    request.POST.get("resumo_motorista"))
+                carga.resumo_motorista = bool(request.POST.get("resumo_motorista"))
                 carga.etiquetas_cds = bool(request.POST.get("etiquetas_cds"))
                 carga.carga_gerada = bool(request.POST.get("carga_gerada"))
 
                 # =================== INICIAR CARGA ===================
                 if acao == "iniciar" and carga.status == carga.STATUS_PENDENTE:
                     carga.status = carga.STATUS_EM_ANDAMENTO
-                    carga.atribuida = True
+                    controle.status = controle.STATUS_EM_ANDAMENTO
                     if not carga.inicio_separacao:
                         carga.inicio_separacao = timezone.now()
                     carga.save()
@@ -287,12 +283,12 @@ class EditarSeparacaoView(View):
                 # =================== CONCLUIR CARGA ===================
                 elif acao == "concluir" and carga.status != carga.STATUS_CONCLUIDO:
                     carga.status = carga.STATUS_CONCLUIDO
+                    controle.STATUS_AGUARDANDO = controle.STATUS_CONCLUIDO
                     carga.finalizada = True
                     carga.save()
 
                     # Se todas as cargas estiverem concluídas, finaliza o controle
-                    cargas_pendentes = controle.cargas.filter(
-                        status__in=[SeparacaoCarga.STATUS_PENDENTE,
+                    cargas_pendentes = controle.cargas.filter(status__in=[SeparacaoCarga.STATUS_PENDENTE,
                                     SeparacaoCarga.STATUS_EM_ANDAMENTO]
                     )
                     if not cargas_pendentes.exists():
@@ -306,5 +302,5 @@ class EditarSeparacaoView(View):
             messages.error(request, f"Erro ao atualizar carga: {e}")
             return redirect("expedicao:editar_carga", pk=lecom.pk)
 
-        messages.success(request, "Carga atualizada com sucesso.")
-        return redirect("expedicao:editar_carga", pk=lecom.pk)
+        messages.success(request, f"{carga} atualizada com sucesso.")
+        return redirect("expedicao:cenario_separacao")
