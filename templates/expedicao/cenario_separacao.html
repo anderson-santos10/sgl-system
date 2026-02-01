@@ -62,7 +62,7 @@
   <select name="status" class="form-select form-select-sm">
       <option value="">Todos</option>
       <option value="Aguardando" {% if request.GET.status == 'Aguardando' %}selected{% endif %}>Aguardando</option>
-      <option value="Andamento" {% if request.GET.status == 'Andamento' %}selected{% endif %}>Em Andamento</option>
+      <option value="Em Andamento" {% if request.GET.status == 'Em Andamento' %}selected{% endif %}>Em Andamento</option>
       <option value="Concluido" {% if request.GET.status == 'Concluido' %}selected{% endif %}>Concluído</option>
   </select>
 </div>
@@ -114,7 +114,8 @@
       <div class="card shadow-sm border-0 rounded-4 bg-light sgl-card">
 
         <div class="card-header">
-          {% include "components/status_badge.html" with status=grupo.grupo.controle_separacao.status|default:"Aguardando" %}
+          {# STATUS DO CONTROLE #}
+          {% include "components/status_badge.html" with status=grupo.grupo.status %}
 
           <div class="d-flex justify-content-between mt-1">
             <span><i class="bi bi-truck me-1"></i> <strong>Transporte:</strong> {{ grupo.grupo.lecom.lecom|default:"—" }}</span>
@@ -138,7 +139,8 @@
                 <span>
                   <i class="bi bi-flag me-1"></i><strong> Status:</strong>
                 </span>
-                {% include "components/status_badge.html" with status=carga.status|default:"Aguardando" %}
+                {# STATUS DA CARGA #}
+                {% include "components/status_badge.html" with status=carga.status %}
               </div>
 
               <div>
@@ -160,25 +162,27 @@
                 <i class="bi bi-grid me-1"></i>
                 <strong>Box:</strong> {{ carga.box }}
               </div>
+
               <div>
                 <i class="bi bi-people me-1"></i>
                 <strong>Separadores:</strong> {{ carga.separadores }}
               </div>
-               <div>
+
+              <div>
                 <i class="bi bi-person-check me-1"></i>
                 <strong>Conferente:</strong> {{ carga.conferente }}
               </div>
 
-            <h6 class="fw-bold mb-2"><i class="bi bi-file-earmark-check me-1"></i> Documentos</h6>
-            <ul class="ps-3 mb-0 small">
-                {% if carga.resumo_conf %}<li>Resumo Conferente</li>{% endif %}
-                {% if carga.resumo_motorista %}<li>Resumo Motorista</li>{% endif %}
-                {% if carga.etiquetas_cds %}<li>Etiquetas CDs</li>{% endif %}
-                {% if carga.carga_gerada %}<li>Carga Gerada</li>{% endif %}
-                {% if not carga.resumo_conf and not carga.resumo_motorista and not carga.etiquetas_cds and not carga.carga_gerada %}
-                    <li class="text-muted">Nenhum documento</li>
-                {% endif %}
-            </ul>
+              <h6 class="fw-bold mb-2"><i class="bi bi-file-earmark-check me-1"></i> Documentos</h6>
+              <ul class="ps-3 mb-0 small">
+                  {% if carga.resumo_conf %}<li>Resumo Conferente</li>{% endif %}
+                  {% if carga.resumo_motorista %}<li>Resumo Motorista</li>{% endif %}
+                  {% if carga.etiquetas_cds %}<li>Etiquetas CDs</li>{% endif %}
+                  {% if carga.carga_gerada %}<li>Carga Gerada</li>{% endif %}
+                  {% if not carga.resumo_conf and not carga.resumo_motorista and not carga.etiquetas_cds and not carga.carga_gerada %}
+                      <li class="text-muted">Nenhum documento</li>
+                  {% endif %}
+              </ul>
 
             </div>
           </a>

@@ -108,16 +108,13 @@ class CenarioSeparacaoView(LoginRequiredMixin, ListView):
             queryset = queryset.filter(lecom__data=filtros["data"])
 
         if filtros["lecom"]:
-            queryset = queryset.filter(
-                lecom__lecom__icontains=filtros["lecom"])
+            queryset = queryset.filter(lecom__lecom__icontains=filtros["lecom"])
 
         if filtros["destino"]:
-            queryset = queryset.filter(
-                lecom__destino__icontains=filtros["destino"])
+            queryset = queryset.filter(lecom__destino__icontains=filtros["destino"])
 
         if filtros["veiculo"]:
-            queryset = queryset.filter(
-                lecom__veiculo__tipo_veiculo=filtros["veiculo"])
+            queryset = queryset.filter(lecom__veiculo__tipo_veiculo=filtros["veiculo"])
 
         if filtros["carga"]:
             queryset = queryset.filter(
@@ -144,30 +141,6 @@ class CenarioSeparacaoView(LoginRequiredMixin, ListView):
 
         return context
 
-    def post(self, request, *args, **kwargs):
-        controle_id = request.POST.get("controle_id")
-
-        if controle_id:
-            controle = get_object_or_404(ControleSeparacao, pk=controle_id)
-            controle.status = ControleSeparacao.STATUS_EM_ANDAMENTO
-            controle.save()
-
-        return redirect("expedicao:cenario_separacao")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context["grupo_cargas"] = [
-            {
-                "grupo": controle,
-                "cargas": controle.cargas.all().order_by("seq"),
-            }
-            for controle in context["grupo_cargas"]
-        ]
-
-        context["veiculos"] = Veiculo.TIPO_VEICULO_CHOICES
-
-        return context
 
 
 class DetalheCardView(LoginRequiredMixin, View):
@@ -203,17 +176,18 @@ class DetalheCardView(LoginRequiredMixin, View):
                 )
 
         if controle.status == ControleSeparacao.STATUS_PENDENTE:
+            controle.status = ControleSeparacao.STATUS_AGUARDANDO
             controle.liberar_separacao()
+            controle.save()
+            
+            SeparacaoCarga.objects.filter(controle=controle).update(status=SeparacaoCarga.STATUS_AGUARDANDO)
 
             messages.success(
                 request,
                 f"Separação {lecom} liberada e enviada para o cenário.",
             )
         else:
-            messages.warning(
-                request,
-                "Transporte já foi liberado.",
-            )
+            messages.warning(request,f"Transporte {lecom} já foi liberado.",)
 
         return redirect("expedicao:cenario_separacao")
 
@@ -266,15 +240,16 @@ class EditarSeparacaoView(View):
                 carga.carga_gerada = bool(request.POST.get("carga_gerada"))
 
                 # =================== INICIAR CARGA ===================
-                if acao == "iniciar" and carga.status == carga.STATUS_PENDENTE:
+                if acao == "iniciar" and carga.status == carga.STATUS_AGUARDANDO:
                     carga.status = carga.STATUS_EM_ANDAMENTO
                     controle.status = controle.STATUS_EM_ANDAMENTO
                     if not carga.inicio_separacao:
                         carga.inicio_separacao = timezone.now()
                     carga.save()
+                    controle.save()
 
                     # Atualiza controle se ainda estiver pendente
-                    if controle.status == controle.STATUS_PENDENTE:
+                    if controle.status == controle.STATUS_AGUARDANDO:
                         controle.status = controle.STATUS_EM_ANDAMENTO
                         if not controle.inicio_separacao:
                             controle.inicio_separacao = timezone.now()
@@ -288,7 +263,7 @@ class EditarSeparacaoView(View):
                     carga.save()
 
                     # Se todas as cargas estiverem concluídas, finaliza o controle
-                    cargas_pendentes = controle.cargas.filter(status__in=[SeparacaoCarga.STATUS_PENDENTE,
+                    cargas_pendentes = controle.cargas.filter(status__in=[SeparacaoCarga.STATUS_EM_ANDAMENTO,
                                     SeparacaoCarga.STATUS_EM_ANDAMENTO]
                     )
                     if not cargas_pendentes.exists():

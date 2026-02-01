@@ -63,12 +63,12 @@ class SeparacaoCarga(models.Model):
 
     seq = models.PositiveIntegerField()
 
-    STATUS_PENDENTE = "Pendente"
+    STATUS_AGUARDANDO = "Aguardando"
     STATUS_EM_ANDAMENTO = "Em Andamento"
     STATUS_CONCLUIDO = "Concluido"
 
     STATUS_CHOICES = [
-        (STATUS_PENDENTE, "Pendente"),
+        (STATUS_AGUARDANDO, "Aguardando"),
         (STATUS_EM_ANDAMENTO, "Em Andamento"),
         (STATUS_CONCLUIDO, "Concluído"),
     ]
@@ -76,7 +76,7 @@ class SeparacaoCarga(models.Model):
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default=STATUS_PENDENTE
+        default=STATUS_AGUARDANDO
     )
 
     numero_transporte = models.CharField(max_length=10)

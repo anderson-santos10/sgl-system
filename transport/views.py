@@ -31,7 +31,7 @@ class CriarTransporteView(View):
             request,
             self.template_name,
             {
-                "status_default": "BLOQUEADO"
+                "status_default": "Bloqueado"
             }
         )
 
@@ -43,7 +43,7 @@ class CriarTransporteView(View):
         m3 = safe_decimal(request.POST.get("m3"))
         data = parse_date(request.POST.get("data", "").strip())
         observacao = request.POST.get("observacao", "").strip()
-        status = request.POST.get("status", "BLOQUEADO")
+        status = request.POST.get("status", "Bloqueado")
 
         errors = []
         if not lecom_code:
@@ -138,7 +138,7 @@ class CriarTransporteView(View):
             return render(request, self.template_name)
 
         messages.success(request, f"LECOM {lecom.lecom} criado com sucesso.")
-        return render(request, self.template_name)
+        return render(request, "transport/cenario_transporte.html")
 
 
 class CenarioTransporteView(ListView):
@@ -266,11 +266,11 @@ class EditarTransporteView(View):
             # 🔄 Regras de negócio da expedição
             sincronizar_expedicao(lecom)
 
-            messages.success(request, "Transporte atualizado com sucesso.")
-            return redirect(self.success_url)
+            messages.success(request, f"Transporte {lecom.lecom} atualizado com sucesso.")
+            return redirect("transport:cenario_transporte")
 
         except Exception:
-            messages.error(request, "Erro ao atualizar o transporte.")
+            messages.error(request, f"Erro ao atualizar o transporte {lecom.lecom}")
 
             cargas = lecom.cargas.all().order_by("seq")
 
