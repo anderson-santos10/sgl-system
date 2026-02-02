@@ -36,3 +36,4 @@ def sincronizar_expedicao(lecom):
     SeparacaoCarga.objects.filter(
         controle=controle
     ).exclude(carga_id__in=cargas_validas).delete()
+

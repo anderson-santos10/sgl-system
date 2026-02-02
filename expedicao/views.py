@@ -128,48 +128,82 @@ class CenarioSeparacaoView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["grupo_cargas"] = [
-            {
-                "grupo": controle,
-                "cargas": controle.cargas.all().order_by("seq"),
-            }
-            for controle in context["grupo_cargas"]
-        ]
+        grupo_cargas = []
+        for controle in context["grupo_cargas"]:
+            cargas = controle.cargas.all().order_by("-seq")
 
+            grupo_cargas.append({
+                "grupo": controle,
+                "cargas": cargas,
+                "total_peso": controle.lecom.peso,  # pega do Lecom
+                "total_m3": controle.lecom.m3,      # pega do Lecom
+            })
+
+        context["grupo_cargas"] = grupo_cargas
         context["veiculos"] = Veiculo.TIPO_VEICULO_CHOICES
+
+        # totais gerais do cenário
+        context["peso_total_cenario"] = sum(item["total_peso"] for item in grupo_cargas)
+        context["m3_total_cenario"] = sum(item["total_m3"] for item in grupo_cargas)
 
         return context
 
 
 class DetalheCardView(LoginRequiredMixin, View):
+    model = Lecom
     template_name = "expedicao/analise_carga.html"
+    context_object_name = "lecom"
 
     def get(self, request, pk):
         lecom = get_object_or_404(Lecom, pk=pk)
+        cargas_transporte = lecom.cargas.all().order_by("seq")
+        controle = getattr(lecom, "controle_separacao", None)
 
-        return render(
-            request,
-            self.template_name,
-            {
-                "lecom": lecom,
-                "cargas": lecom.cargas.all().order_by("seq"),
-            },
-        )
+        total_peso_transporte = lecom.peso or 0
+        total_m3_transporte = lecom.m3 or 0
+
+        transportes_cenario = ControleSeparacao.objects.filter(
+            status__in=[
+                ControleSeparacao.STATUS_AGUARDANDO,
+                ControleSeparacao.STATUS_EM_ANDAMENTO
+            ]
+        ).exclude(lecom=lecom).select_related("lecom")
+
+        total_peso_cenario = sum(t.lecom.peso or 0 for t in transportes_cenario)
+        total_m3_cenario = sum(t.lecom.m3 or 0 for t in transportes_cenario)
+
+        total_peso_impacto = total_peso_cenario + total_peso_transporte
+        total_m3_impacto = total_m3_cenario + total_m3_transporte
+
+        context = {
+            "controle": controle,
+            "lecom": lecom,
+            "cargas": cargas_transporte,
+            "total_peso_transporte": total_peso_transporte,
+            "total_m3_transporte": total_m3_transporte,
+            "peso_total_cenario": total_peso_cenario,
+            "m3_total_cenario": total_m3_cenario,
+            "peso_total_impacto": total_peso_impacto,
+            "m3_total_impacto": total_m3_impacto,
+        }
+
+        return render(request, self.template_name, context)
 
     def post(self, request, pk):
         lecom = get_object_or_404(Lecom, pk=pk)
         controle = getattr(lecom, "controle_separacao", None)
 
         turno = request.POST.get("turno")
-        data = request.POST.get("data_carregamento")
-        hora = request.POST.get("hora_carregamento")
+        data_carregamento = request.POST.get("data_carregamento")
+        hora_carregamento = request.POST.get("hora_carregamento")
 
+        # 🔹 SE NÃO EXISTE CONTROLE → CRIA
         if not controle:
             controle = ControleSeparacao.objects.create(
                 lecom=lecom,
                 turno=turno,
-                data_carregamento=data,
-                hora_carregamento=hora,
+                data_carregamento=data_carregamento,
+                hora_carregamento=hora_carregamento,
             )
 
             for carga in lecom.cargas.all():
@@ -181,30 +215,25 @@ class DetalheCardView(LoginRequiredMixin, View):
                     entregas=carga.total_entregas,
                     mod=carga.mod,
                 )
-        else:
-            # 🔥 AQUI estava faltando
-            controle.turno = turno
-            controle.data_carregamento = data
-            controle.hora_carregamento = hora
-            controle.save()
 
-        if controle.status == ControleSeparacao.STATUS_PENDENTE:
             controle.liberar_separacao()
             SeparacaoCarga.objects.filter(controle=controle).update(
                 status=SeparacaoCarga.STATUS_AGUARDANDO
             )
 
-            messages.success(
-                request,
-                f"Separação {lecom} liberada e enviada para o cenário.",
-            )
+            messages.success(request, f"Separação {lecom} liberada.")
+
+        # 🔹 SE JÁ EXISTE → APENAS ATUALIZA
         else:
-            messages.warning(
-                request,
-                f"Transporte {lecom} já foi liberado.",
-            )
+            controle.turno = turno
+            controle.data_carregamento = data_carregamento
+            controle.hora_carregamento = hora_carregamento
+            controle.save()
+
+            messages.success(request, f"Agendamento do transporte {lecom} atualizado.")
 
         return redirect("expedicao:cenario_separacao")
+
 
 
 class CenarioCarregamentoView(LoginRequiredMixin, View):

@@ -73,16 +73,12 @@
 
         <div class="col-6 col-md-2">
           <div class="info-label">Data Doca</div>
-          <div class="fw-semibold">
-            {{ controle.data_carregamento|date:"d/m/Y"|default:"—" }}
-          </div>
+          <div class="fw-semibold">{{ controle.data_carregamento|date:"d/m/Y"|default:"—" }}</div>
         </div>
 
         <div class="col-6 col-md-2">
           <div class="info-label">Hora Doca</div>
-          <div class="fw-semibold">
-            {{ controle.hora_carregamento|time:"H:i"|default:"—" }}
-          </div>
+          <div class="fw-semibold">{{ controle.hora_carregamento|time:"H:i"|default:"—" }}</div>
         </div>
 
       </div>
@@ -120,64 +116,78 @@
             <strong>{{ carga.seq }}</strong>
           </div>
 
-          <!-- DADOS -->
+          <!-- ================= INPUTS FLOATING ================= -->
           <div class="row g-2 mb-3">
 
             <div class="col-6">
-              <label class="form-label small">Conferente</label>
-              <input type="text" name="Conferente" class="form-control form-control-sm"
-                     value="{{ carga.conferente|default:'' }}">
+              <div class="form-floating mb-2">
+                <input type="text" name="Conferente" class="form-control form-control-sm"
+                       id="conferente{{ carga.id }}" placeholder="Conferente"
+                       value="{{ carga.conferente|default:'' }}">
+                <label for="conferente{{ carga.id }}">Conferente</label>
+              </div>
             </div>
 
             <div class="col-6">
-              <label class="form-label small">Separadores</label>
-              <input type="text" name="Separadores" class="form-control form-control-sm"
-                     value="{{ carga.separadores|default:'' }}">
+              <div class="form-floating mb-2">
+                <input type="text" name="Separadores" class="form-control form-control-sm"
+                       id="separadores{{ carga.id }}" placeholder="Separadores"
+                       value="{{ carga.separadores|default:'' }}">
+                <label for="separadores{{ carga.id }}">Separadores</label>
+              </div>
             </div>
 
             <div class="col-6">
-              <label class="form-label small">OT</label>
-              <input type="text" name="OT" class="form-control form-control-sm"
-                     value="{{ carga.ot|default:'' }}">
+              <div class="form-floating mb-2">
+                <input type="text" name="OT" class="form-control form-control-sm"
+                       id="ot{{ carga.id }}" placeholder="OT"
+                       value="{{ carga.ot|default:'' }}">
+                <label for="ot{{ carga.id }}">OT</label>
+              </div>
             </div>
 
             <div class="col-6">
-              <label class="form-label small">Box</label>
-              <input type="text" name="BOX" class="form-control form-control-sm"
-                     value="{{ carga.box|default:'' }}">
+              <div class="form-floating mb-2">
+                <input type="text" name="BOX" class="form-control form-control-sm"
+                       id="box{{ carga.id }}" placeholder="Box"
+                       value="{{ carga.box|default:'' }}">
+                <label for="box{{ carga.id }}">Box</label>
+              </div>
             </div>
 
           </div>
 
           <hr class="my-2">
 
-          <!-- DOCUMENTOS -->
+          <!-- ================= DOCUMENTOS ================= -->
           <h6 class="fw-bold mb-2">
             <i class="bi bi-file-earmark-check me-1"></i> Documentos
           </h6>
 
           <div class="small d-grid gap-1">
-
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="resumo_conf" {% if carga.resumo_conf %}checked{% endif %}>
-              <label class="form-check-label">Resumo Conferente</label>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="resumo_conf"
+                     id="resumo_conf{{ carga.id }}" {% if carga.resumo_conf %}checked{% endif %}>
+              <label class="form-check-label" for="resumo_conf{{ carga.id }}">Resumo Conferente</label>
             </div>
 
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="resumo_motorista" {% if carga.resumo_motorista %}checked{% endif %}>
-              <label class="form-check-label">Resumo Motorista</label>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="resumo_motorista"
+                     id="resumo_motorista{{ carga.id }}" {% if carga.resumo_motorista %}checked{% endif %}>
+              <label class="form-check-label" for="resumo_motorista{{ carga.id }}">Resumo Motorista</label>
             </div>
 
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="etiquetas_cds" {% if carga.etiquetas_cds %}checked{% endif %}>
-              <label class="form-check-label">Etiquetas CDs</label>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="etiquetas_cds"
+                     id="etiquetas_cds{{ carga.id }}" {% if carga.etiquetas_cds %}checked{% endif %}>
+              <label class="form-check-label" for="etiquetas_cds{{ carga.id }}">Etiquetas CDs</label>
             </div>
 
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="carga_gerada" {% if carga.carga_gerada %}checked{% endif %}>
-              <label class="form-check-label">Carga Gerada</label>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="carga_gerada"
+                     id="carga_gerada{{ carga.id }}" {% if carga.carga_gerada %}checked{% endif %}>
+              <label class="form-check-label" for="carga_gerada{{ carga.id }}">Carga Gerada</label>
             </div>
-
           </div>
 
         </div>

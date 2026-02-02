@@ -7,46 +7,79 @@
     {% url 'expedicao:cenario_expedicao' %}
 {% endblock %}
 
-{% block filter_fields %}
-<div class="mb-3">
-    <label class="form-label small">Data</label>
-    <input type="date" name="data" class="form-control form-control-sm" value="{{ request.GET.data }}">
-</div>
-
-<div class="mb-3">
-    <label class="form-label small">ID</label>
-    <input type="text" name="controle_id" class="form-control form-control-sm"
-           placeholder="Ex: 123" value="{{ request.GET.controle_id }}">
-</div>
-
-<div class="mb-3">
-    <label class="form-label">Carga</label>
-    <input type="text" name="carga" class="form-control form-control-sm"
-           placeholder="Ex: 1023" value="{{ request.GET.carga }}">
-</div>
-
-<div class="mb-3">
-    <label class="form-label">Lecom</label>
-    <input type="text" name="lecom" class="form-control"
-           placeholder="Ex: 123" value="{{ request.GET.lecom }}">
-</div>
-
-<div class="mb-3">
-    <label class="form-label">Destino</label>
-    <input type="text" name="destino" class="form-control"
-           placeholder="Ex: São Paulo" value="{{ request.GET.destino }}">
-</div>
-
-<div class="mb-3">
-    <label class="form-label">Veículo</label>
-    <select name="veiculo" class="form-select form-select-sm">
-        <option value="">Todos</option>
-        {% for value, label in veiculos %}
-            <option value="{{ value }}">{{ label }}</option>
-        {% endfor %}
-    </select>
-</div>
+{% block scenario_header %}
+<!-- ================= HEADER DO CENÁRIO ================= -->
+    <header class="sgl-header sgl-header-inline mb-4">
+        <div class="sgl-header-left">
+            <div>
+                Peso total: <span>{{ peso_total_cenario }} kg</span>
+                &nbsp;•&nbsp;
+                Volume total: <span>{{ m3_total_impacto }} m³</span>
+            </div>
+        </div>
+    </header>
 {% endblock %}
+
+{% block filter_fields %}
+
+<div class="mb-3">
+  <label class="form-label small">Data</label>
+  <input type="date"
+         name="data"
+         class="form-control form-control-sm"
+         value="{{ request.GET.data }}">
+</div>
+
+<div class="mb-3">
+  <label class="form-label small">ID do Controle</label>
+  <input type="text"
+         name="controle_id"
+         class="form-control form-control-sm"
+         placeholder="Ex: 123"
+         value="{{ request.GET.controle_id }}">
+</div>
+
+<div class="mb-3">
+  <label class="form-label small">Carga</label>
+  <input type="text"
+         name="carga"
+         class="form-control form-control-sm"
+         placeholder="Ex: 1023"
+         value="{{ request.GET.carga }}">
+</div>
+
+<div class="mb-3">
+  <label class="form-label small">Lecom</label>
+  <input type="text"
+         name="lecom"
+         class="form-control form-control-sm"
+         placeholder="Ex: 456"
+         value="{{ request.GET.lecom }}">
+</div>
+
+<div class="mb-3">
+  <label class="form-label small">Destino</label>
+  <input type="text"
+         name="destino"
+         class="form-control form-control-sm"
+         placeholder="Ex: São Paulo"
+         value="{{ request.GET.destino }}">
+</div>
+
+<div class="mb-3">
+  <label class="form-label small">Veículo</label>
+  <select name="veiculo" class="form-select form-select-sm">
+      <option value="">Todos</option>
+      {% for value, label in veiculos %}
+          <option value="{{ value }}" {% if request.GET.veiculo == value %}selected{% endif %}>
+              {{ label }}
+          </option>
+      {% endfor %}
+  </select>
+</div>
+
+{% endblock %}
+
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/table.css' %}">

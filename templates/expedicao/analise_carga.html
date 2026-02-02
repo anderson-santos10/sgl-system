@@ -7,41 +7,38 @@
 <link rel="stylesheet" href="{% static 'css/expedicao/analise_carga.css' %}">
 {% endblock %}
 
+{% block scenario_header %}
+<header class="sgl-header sgl-header-inline mb-4">
+    <div class="sgl-header-left">
+        <h3>ID #{{ lecom.pk }}</h3>
+        <div>
+            Peso total: <span>{{ peso_total_impacto }} kg</span><br>
+            Volume total: <span>{{ m3_total_impacto }} m³</span>
+        </div>
+        <small>
+            LECOM: {{ lecom.lecom }}
+        </small>
+    </div>
+</header>
+{% endblock %}
+
 {% block content %}
 <div class="sgl-page">
 
-  <!-- ================= HEADER ================= -->
-  <header class="sgl-header sgl-header-inline">
-    <div class="sgl-header-left">
-      <h3>ID #{{ lecom.pk }}</h3>
-      <small>
-        LECOM: {{ lecom.lecom }} 
-        <br>DESTINO: {{ lecom.destino }} / {{ lecom.uf }}
-      </small>
-    </div>
-
-    <div class="sgl-header-right">
-      {% include "components/status_badge.html" with status=lecom.status %}
-    </div>
-  </header>
-
   <!-- ================= KPIs ================= -->
-  <section class="sgl-kpis sgl-kpis-compact">
+  <section class="sgl-kpis sgl-kpis-compact mb-4">
     <div class="kpi">
       <span>Peso</span>
       <strong>{{ lecom.peso }} kg</strong>
     </div>
-
     <div class="kpi">
       <span>Volume</span>
       <strong>{{ lecom.m3 }} m³</strong>
     </div>
-
     <div class="kpi">
       <span>Cargas</span>
       <strong>{{ cargas|length }}</strong>
     </div>
-
     <div class="kpi">
       <span>Veículo</span>
       <strong>{{ lecom.veiculo.tipo_veiculo|default:"—" }}</strong>
@@ -49,7 +46,7 @@
   </section>
 
   <!-- ================= DADOS ================= -->
-  <section class="sgl-card sgl-card-compact">
+  <section class="sgl-card sgl-card-compact mb-4">
     <div class="sgl-card-header">
       <h5>Dados do Transporte</h5>
     </div>
@@ -57,14 +54,12 @@
     <div class="sgl-grid sgl-grid-3">
       <div>
         <label>Destino</label>
-        <p>{{ lecom.destino }}</p>
+        <p>{{ lecom.destino }} / {{ lecom.uf }}</p>
       </div>
-
       <div>
         <label>Data</label>
         <p>{{ lecom.data|date:"d/m/Y" }}</p>
       </div>
-
       <div>
         <label>Observação</label>
         <p>{{ lecom.observacao|default:"—" }}</p>
@@ -72,14 +67,15 @@
     </div>
   </section>
 
-  <!-- ================= DEFINIÇÃO DE CARREGAMENTO ================= -->
-  <section class="sgl-card">
-    <div class="sgl-card-header">
-      <h5>Agendamento de Carregamento</h5>
-    </div>
+  <!-- ================= FORM ================= -->
+  <form method="post">
+    {% csrf_token %}
 
-    <form method="post">
-      {% csrf_token %}
+    <!-- ================= AGENDAMENTO ================= -->
+    <section class="sgl-card mb-4">
+      <div class="sgl-card-header">
+        <h5>Agendamento de Carregamento</h5>
+      </div>
 
       <div class="sgl-grid sgl-grid-3">
 
@@ -87,62 +83,81 @@
           <label>Turno</label>
           <select name="turno" class="form-select" required>
             <option value="">Selecione</option>
-            <option value="Manhã">Manhã</option>
-            <option value="Tarde">Tarde</option>
-            <option value="Noite">Noite</option>
+            <option value="Manhã" {% if controle and controle.turno == "Manhã" %}selected{% endif %}>Manhã</option>
+            <option value="Tarde" {% if controle and controle.turno == "Tarde" %}selected{% endif %}>Tarde</option>
+            <option value="Noite" {% if controle and controle.turno == "Noite" %}selected{% endif %}>Noite</option>
           </select>
         </div>
 
         <div>
           <label>Data do Carregamento</label>
-          <input type="date" name="data_carregamento" class="form-control" required>
+          <input type="date"
+                 name="data_carregamento"
+                 class="form-control"
+                 value="{{ controle.data_carregamento|date:'Y-m-d' }}"
+                 required>
         </div>
 
         <div>
           <label>Horário na Doca</label>
-          <input type="time" name="hora_carregamento" class="form-control" required>
+          <input type="time"
+                 name="hora_carregamento"
+                 class="form-control"
+                 value="{{ controle.hora_carregamento|time:'H:i' }}"
+                 required>
         </div>
 
       </div>
+    </section>
 
-      <div class="sgl-actions mt-4">
+    <!-- ================= CARGAS ================= -->
+    <section class="sgl-card">
+      <div class="sgl-card-header sgl-card-header-inline">
+        <h5>Cargas Vinculadas</h5>
+        <span class="sgl-muted">{{ cargas|length }} registro(s)</span>
+      </div>
+
+      <div class="sgl-table">
+        <div class="sgl-table-head">
+          <span>SEQ</span>
+          <span>Carga</span>
+          <span>Entregas</span>
+          <span>MOD</span>
+        </div>
+
+        {% for carga in cargas %}
+        <div class="sgl-table-row">
+          <span>{{ carga.seq }}</span>
+          <span>{{ carga.carga }}</span>
+          <span>{{ carga.total_entregas }}</span>
+          <span>{{ carga.mod }}</span>
+        </div>
+        {% empty %}
+        <div class="sgl-empty">Nenhuma carga vinculada</div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- ================= AÇÕES ================= -->
+    <div class="sgl-actions mt-4 d-flex justify-content-between">
+
+      <a href="{% url 'expedicao:cenario_expedicao' %}" class="btn btn-secondary btn-lg">
+        ← Voltar
+      </a>
+
+      {% if controle and controle.status == "Pendente" %}
         <button type="submit" class="btn btn-primary btn-lg">
           Liberar Separação
         </button>
-      </div>
+      {% else %}
+        <button type="submit" class="btn btn-primary btn-lg">
+          Atualizar
+        </button>
+      {% endif %}
 
-    </form>
-  </section>
-
-  <!-- ================= CARGAS ================= -->
-  <section class="sgl-card">
-    <div class="sgl-card-header sgl-card-header-inline">
-      <h5>Cargas Vinculadas</h5>
-      <span class="sgl-muted">{{ cargas|length }} registro(s)</span>
     </div>
 
-    <div class="sgl-table">
-      <div class="sgl-table-head">
-        <span>SEQ</span>
-        <span>Carga</span>
-        <span>Entregas</span>
-        <span>MOD</span>
-      </div>
-
-      {% for carga in cargas %}
-      <div class="sgl-table-row">
-        <span>{{ carga.seq }}</span>
-        <span>{{ carga.carga }}</span>
-        <span>{{ carga.total_entregas }}</span>
-        <span>{{ carga.mod }}</span>
-      </div>
-      {% empty %}
-      <div class="sgl-empty">
-        Nenhuma carga vinculada
-      </div>
-      {% endfor %}
-    </div>
-  </section>
+  </form>
 
 </div>
 {% endblock %}
